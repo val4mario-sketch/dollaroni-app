@@ -1,0 +1,112 @@
+{
+  "schema": "dollaroni/1",
+  "name": "Meravijosa",
+  "team": "SFT",
+  "season": 2026,
+  "stage": "S2",
+  "concept": "NEW",
+  "rules": "2026",
+  "description": "As-built S2 2026 come nel documento 's2 sez 2.docx'. Le parti 'hull' e 'wing-panel' sono ricostruite dal foglio interno 'Conteggio SM$' (area × ply × 400 g/m²) solo per il controllo delle masse.",
+  "catalogExtras": [
+    { "id": "hw-ropes", "name": "Ropes (Dyneema control lines)", "unit": "m", "price": 2.33, "priceSource": "MSRP Gottifredi Maffioli" },
+    { "id": "hw-blocks", "name": "Blocks (Harken Fly, Gottifredi Maffioli)", "unit": "pc", "price": 35, "priceSource": "MSRP Harken / Gottifredi Maffioli" }
+  ],
+  "parts": [
+    {
+      "id": "hull", "status": "measured", "name": "Hull", "component": "hull", "limitGroup": "hull", "massGroup": "hull", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 3.997, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ]
+    },
+    {
+      "id": "wing-panel", "status": "measured", "name": "Wing panel", "component": "wingbars", "limitGroup": "wingbars", "massGroup": "wings", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 4.781, "plies": 1, "arealWeight": 400, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ]
+    }
+  ],
+  "lines": [
+    { "id": "hull-mould", "status": "measured", "component": "hull", "name": "hull mould",
+      "s2Label": "MDF (mould blocks)",
+      "material": { "ref": "mdf-hdf-wood", "label": "MDF", "qty": 110 },
+      "process": { "ref": "machining", "label": "CNC Machining", "hours": 30, "s2Label": "CNC Machining (mould milling)" } },
+    { "id": "hull-reinf", "status": "measured", "component": "hull", "name": "hull reinforcement", "s2Label": "Basalt fiber (hull reinforcement)",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 3.1976, "check": { "parts": ["hull"], "kind": "fibre" } } },
+    { "id": "hull-matrix", "status": "measured", "component": "hull", "name": "hull matrix", "s2Label": "Epoxy resin (hull matrix)",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin", "qty": 1.4391, "source": "out_of_shelf_life", "check": { "parts": ["hull"], "kind": "resin" } } },
+    { "id": "hull-core", "status": "measured", "component": "hull", "name": "hull core", "s2Label": "PET foam (hull core)",
+      "material": { "ref": "pet/standard", "label": "PET foam", "qty": 0.9, "source": "industrial_excess" } },
+    { "id": "mould-finish", "status": "measured", "component": "hull", "name": "mould finish", "s2Label": "Epoxy gelcoat (mould finish)",
+      "footnote": "Epoxy gelcoat classified under the \"PU Resin / Paints – Coating\" entry of the official Standardized Costs reference (25 SM$/kg)",
+      "material": { "ref": "pu-resin-paints/coating-core", "label": "Epoxy gelcoat", "qty": 3.5 } },
+    { "id": "hull-junctions", "status": "measured", "component": "hull", "name": "hull junctions", "s2Label": "Epoxy adhesive (hull junctions)", "mass": { "group": "hull", "kind": "adhesive" },
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy adhesive", "qty": 0.3 } },
+    { "id": "bulkheads-reinf", "status": "measured", "component": "hull", "name": "bulkheads reinforcement", "s2Label": "Basalt fiber (bulkheads reinforcement)",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 1.32 } },
+    { "id": "bulkheads-matrix", "status": "measured", "component": "hull", "name": "bulkheads matrix", "s2Label": "Epoxy resin (bulkheads matrix)",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin", "qty": 0.88, "source": "out_of_shelf_life" } },
+    { "id": "bulkheads-core", "status": "measured", "component": "hull", "name": "bulkheads core", "s2Label": "PET foam (bulkheads core)",
+      "material": { "ref": "pet/standard", "label": "PET foam", "qty": 0.3, "source": "industrial_excess" } },
+    { "id": "cons-peel-ply", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "Peel ply (consumable)", "material": { "ref": "vacuum-bagging/peel-ply", "qty": 10 } },
+    { "id": "cons-vacuum-bag", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "Vacuum bag (consumable)", "material": { "ref": "vacuum-bagging/vacuum-bag", "qty": 8 } },
+    { "id": "cons-pvc-hose", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "PVC vacuum hose (consumable)", "material": { "ref": "vacuum-bagging/pvc-vacuum-hose", "qty": 1 } },
+    { "id": "cons-flowmesh", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "Flowmesh (consumable)", "material": { "ref": "vacuum-bagging/flowmesh", "qty": 3 } },
+    { "id": "cons-breather", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "Breather (consumable)", "material": { "ref": "vacuum-bagging/breather", "qty": 10 } },
+    { "id": "cons-pva", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "PVA release agent (consumable)", "material": { "ref": "release-agent/pva", "qty": 1 } },
+    { "id": "cons-tacky-tape", "status": "measured", "component": "hull", "name": "consumable", "s2Label": "Tacky tape (consumable)", "material": { "ref": "vacuum-bagging/tacky-tape", "qty": 3 } },
+
+    { "id": "foil-mv", "status": "measured", "component": "foils", "name": "Main Vertical", "s2Label": "Main Vertical (pre-2015, on loan)", "origin": "On loan from Lega Navale Italiana – Ventotene",
+      "usedPart": { "element": "main_vertical", "year": 2014 } },
+    { "id": "foil-mh", "status": "measured", "component": "foils", "name": "Main Horizontal", "s2Label": "Main Horizontal (pre-2015, on loan)", "origin": "On loan from Lega Navale Italiana – Ventotene",
+      "usedPart": { "element": "main_horizontal", "year": 2014 } },
+    { "id": "foil-rv", "status": "measured", "component": "foils", "name": "Rudder Vertical", "s2Label": "Rudder Vertical (pre-2015, on loan)", "origin": "On loan from Lega Navale Italiana – Ventotene",
+      "usedPart": { "element": "rudder_vertical", "year": 2014 } },
+    { "id": "foil-rh", "status": "measured", "component": "foils", "name": "Rudder Horizontal", "s2Label": "Rudder Horizontal (pre-2015, on loan)", "origin": "On loan from Lega Navale Italiana – Ventotene",
+      "usedPart": { "element": "rudder_horizontal", "year": 2014 } },
+
+    { "id": "mcs-pla", "status": "measured", "component": "mechanical_control", "name": "PLA components", "s2Label": "PLA filament",
+      "material": { "ref": "pla/filament", "label": "PLA filament", "qty": 2 },
+      "process": { "ref": "additive-manuf", "label": "3D Printing", "hours": 15, "s2Label": "3D Printing (PLA components)" } },
+    { "id": "mcs-frf", "status": "measured", "component": "mechanical_control", "name": "FRF components", "s2Label": "Fiber-reinforced filament (co-polymer + reinforced)",
+      "material": { "ref": "other-filements/co-polymer-reinforced", "label": "Fiber-reinforced filament", "qty": 0.5 },
+      "process": { "ref": "additive-manuf", "label": "3D Printing", "hours": 5, "s2Label": "3D Printing (FRF components)" } },
+
+    { "id": "gantry", "status": "measured", "component": "gantry", "name": "Gantry", "s2Label": "Gantry assembly (upcycled, IMCA Moth platform)",
+      "origin": "Obsolete IMCA Moth gantry received from another team; rework materials accounted for in Hull and Wingbars",
+      "material": { "name": "Gantry assembly", "unit": "pc", "qty": 1, "source": "upcycled" } },
+
+    { "id": "wf-reinf", "status": "measured", "component": "wingbars", "name": "wing frames reinforcement", "s2Label": "Basalt fiber (wing frames reinforcement)",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 2.4 } },
+    { "id": "wf-matrix", "status": "measured", "component": "wingbars", "name": "wing frames matrix", "s2Label": "Epoxy resin (wing frames matrix)",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin", "qty": 0.96, "source": "out_of_shelf_life" } },
+    { "id": "wf-core", "status": "measured", "component": "wingbars", "name": "wing frames core", "s2Label": "Recycled PET foam (wing frames core)",
+      "footnote": "Recycled PET classified under the \"PET – Recycled\" entry of the official Standardized Costs reference, with a standard cost of 0 SM$/kg",
+      "material": { "ref": "pet/recycled", "label": "Recycled PET foam", "qty": 1.1 } },
+    { "id": "wp-reinf", "status": "measured", "component": "wingbars", "name": "wing panels reinforcement", "s2Label": "Basalt fiber (wing panels reinforcement)",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 1.912, "check": { "parts": ["wing-panel"], "kind": "fibre" } } },
+    { "id": "wp-kevlar", "status": "measured", "component": "wingbars", "name": "wing panels reinforcement", "s2Label": "Kevlar (wing panels reinforcement)",
+      "material": { "ref": "dry-fabric-aramid-fibers/kevlar", "label": "Kevlar", "qty": 0.3 } },
+    { "id": "wp-matrix", "status": "measured", "component": "wingbars", "name": "wing panels matrix", "s2Label": "Epoxy resin (wing panels matrix)",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin", "qty": 0.9954, "source": "out_of_shelf_life" } },
+    { "id": "wp-core", "status": "measured", "component": "wingbars", "name": "wing panels core", "s2Label": "Recycled PET (wing panels core)",
+      "footnote": "Recycled PET classified under the \"PET – Recycled\" entry of the official Standardized Costs reference, with a standard cost of 0 SM$/kg",
+      "material": { "ref": "pet/recycled", "label": "Recycled PET", "qty": 1.54 } },
+
+    { "id": "rig-ropes", "status": "measured", "component": "rig", "name": "rig", "s2Label": "Ropes (Dyneema control lines)", "material": { "ref": "hw-ropes", "qty": 115 } },
+    { "id": "rig-blocks", "status": "measured", "component": "rig", "name": "rig", "s2Label": "Blocks (Harken Fly, Gottifredi Maffioli)", "material": { "ref": "hw-blocks", "qty": 45 } },
+    { "id": "rig-sail", "status": "measured", "component": "rig", "name": "Sail", "s2Label": "Mainsail Mylar (pre-2015, used)", "origin": "Lega Navale Italiana – Ventotene", "usedPart": { "element": "sail", "year": 2014 } },
+    { "id": "rig-mast", "status": "measured", "component": "rig", "name": "Mast", "s2Label": "Mast – carbon fiber (pre-2015, used)", "origin": "Lega Navale Italiana – Ventotene", "usedPart": { "element": "mast", "year": 2014 } },
+    { "id": "rig-boom", "status": "measured", "component": "rig", "name": "Boom", "s2Label": "Boom – carbon fiber (pre-2015, used)", "origin": "Lega Navale Italiana – Ventotene", "usedPart": { "element": "boom", "year": 2014 } },
+    { "id": "rig-spreader", "status": "measured", "component": "rig", "name": "Spreader", "s2Label": "Spreader – carbon fiber (pre-2015, used)", "origin": "Lega Navale Italiana – Ventotene", "usedPart": { "element": "spreader", "year": 2014 } },
+
+    { "id": "el-esp32", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "ESP32 development board", "material": { "name": "ESP32 development board", "unit": "pc", "qty": 1, "price": 10, "priceSource": "MSRP" } },
+    { "id": "el-gps", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "u-blox GY-NEO6MV2 GPS module", "material": { "name": "GPS module", "unit": "pc", "qty": 1, "price": 10, "priceSource": "MSRP" } },
+    { "id": "el-imu", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "Pololu MinIMU-9 v5 (9-axis IMU)", "material": { "name": "IMU", "unit": "pc", "qty": 1, "price": 40, "priceSource": "MSRP Pololu" } },
+    { "id": "el-sd", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "MicroSD", "material": { "name": "MicroSD", "unit": "pc", "qty": 1, "price": 5, "priceSource": "MSRP" } },
+    { "id": "el-lipo", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "LiPo battery 20000 mAh", "material": { "name": "LiPo battery", "unit": "pc", "qty": 1, "price": 15, "priceSource": "MSRP" } },
+    { "id": "el-pcb", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "Custom PCB", "material": { "name": "Custom PCB", "unit": "pc", "qty": 1, "price": 2, "priceSource": "MSRP" } },
+    { "id": "el-buttons", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "RGB buttons", "material": { "name": "RGB button", "unit": "pc", "qty": 2, "price": 1, "priceSource": "MSRP" } },
+    { "id": "el-sd-adapter", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "MicroSD adapter", "material": { "name": "MicroSD adapter", "unit": "pc", "qty": 1, "price": 3, "priceSource": "MSRP" } },
+    { "id": "el-wiring", "status": "measured", "component": "electronics", "name": "electronics", "s2Label": "Wiring & connectors", "material": { "name": "Wiring & connectors", "unit": "set", "qty": 1, "price": 6, "priceSource": "MSRP" } }
+  ]
+}

@@ -1,0 +1,11 @@
+# file generati
+out/
+_site/
+__pycache__/
+
+# note interne e progetti del team: non vanno nel repository pubblico
+handoff.md
+*.dollaroni.json
+
+# file temporanei degli aggiornamenti
+*.tmp-update

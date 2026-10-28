@@ -1,0 +1,143 @@
+{
+  "schema": "dollaroni/1",
+  "name": "Meravijosa",
+  "team": "SFT",
+  "season": 2026,
+  "stage": "S1",
+  "concept": "NEW",
+  "rules": "2026",
+  "description": "Stima S1 consegnata a febbraio 2026: pezzi laminati dall'Appendice G, righe di costo dalla Tabella 2 del report S1.",
+  "catalogExtras": [
+    { "id": "hw-ropes", "name": "Ropes (Dyneema)", "unit": "m", "price": 2.33, "priceSource": "MSRP Gottifredi Maffioli" },
+    { "id": "hw-blocks", "name": "Blocks", "unit": "pc", "price": 32.5, "priceSource": "MSRP Harken" }
+  ],
+  "parts": [
+    {
+      "id": "hull", "name": "Hull", "component": "hull", "limitGroup": "hull", "massGroup": "hull", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 3.997, "plies": 4, "arealWeight": 340, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ],
+      "core": { "ref": "pet/standard", "mass": 0.719 }
+    },
+    {
+      "id": "wing-panel", "name": "Wing panel", "component": "wingbars", "limitGroup": "wingbars", "massGroup": "wings", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 5.781, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ],
+      "core": { "ref": "pet/standard", "mass": 1.54 }
+    },
+    {
+      "id": "wing-frame", "name": "Wing frame", "component": "wingbars", "limitGroup": "wingbars", "massGroup": "wings", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 1.055, "plies": 6, "arealWeight": 400, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ],
+      "core": { "ref": "pet/standard", "mass": 0.696 }
+    },
+    {
+      "id": "bulkheads", "name": "Bulkheads", "component": "hull", "limitGroup": "hull", "massGroup": "hull", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.61, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.61, "plies": 2, "arealWeight": 300, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ],
+      "core": { "ref": "pet/standard", "mass": 0.30 }
+    },
+    {
+      "id": "main-vertical", "name": "Main vertical", "component": "foils", "limitGroup": "main_vertical", "massGroup": "vertical_foils", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.164, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.15, "plies": 12, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.12, "plies": 12, "arealWeight": 300, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.08, "plies": 12, "arealWeight": 300, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.065, "plies": 20, "arealWeight": 300, "process": "HAND LAYUP + VAC", "matrixSource": "out_of_shelf_life" }
+      ]
+    },
+    {
+      "id": "rudder-horizontal", "name": "Rudder horizontal", "component": "foils", "limitGroup": "rudder_horizontal", "massGroup": "horizontal_foils", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.11, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.08, "plies": 2, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.057, "plies": 2, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.04, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.03, "plies": 2, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" }
+      ]
+    },
+    {
+      "id": "rudder-vertical", "name": "Rudder vertical", "component": "foils", "limitGroup": "rudder_vertical", "massGroup": "vertical_foils", "autoLines": false,
+      "note": "Nel file 2026 c'era un substack E di carbonio con 0 ply (vuoto): omesso.",
+      "substacks": [
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.125, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.1, "plies": 10, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.08, "plies": 16, "arealWeight": 300, "process": "INFUSION", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.05, "plies": 16, "arealWeight": 300, "process": "INFUSION", "matrixSource": "out_of_shelf_life" }
+      ]
+    },
+    {
+      "id": "main-horizontal", "name": "Main horizontal", "component": "foils", "limitGroup": "main_horizontal", "massGroup": "horizontal_foils", "autoLines": false,
+      "substacks": [
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.094, "plies": 2, "arealWeight": 400, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.08, "plies": 6, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.055, "plies": 6, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.035, "plies": 8, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" },
+        { "reinforcement": "dry-fabric-carbon-fibers/int-modulus-cf", "matrix": "std-epoxy/lamination-resin", "plyArea": 0.017, "plies": 10, "arealWeight": 300, "process": "HAND LAYUP + VAC", "reinforcementSource": "out_of_shelf_life", "matrixSource": "out_of_shelf_life" }
+      ]
+    }
+  ],
+  "lines": [
+    { "id": "hull-mould", "component": "hull", "name": "Hull & foils - mould",
+      "material": { "ref": "mdf-hdf-wood", "label": "MDF", "qty": 190 },
+      "process": { "ref": "machining", "label": "CNC Machining", "hours": 35 } },
+    { "id": "hull-reinf", "component": "hull", "name": "Hull - reinforcement", "notes": "Takes into account all laminated components",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 5.40, "check": { "parts": ["hull"], "kind": "fibre" } },
+      "process": { "ref": "oven-cure", "label": "Oven cure", "hours": 20 } },
+    { "id": "hull-matrix", "component": "hull", "name": "Hull - matrix",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin (out of shelf)", "qty": 4.00, "source": "out_of_shelf_life", "check": { "parts": ["hull"], "kind": "resin" } } },
+    { "id": "hull-core", "component": "hull", "name": "Hull - core",
+      "material": { "ref": "pet/standard", "label": "PET", "qty": 0.719, "check": { "parts": ["hull"], "kind": "core" } } },
+    { "id": "mould-finish", "component": "hull", "name": "Mould finish",
+      "material": { "ref": "pu-resin-paints/coating-core", "label": "Epoxy gelcoat", "qty": 2.50 } },
+    { "id": "hull-junctions", "component": "hull", "name": "Hull - junctions", "mass": { "group": "hull", "kind": "adhesive" },
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy adhesive", "qty": 1.00 } },
+    { "id": "wing-frames-reinf", "component": "wingbars", "name": "Wing frames - reinforcement",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 2.50, "check": { "parts": ["wing-frame"], "kind": "fibre" } } },
+    { "id": "wing-frames-matrix", "component": "wingbars", "name": "Wing frames - matrix",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin (out of shelf)", "qty": 1.90, "source": "out_of_shelf_life", "check": { "parts": ["wing-frame"], "kind": "resin" } } },
+    { "id": "wing-frames-core", "component": "wingbars", "name": "Wing frames - core",
+      "material": { "ref": "pet/standard", "label": "PET", "qty": 0.696, "check": { "parts": ["wing-frame"], "kind": "core" } } },
+    { "id": "wing-panels-reinf", "component": "wingbars", "name": "Wing panels - reinforcement",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 4.60, "check": { "parts": ["wing-panel"], "kind": "fibre" } } },
+    { "id": "wing-panels-matrix", "component": "wingbars", "name": "Wing panels - matrix",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin (out of shelf)", "qty": 3.40, "source": "out_of_shelf_life", "check": { "parts": ["wing-panel"], "kind": "resin" } } },
+    { "id": "wing-panels-core", "component": "wingbars", "name": "Wing panels - core",
+      "material": { "ref": "pet/standard", "label": "PET", "qty": 1.54, "check": { "parts": ["wing-panel"], "kind": "core" } } },
+    { "id": "bulkheads-reinf", "component": "hull", "name": "Bulkheads - reinforcement",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 0.86, "check": { "parts": ["bulkheads"], "kind": "fibre" } } },
+    { "id": "bulkheads-matrix", "component": "hull", "name": "Bulkheads - matrix",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin (out of shelf)", "qty": 0.63, "source": "out_of_shelf_life", "check": { "parts": ["bulkheads"], "kind": "resin" } } },
+    { "id": "bulkheads-core", "component": "hull", "name": "Bulkheads - core",
+      "material": { "ref": "pet/standard", "label": "PET", "qty": 0.30, "check": { "parts": ["bulkheads"], "kind": "core" } } },
+    { "id": "foils-reinf-1", "component": "foils", "name": "Foils - reinforcement 1",
+      "material": { "ref": "dry-fabric-basalt-fibers", "label": "Basalt fiber", "qty": 1.74,
+        "check": { "parts": ["main-vertical", "rudder-vertical", "main-horizontal", "rudder-horizontal"], "kind": "fibre", "material": "dry-fabric-basalt-fibers" } } },
+    { "id": "foils-reinf-2", "component": "foils", "name": "Foils - reinforcement 2",
+      "material": { "ref": "dry-fabric-carbon-fibers/int-modulus-cf", "label": "Carbon Fiber - Int modulus (out of shelf)", "qty": 1.742, "source": "out_of_shelf_life",
+        "check": { "parts": ["main-vertical", "rudder-vertical", "main-horizontal", "rudder-horizontal"], "kind": "fibre", "material": "dry-fabric-carbon-fibers/int-modulus-cf" } } },
+    { "id": "foils-matrix", "component": "foils", "name": "Foils - matrix",
+      "material": { "ref": "std-epoxy/lamination-resin", "label": "Epoxy resin (out of shelf)", "qty": 3.225, "source": "out_of_shelf_life",
+        "check": { "parts": ["main-vertical", "rudder-vertical", "main-horizontal", "rudder-horizontal"], "kind": "resin" } } },
+    { "id": "cons-peel-ply", "component": "hull", "name": "Consumable", "material": { "ref": "vacuum-bagging/peel-ply", "label": "Peel ply", "qty": 15 } },
+    { "id": "cons-vacuum-bag", "component": "hull", "name": "Consumable", "material": { "ref": "vacuum-bagging/vacuum-bag", "label": "Vacuum bag", "qty": 15 } },
+    { "id": "cons-pvc-hose", "component": "hull", "name": "Consumable", "material": { "ref": "vacuum-bagging/pvc-vacuum-hose", "label": "PVC vacuum hose", "qty": 2 } },
+    { "id": "cons-breather", "component": "hull", "name": "Consumable", "material": { "ref": "vacuum-bagging/breather", "label": "Breather", "qty": 15 } },
+    { "id": "cons-pva", "component": "hull", "name": "Consumable", "material": { "ref": "release-agent/pva", "label": "PVA release agent", "qty": 2 } },
+    { "id": "cons-tacky-tape", "component": "hull", "name": "Consumable", "material": { "ref": "vacuum-bagging/tacky-tape", "label": "Tacky tape", "qty": 1 } },
+    { "id": "rig-ropes", "component": "rig", "name": "Rig", "material": { "ref": "hw-ropes", "label": "Ropes", "qty": 140 } },
+    { "id": "rig-blocks", "component": "rig", "name": "Rig", "material": { "ref": "hw-blocks", "label": "Blocks", "qty": 50 } },
+    { "id": "rig-fittings", "component": "mechanical_control", "name": "Rig fittings",
+      "material": { "ref": "pla/filament", "label": "PLA", "qty": 3 },
+      "process": { "ref": "additive-manuf", "label": "3D Printing", "hours": 15 } },
+    { "id": "sail", "component": "rig", "name": "Sail", "notes": "Upcycled, pre 2015", "material": { "name": "Mylar", "unit": "pc", "qty": 1, "source": "upcycled" } },
+    { "id": "mast", "component": "rig", "name": "Mast", "notes": "Upcycled, pre 2015", "material": { "name": "Carbon Fiber", "unit": "pc", "qty": 1, "source": "upcycled" } },
+    { "id": "boom", "component": "rig", "name": "Boom", "notes": "Upcycled, pre 2015", "material": { "name": "Carbon Fiber", "unit": "pc", "qty": 1, "source": "upcycled" } },
+    { "id": "spreader", "component": "rig", "name": "Spreader", "notes": "Upcycled, pre 2015", "material": { "name": "Carbon Fiber", "unit": "pc", "qty": 1, "source": "upcycled" } }
+  ]
+}
