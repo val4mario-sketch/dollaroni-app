@@ -6,7 +6,7 @@ serve, un tasto riempie i template ufficiali.
 
 **Versione 0.5.0 (fase 5).** Ci sono il motore di calcolo, i dati 2026, l'interfaccia, "Esporta S1", il passaggio S1→S2 con confronto ed "Esporta S2",
 le **regole 2027**, **Brumoth**, l'assistente con IA locale (la barchetta in basso a destra) e gli **avvisi di aggiornamento** per tutti i PC.
-Mancano ancora il listino 2027 (sta su SuMoth Agora), il salvataggio su Google Drive e la creazione del repository GitHub.
+Mancano ancora il listino 2027 (sta su SuMoth Agora) e il salvataggio su Google Drive.
 
 ## Come si usa
 
@@ -301,5 +301,4 @@ vendor/            JSZip 3.10.1 (MIT), htm 3.1.1 + Preact (MIT), wllama 3.8.1 (M
 
 0. Listino 2027 da SuMoth Agora (quando il team è ammesso): sostituire i file provvisori in `rules-2027.js` e togliere gli avvisi sugli sconti se non esistono più.
 1. Salvataggio condiviso su Google Drive con login Google, con unione delle modifiche fatte da più persone.
-2. Pubblicazione su GitHub Pages: app installabile, aggiornamenti e test prima della pubblicazione sono pronti; manca creare il repository, scriverlo in `dollaroni.config.json` e fare il primo push.
-3. Controllo in Google Docs dei documenti importati: i file di prova sono in `Barca\Dollaroni - prova Google Docs`.
+2. Controllo in Google Docs dei documenti importati: i file di prova sono in `Barca\Dollaroni - prova Google Docs`.

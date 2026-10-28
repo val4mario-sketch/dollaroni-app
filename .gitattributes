@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# i .bat devono avere i fine riga di Windows anche nello zip scaricato dagli aggiornamenti
+*.bat text eol=crlf
