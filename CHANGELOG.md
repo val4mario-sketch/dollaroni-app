@@ -3,6 +3,12 @@
 Le versioni seguono `MAGGIORE.MINORE.CORREZIONE`. La versione in uso e le sue note stanno in `version.json`:
 per pubblicarne una nuova usa `python tools/release.py <versione> "nota" "nota"` (aggiorna entrambi i file).
 
+## 0.5.1 – 01/11/2026
+- Il lavoro non salvato è protetto: prima di sostituire un progetto l'app chiede conferma e ne tiene una copia, recuperabile dalla schermata iniziale. Avvisa anche se chiudi la pagina.
+- Salvando su file, l'app avvisa se nel frattempo il file è stato cambiato da qualcun altro.
+- Nuovi controlli sui conti: valori negativi, id duplicati, voci a costo zero dimenticate, carbonio su voci a mano fuori dalla Tab. 2, foil senza gruppo.
+- L'avviso sugli sconti 2027 mostra anche totale e margine senza sconti. I file progetto danneggiati vengono rifiutati con un messaggio chiaro.
+
 ## 0.5.0 – 26/10/2026
 - Brumoth, l'assistente di Dollaroni: la barchetta in basso a destra (con il fumetto "Chiedi a Brumoth!") apre una chat che risponde sul progetto aperto (budget, carbonio, classifiche, simulazioni, regolamento) usando i numeri calcolati dall'app.
 - Brumoth può modificare il progetto (aggiungere fibra a un pezzo, voci, pezzi nuovi, materiali nel listino, cambiare fibra, eliminare un pezzo), sempre mostrando prima cosa cambia e l'effetto su budget e limiti, con Applica / Annulla. Se la richiesta è troppo generica lo dice e chiede cosa manca. Spiega anche passo passo come fare le cose nell'app.

@@ -5,8 +5,56 @@ import { weighedParts } from './compare.js';
 
 const pct = (x) => `${x >= 0 ? '+' : ''}${(x * 100).toFixed(0)}%`;
 const kg = (x) => `${x.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg`;
-const sm = (x) => `${x.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SM$`;
+const sm = (x) => `${x.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' })} SM$`;
 const num = (x) => x.toLocaleString('it-IT', { maximumFractionDigits: 3 });
+
+const CARBON_RE = /carbon|\bcf\b|cfrp/i;
+
+/** Materiale di carbonio su una voce a mano: i limiti della Tab. 2 si calcolano solo dai pezzi laminati. */
+function isManualCarbon(l) {
+  const m = l.material;
+  if (!m || l.line.auto || l.usedPart || l.line.material.fromLayup || l.line.material.check) return false;
+  if (m.entry && !m.entry.extra) return ['reinforcement', 'prepreg'].includes(m.entry.kind) && CARBON_RE.test(`${m.entry.group ?? ''} ${m.entry.type ?? ''}`);
+  // voce libera: solo materiale a peso, non pezzi già fatti come un albero upcycled (in "pc")
+  return m.unit === 'kg' && CARBON_RE.test(`${m.label ?? ''} ${m.entry?.name ?? ''}`);
+}
+
+/** Valori che non possono essere negativi, come [dove, campo, valore, id]. */
+function negativeValues(project) {
+  const out = [];
+  const scan = (where, id, obj, fields) => {
+    for (const [f, label] of fields) {
+      if (typeof obj?.[f] === 'number' && obj[f] < 0) out.push([where, label, obj[f], id]);
+    }
+  };
+  for (const part of project?.parts || []) {
+    (part.substacks || []).forEach((s, i) => scan(`${part.name}, substack ${i + 1}`, part.id, s, [['plyArea', 'area'], ['plies', 'strati'], ['arealWeight', 'grammatura']]));
+    scan(`${part.name}, anima`, part.id, part.core, [['mass', 'massa'], ['area', 'area'], ['thickness', 'spessore'], ['density', 'densità'], ['resinUptake', 'assorbimento di resina']]);
+    scan(part.name, part.id, part, [['measuredMass', 'peso pesato']]);
+    for (const [ref, kgWaste] of Object.entries(part.waste || {})) {
+      if (kgWaste < 0) out.push([part.name, `scarto di ${ref}`, kgWaste, part.id]);
+    }
+  }
+  for (const line of project?.lines || []) {
+    scan(line.s2Label || line.name, line.id, line.material, [['qty', 'quantità'], ['price', 'prezzo'], ['waste', 'scarto']]);
+    scan(line.s2Label || line.name, line.id, line.process, [['hours', 'ore'], ['rate', 'tariffa']]);
+  }
+  for (const extra of project?.catalogExtras || []) scan(extra.name, null, extra, [['price', 'prezzo'], ['density', 'densità']]);
+  return out;
+}
+
+function duplicateIds(project) {
+  const out = [];
+  for (const [items, what] of [[project?.parts, 'pezzi'], [project?.lines, 'voci'], [project?.catalogExtras, 'voci del team']]) {
+    const seen = new Set();
+    const reported = new Set();
+    for (const { id } of items || []) {
+      if (seen.has(id) && !reported.has(id)) { out.push([what, id]); reported.add(id); }
+      seen.add(id);
+    }
+  }
+  return out;
+}
 
 export function runChecks(ev, { layupMaxSubstacks = 5, qtyTolerance = 0.02, weighTolerance = 0.1 } = {}) {
   const out = [];
@@ -24,9 +72,13 @@ export function runChecks(ev, { layupMaxSubstacks = 5, qtyTolerance = 0.02, weig
 
   for (const l of ev.unknownComponent) add('error', 'component', `"${l.name}": componente "${l.component}" non valido`, l.id);
 
+  for (const [where, label, value, id] of negativeValues(ev.project)) add('error', 'negative', `${where}: ${label} negativa o negativo (${num(value)}), abbasserebbe i conti`, id);
+  for (const [what, id] of duplicateIds(ev.project)) add('error', 'duplicate-id', `Due o più ${what} hanno lo stesso id "${id}": i calcoli e il confronto S1→S2 possono confonderli`, id);
+
   for (const pr of ev.parts) {
     const p = pr.part;
     for (const e of pr.errors) add('error', 'part', `${p.name}: ${e}`, p.id);
+    if (p.component === 'foils' && !p.limitGroup) add('warning', 'foil-group', `${p.name}: scegli quale foil è (limiti carbonio Tab. 2). Finché non lo scegli il carbonio finisce nel gruppo "other" e il limite controllato è sbagliato`, p.id);
     const outside = pr.substacks.filter((r) => !r.errors.length && !r.inCalculator);
     if (outside.length) {
       const names = [...new Set(outside.flatMap((r) => [r.reinforcement, r.matrix].filter((m) => !m.inCalculator).map((m) => m.entry.name)))];
@@ -56,6 +108,17 @@ export function runChecks(ev, { layupMaxSubstacks = 5, qtyTolerance = 0.02, weig
     const name = l.line.s2Label || l.name;
     for (const e of l.errors) add('error', 'line', `${name}: ${e}`, l.id);
     const m = l.material;
+    if (!l.line.auto && !l.errors.length) {
+      // un prezzo 0 del listino ufficiale è legittimo (basalto, PET riciclato…): si segnalano solo i valori inseriti a mano
+      const noPrice = m && m.basePrice === 0 && m.factor > 0 && (!m.entry || m.entry.extra || m.manualPrice);
+      if (!m && !l.process && !l.usedPart) add('warning', 'zero-cost', `${name}: voce vuota, non costa niente`, l.id);
+      else if (m && m.qty === 0) add('warning', 'zero-cost', `${name}: quantità 0, la voce non costa niente`, l.id);
+      else if (noPrice) add('warning', 'zero-cost', `${name}: prezzo 0 SM$ inserito a mano. Se è gratis indicane il motivo, altrimenti manca il prezzo`, l.id);
+      if (l.process && l.process.cost === 0) add('warning', 'zero-cost', `${name}: lavorazione con ore o tariffa a 0, non costa niente`, l.id);
+    }
+    if (m && isManualCarbon(l) && m.qty > 0) {
+      add('warning', 'manual-carbon', `${name}: ${num(m.qty)} ${m.unit} di carbonio su una voce a mano non contano nei limiti della Tab. 2. Inseriscilo in un pezzo laminato o controlla il limite a parte`, l.id);
+    }
     if (m) {
       if (m.layupKg !== null && l.line.material.qty !== undefined && m.layupKg > 0) {
         const d = (m.qty - m.layupKg) / m.layupKg;
@@ -72,7 +135,7 @@ export function runChecks(ev, { layupMaxSubstacks = 5, qtyTolerance = 0.02, weig
       } else if ((m.manualPrice || m.entry?.extra) && !m.priceSource && !m.entry?.priceSource && m.factor > 0 && m.unitPrice > 0) {
         add('info', 'price-source', `${name}: prezzo inserito a mano senza fonte (${help.priceSource || 'indicare da dove viene'})`, l.id);
       }
-      if (m.waste > m.qty + 1e-9) add('warning', 'waste-over', `${name}: lo scarto (${num(m.waste)}) è più della quantità usata (${num(m.qty)})`, l.id);
+      if (m.waste > 0 && m.waste > m.qty + 1e-9) add('warning', 'waste-over', `${name}: lo scarto (${num(m.waste)}) è più della quantità usata (${num(m.qty)})`, l.id);
       // elemento upcycled recuperato (voce libera, non materiale di listino) nello scafo
       if (rules.upcycledHullNonFoiling && l.component === 'hull' && m.source === 'upcycled' && !m.entry) {
         add('info', 'upcycled-hull', `${name}: se è uno scafo (o parte di scafo) recuperato, nel 2027 è ammesso solo se in origine era di un'imbarcazione non foiling (§6.2.1)`, l.id);
@@ -87,9 +150,12 @@ export function runChecks(ev, { layupMaxSubstacks = 5, qtyTolerance = 0.02, weig
     if (discounted.length) {
       const saving = discounted.reduce((a, l) => a + (l.material.basePrice ?? 0) * (1 - l.material.factor) * l.material.qty, 0);
       const noPrice = discounted.filter((l) => l.material.basePrice === null).length;
+      const marginWithout = ev.margin - saving;
+      const worstCase = marginWithout < 0 ? `sforeresti il budget di ${sm(-marginWithout)}` : `il margine scenderebbe a ${sm(marginWithout)}`;
       add('warning', 'discount-unconfirmed',
         `${discounted.length} voci usano gli sconti di provenienza del 2026 (eccedenza −25%, scaduto −50%, upcycled −100%), che il regolamento 2027 non cita più. ` +
-        `Valgono ${sm(saving)} di sconto${noPrice ? ` più ${noPrice} ${noPrice === 1 ? 'elemento upcycled' : 'elementi upcycled'} senza prezzo di listino` : ''}: da confermare su SuMoth Agora`);
+        `Valgono ${sm(saving)} di sconto${noPrice ? ` più ${noPrice} ${noPrice === 1 ? 'elemento upcycled' : 'elementi upcycled'} senza prezzo di listino` : ''}: da confermare su SuMoth Agora. ` +
+        `Senza sconti il totale sarebbe ${sm(ev.total + saving)} e ${worstCase}${noPrice ? ', senza contare gli elementi senza prezzo' : ''}`);
     }
   }
 

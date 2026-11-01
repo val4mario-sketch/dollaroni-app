@@ -82,7 +82,11 @@ function PartEditor({ part, ev, evBase, isS2, ctx, update, onSelect }) {
           <${Select} value=${part.component} options=${rules.components.map((c) => ({ value: c.id, label: c.it }))}
             onChange=${(v) => set((p) => { p.component = v; Object.assign(p, DEFAULT_GROUPS[v]); })} /></label>
         <label class="field"><span>Limiti carbonio (Tab. 2)</span>
-          <${Select} value=${part.limitGroup || 'other'} options=${rules.carbonGroups.map((g) => ({ value: g.id, label: g.en }))} onChange=${(v) => set((p) => { p.limitGroup = v; })} /></label>
+          <${Select} value=${part.limitGroup || (part.component === 'foils' ? '' : 'other')} placeholder="Scegli il foil…" options=${rules.carbonGroups.map((g) => ({ value: g.id, label: g.en }))} onChange=${(v) => set((p) => {
+            p.limitGroup = v;
+            if (p.component === 'foils' && /horizontal/.test(v)) p.massGroup = 'horizontal_foils';
+            if (p.component === 'foils' && /vertical/.test(v)) p.massGroup = 'vertical_foils';
+          })} /></label>
         <label class="field"><span>Riga masse${rules.refs.mass ? ` (${rules.refs.mass})` : ''}</span>
           <${Select} value=${part.massGroup || 'other'} options=${rules.massGroups.map((g) => ({ value: g.id, label: g.en }))} onChange=${(v) => set((p) => { p.massGroup = v; })} /></label>
       </div>

@@ -76,7 +76,7 @@ export function freezeToS2(project, now = new Date().toISOString()) {
 
 export const DEFAULT_GROUPS = {
   hull: { limitGroup: 'hull', massGroup: 'hull' },
-  foils: { limitGroup: 'main_vertical', massGroup: 'vertical_foils' },
+  foils: { limitGroup: null, massGroup: 'vertical_foils' }, // main/rudder, vertical/horizontal: lo sceglie il team (i limiti cambiano)
   mechanical_control: { limitGroup: 'other', massGroup: 'other' },
   gantry: { limitGroup: 'gantry', massGroup: 'other' },
   wingbars: { limitGroup: 'wingbars', massGroup: 'wings' },

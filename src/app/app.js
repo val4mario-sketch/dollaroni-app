@@ -1,7 +1,7 @@
 import { html, useState, useMemo, useEffect, useCallback } from '../../vendor/preact-htm.js';
 import { Button, Icon, Bar, Badge, TextInput, NumInput } from './ui.js';
 import { sm, pct } from './format.js';
-import { useProject, useAutosave, loadAutosave, openProjectFile, saveProjectFile, serialize, validateProject, downloadBytes } from './store.js';
+import { useProject, useAutosave, loadAutosave, openProjectFile, saveProjectFile, serialize, validateProject, downloadBytes, hasUnsavedWork, saveRecoveryCopy, loadRecoveryCopy, clearRecoveryCopy } from './store.js';
 import { emptyProject, projectFrom2026, freezeToS2, toRules2027 } from './templates.js';
 import { CURRENT_RULES, rulesId } from '../engine/rules.js';
 import { evaluate } from '../engine/project.js';
@@ -37,7 +37,8 @@ export function App({ contexts }) {
   const autosave = useMemo(loadAutosave, []);
   const { project, update, replace, undo, redo, canUndo, canRedo } = useProject(null);
   const ctx = contextFor(contexts, project);
-  const [file, setFile] = useState({ handle: null, fileName: null, savedJson: null });
+  const [file, setFile] = useState({ handle: null, fileName: null, savedJson: null, pristineJson: null, lastModified: null });
+  const [recovery, setRecovery] = useState(loadRecoveryCopy);
   const [view, setView] = useState('overview');
   const [welcome, setWelcome] = useState(true);
   const [selPart, setSelPart] = useState(null);
@@ -45,7 +46,7 @@ export function App({ contexts }) {
   const [expandedLine, setExpandedLine] = useState(null);
   const [toast, setToast] = useState(null);
 
-  useAutosave(project, { fileName: file.fileName, savedJson: file.savedJson });
+  useAutosave(project, { fileName: file.fileName, savedJson: file.savedJson, pristineJson: file.pristineJson });
 
   const ev = useMemo(() => {
     if (!project) return null;
@@ -70,15 +71,42 @@ export function App({ contexts }) {
   const baseTotals = useMemo(() => (evBase ? new Map(evBase.lines.map((l) => [l.id, l.total])) : null), [evBase]);
   const checks = useMemo(() => (ev && !ev.error ? runChecks(ev) : []), [ev]);
   const dirty = project && file.savedJson !== serialize(project);
+  const unsaved = hasUnsavedWork(project, file.savedJson, file.pristineJson);
+
+  useEffect(() => {
+    if (!unsaved) return undefined;
+    const onLeave = (e) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', onLeave);
+    return () => window.removeEventListener('beforeunload', onLeave);
+  }, [unsaved]);
 
   const notify = (text, tone = 'ok') => {
     setToast({ text, tone });
     setTimeout(() => setToast(null), 3200);
   };
 
-  const load = (p, fileInfo = { handle: null, fileName: null, savedJson: null }) => {
+  /** Prima di sostituire il progetto: chiede conferma se c'è lavoro non salvato e ne tiene una copia di recupero. */
+  const confirmReplace = () => {
+    const current = project
+      ? (unsaved ? { project, fileName: file.fileName, savedJson: file.savedJson, pristineJson: file.pristineJson } : null)
+      : (autosave?.project && hasUnsavedWork(autosave.project, autosave.savedJson, autosave.pristineJson) ? autosave : null);
+    if (!current) return true;
+    const ok = confirm(
+      `"${current.project.name}" ha modifiche non salvate su file.\n\n` +
+      'Continuando verrà sostituito: ne tengo una copia di recupero nella schermata iniziale, ma solo finché non ne sostituisci un altro.\n\n' +
+      'Continuare?'
+    );
+    if (!ok) return false;
+    if (saveRecoveryCopy(current)) {
+      setRecovery(loadRecoveryCopy());
+      return true;
+    }
+    return confirm('Non riesco a tenere la copia di recupero: continuando le modifiche andranno perse. Continuare?');
+  };
+
+  const load = (p, fileInfo = {}) => {
     replace(p);
-    setFile(fileInfo);
+    setFile({ handle: null, fileName: null, savedJson: null, lastModified: null, pristineJson: serialize(p), ...fileInfo });
     setWelcome(false);
     setView('overview');
     setSelPart(null);
@@ -101,10 +129,32 @@ export function App({ contexts }) {
   }, []);
 
   const actions = {
-    resume: () => load(autosave.project, { handle: null, fileName: autosave.fileName, savedJson: autosave.savedJson }),
-    new: () => load(emptyProject()),
-    template: async () => load(projectFrom2026(await fetchJson('data/projects/meravijosa-2026-s1.json'))),
+    resume: () => {
+      try {
+        load(validateProject(autosave.project), { fileName: autosave.fileName, savedJson: autosave.savedJson, pristineJson: autosave.pristineJson ?? null });
+      } catch (e) {
+        alert('Non riesco a riprendere il progetto: ' + e.message);
+      }
+    },
+    recover: () => {
+      if (!confirmReplace()) return;
+      const kept = recovery;
+      try {
+        load(validateProject(kept.project), { fileName: kept.fileName, savedJson: kept.savedJson, pristineJson: kept.pristineJson ?? null });
+      } catch (e) {
+        alert('Non riesco a recuperare il progetto: ' + e.message);
+        return;
+      }
+      // confirmReplace può aver appena messo da parte il progetto sostituito: quella copia resta
+      if (loadRecoveryCopy()?.keptAt === kept.keptAt) {
+        clearRecoveryCopy();
+        setRecovery(null);
+      }
+    },
+    new: () => { if (confirmReplace()) load(emptyProject()); },
+    template: async () => { if (confirmReplace()) load(projectFrom2026(await fetchJson('data/projects/meravijosa-2026-s1.json'))); },
     example: async (id) => {
+      if (!confirmReplace()) return;
       const p = await fetchJson(`data/projects/${id}.json`);
       // l'esempio S2 2026 viene collegato alla stima S1 2026 per il confronto
       if (p.stage === 'S2' && !p.baseline && id === 'meravijosa-2026-s2') {
@@ -115,7 +165,7 @@ export function App({ contexts }) {
     open: async () => {
       try {
         const r = await openProjectFile();
-        if (r) load(r.project, { handle: r.handle, fileName: r.fileName, savedJson: serialize(r.project) });
+        if (r && confirmReplace()) load(r.project, { handle: r.handle, fileName: r.fileName, savedJson: serialize(r.project), lastModified: r.lastModified ?? null });
       } catch (e) {
         alert('Non riesco ad aprire il file: ' + e.message);
       }
@@ -123,9 +173,17 @@ export function App({ contexts }) {
     save: async (saveAs = false) => {
       if (!project) return;
       try {
-        const r = await saveProjectFile(project, file.handle, { saveAs });
+        const r = await saveProjectFile(project, file.handle, {
+          saveAs,
+          knownModified: file.lastModified,
+          confirmOverwrite: (when) => confirm(
+            `Il file "${file.fileName}" è cambiato dopo che l'hai aperto (ultima modifica ${new Date(when).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}): forse l'ha salvato qualcun altro o un'altra finestra.\n\n` +
+            'OK = sovrascrivilo con la tua versione (le modifiche dell\'altro vanno perse).\n' +
+            'Annulla = non salvare: con Ctrl+Maiusc+S puoi salvare in un altro file.'
+          ),
+        });
         if (r) {
-          setFile({ handle: r.handle, fileName: r.fileName, savedJson: serialize(project) });
+          setFile((f) => ({ ...f, handle: r.handle, fileName: r.fileName, savedJson: serialize(project), lastModified: r.lastModified }));
           notify(`Salvato in ${r.fileName}`);
         }
       } catch (e) {
@@ -144,7 +202,7 @@ export function App({ contexts }) {
       if (!ok) return;
       const { s2 } = freezeToS2(project);
       update(() => s2);
-      setFile({ handle: null, fileName: null, savedJson: null });
+      setFile({ handle: null, fileName: null, savedJson: null, pristineJson: null, lastModified: null });
       go('compare');
       notify('S1 congelato: ora sei in S2');
     },
@@ -187,7 +245,8 @@ export function App({ contexts }) {
   });
 
   if (welcome || !project) {
-    return html`<${Welcome} autosave=${autosave} onResume=${actions.resume} onNew=${actions.new} onTemplate=${actions.template}
+    // con un progetto aperto il salvataggio letto all'avvio è vecchio: per tornarci c'è "Torna al progetto aperto"
+    return html`<${Welcome} autosave=${project ? null : autosave} recovery=${recovery} onRecover=${actions.recover} onResume=${actions.resume} onNew=${actions.new} onTemplate=${actions.template}
       onOpen=${actions.open} onExample=${actions.example} onClose=${project ? () => setWelcome(false) : null} />`;
   }
 

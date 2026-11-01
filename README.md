@@ -224,7 +224,7 @@ Serve solo Python (nessuna installazione di Node).
 python tools/devserver.py
 ```
 
-Poi apri http://127.0.0.1:8765/tests/ nel browser: deve comparire "67/67 test superati".
+Poi apri http://127.0.0.1:8765/tests/ nel browser: deve comparire "81/81 test superati".
 I test salvano anche gli xlsx del Layup Calculator in `out/layup-s1/`.
 
 Senza aprire finestre (usa Chrome o Edge in modalità headless, come fa GitHub prima di pubblicare):

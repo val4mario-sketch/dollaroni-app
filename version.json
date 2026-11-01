@@ -1,10 +1,10 @@
 {
-  "version": "0.5.0",
-  "date": "2026-10-26",
+  "version": "0.5.1",
+  "date": "2026-11-01",
   "notes": [
-    "Brumoth, l'assistente di Dollaroni: la barchetta in basso a destra (con il fumetto \"Chiedi a Brumoth!\") apre una chat che risponde sul progetto aperto (budget, carbonio, classifiche, simulazioni, regolamento) usando i numeri calcolati dall'app.",
-    "Brumoth può modificare il progetto (aggiungere fibra a un pezzo, voci, pezzi nuovi, materiali nel listino, cambiare fibra, eliminare un pezzo), sempre mostrando prima cosa cambia e l'effetto su budget e limiti, con Applica / Annulla. Se la richiesta è troppo generica lo dice e chiede cosa manca. Spiega anche passo passo come fare le cose nell'app.",
-    "Brumoth ha due modalità, scelte dal menu sotto la chat: Istantaneo (risposte subito, dai dati) e Completo (l'IA locale riscrive la risposta a parole sue: ci mette di più, da mezzo minuto a qualche minuto). L'IA gira nel browser, si scarica una volta sola e poi funziona anche senza internet.",
-    "Aggiornamenti: avviso \"Nuova versione disponibile\" con le novità anche per chi usa Avvia Dollaroni.bat, e aggiornamento con un clic."
+    "Il lavoro non salvato è protetto: prima di sostituire un progetto l'app chiede conferma e ne tiene una copia, recuperabile dalla schermata iniziale. Avvisa anche se chiudi la pagina.",
+    "Salvando su file, l'app avvisa se nel frattempo il file è stato cambiato da qualcun altro.",
+    "Nuovi controlli sui conti: valori negativi, id duplicati, voci a costo zero dimenticate, carbonio su voci a mano fuori dalla Tab. 2, foil senza gruppo.",
+    "L'avviso sugli sconti 2027 mostra anche totale e margine senza sconti. I file progetto danneggiati vengono rifiutati con un messaggio chiaro."
   ]
 }

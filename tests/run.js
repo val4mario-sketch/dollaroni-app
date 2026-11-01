@@ -7,6 +7,7 @@ import './s1-s2.test.js';
 import './rules-2027.test.js';
 import './assistant.test.js';
 import './actions.test.js';
+import './safety.test.js';
 
 const results = await runAll();
 const failed = results.filter((r) => !r.ok);
