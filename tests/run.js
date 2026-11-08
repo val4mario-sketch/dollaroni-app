@@ -26,10 +26,10 @@ for (const r of results) {
   line.textContent = `${r.ok ? '✓' : '✗'} ${r.name}${r.ok ? '' : '\n    ' + r.error}`;
   log.appendChild(line);
 }
-document.getElementById('summary').textContent = `${results.length - failed.length}/${results.length} test superati`;
+document.getElementById('summary').textContent = `${results.length - failed.length}/${results.length} tests passed`;
 window.__RESULTS__ = results;
 
-// per tools/run_tests_headless.py (e GitHub prima di pubblicare): risultati su disco tramite il server locale
+// for tools/run_tests_headless.py (and GitHub before publishing): results on disk through the local server
 fetch('../out/test-results.json', {
   method: 'PUT',
   body: JSON.stringify({ passed: results.length - failed.length, total: results.length, failed: failed.map((r) => ({ suite: r.suite, name: r.name, error: r.error })) }),

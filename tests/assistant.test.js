@@ -1,4 +1,4 @@
-// Assistente: argomenti riconosciuti, numeri delle risposte (presi dal motore) e controllo dei numeri dell'IA.
+// Assistant: recognized topics, numbers in the answers (from the engine) and check of the AI numbers.
 
 import { suite, test, eq, close, ok } from './lib.js';
 import { loadContext } from './context.js';
@@ -23,8 +23,8 @@ const ask = async (q, extra = {}) => {
   return answer(q, { ...ctx, ...extra });
 };
 
-suite('Assistente – argomenti e numeri', () => {
-  test('capisce di cosa parla la domanda', async () => {
+suite('Assistant – topics and numbers', () => {
+  test('works out what the question is about', async () => {
     const { ev } = await ctx2027();
     const ids = (q) => route(q, { ev }).intents.map((x) => x.id);
     eq(ids('quanto budget ci rimane?')[0], 'budget');
@@ -39,7 +39,7 @@ suite('Assistente – argomenti e numeri', () => {
     eq(r.entities.materials.map((m) => m.key).join(), 'basalt');
     eq(findMaterials(normalize('carbonio alto modulo e carbonio')).map((m) => m.key).join(), 'carbon-hm,carbon');
   });
-  test('domanda di seguito: "e lo scafo?" riusa l\'argomento precedente', async () => {
+  test('follow-up question: "e lo scafo?" reuses the previous topic', async () => {
     const { ev } = await ctx2027();
     const prev = route('quanto pesa la deriva?', { ev });
     eq(prev.intents[0].id, 'parts');
@@ -47,23 +47,23 @@ suite('Assistente – argomenti e numeri', () => {
     eq(r.intents[0].id, 'parts');
     eq(r.entities.parts[0].part.name, 'Hull');
   });
-  test('budget: totale e margine del motore (Meravijosa portata al 2027)', async () => {
+  test('budget: engine total and margin (Meravijosa brought to 2027)', async () => {
     const a = await ask('quanto budget rimane?');
     ok(a.text.includes('8.422,36 SM$'), 'totale');
-    ok(a.text.includes('Restano 1.577,64 SM$'), 'margine');
-    ok(a.text.includes('−500 punti'), 'penalità 2027');
-    ok(a.text.includes('338,56 SM$ di sconti'), 'sconti da confermare');
+    ok(a.text.includes('Remaining 1.577,64 SM$'), 'margine');
+    ok(a.text.includes('−500 points'), 'penalità 2027');
+    ok(a.text.includes('338,56 SM$ of 2026 origin discounts'), 'discounts to be confirmed');
   });
-  test('capienza: carbonio comprabile col margine e limiti Tab. 2', async () => {
+  test('capacity: carbon that can be bought with the margin and Table 2 limits', async () => {
     const a = await ask('quanto carbonio serve per finire il budget? dove ce ne è troppo?');
     eq(a.intents.join(), 'capacity,carbon');
-    ok(a.text.includes('circa 10,52 kg'), 'carbonio secco 1577,64/150');
-    ok(a.text.includes('1,21 kg di resina'), 'resina per kg di fibra a Vf 35%');
-    ok(a.text.includes('9,15 kg di CFRP'), 'spazio CFRP rimasto');
-    ok(a.text.includes('i limiti fermano prima'), 'il limite arriva prima del budget');
-    ok(a.text.includes('Main Horizontal (CFRP, 0,04 g oltre il limite)'), 'main horizontal oltre di 0,04 g');
+    ok(a.text.includes('about 10,52 kg'), 'dry carbon 1577,64/150');
+    ok(a.text.includes('1,21 kg of resin'), 'resin per kg of fibre at Vf 35%');
+    ok(a.text.includes('9,15 kg of CFRP'), 'CFRP room left');
+    ok(a.text.includes('the limits stop you first'), 'the limit comes before the budget');
+    ok(a.text.includes('Main Horizontal (CFRP, 0,04 g over the limit)'), 'main horizontal over by 0,04 g');
   });
-  test('simulazione: la deriva in basalto, uguale al ricalcolo completo del progetto', async () => {
+  test('simulation: the fin in basalt, equal to the full recalculation of the project', async () => {
     const { ev, project, base, c } = await ctx2027();
     const a = await ask('e se facessi la deriva in basalto?');
     ok(a.text.includes('Main vertical'), 'pezzo');
@@ -72,51 +72,51 @@ suite('Assistente – argomenti e numeri', () => {
     const p2 = structuredClone(project);
     for (const s of p2.parts.find((p) => p.id === 'main-vertical').substacks) { s.reinforcement = 'dry-fabric-basalt-fibers'; delete s.carbonSource; }
     const ev2 = evaluate(p2, base);
-    close(sims[0].delta, ev2.total - ev.total, 0.005, 'Δ simulato = Δ del progetto ricalcolato');
-    ok(sims[0].delta < 0, 'il basalto costa meno');
+    close(sims[0].delta, ev2.total - ev.total, 0.005, 'simulated Δ = Δ of the recalculated project');
+    ok(sims[0].delta < 0, 'basalt costs less');
   });
-  test('idee di risparmio: MDF riciclato e carbonio -> basalto', async () => {
+  test('savings ideas: recycled MDF and carbon -> basalt', async () => {
     const { ev, c } = await ctx2027();
     const ideas = savingIdeas(ev, { spec: c.spec });
     const mdf = ideas.find((x) => x.kind === 'recycled' && x.target === 'hull-mould');
-    ok(mdf, 'manca MDF riciclato');
+    ok(mdf, 'recycled MDF missing');
     close(mdf.saving, 1900, 0.005, '190 kg × (20 − 10)');
-    ok(ideas.some((x) => x.kind === 'basalt'), 'manca carbonio -> basalto');
-    ok(ideas.every((x, i) => i === 0 || ideas[i - 1].saving >= x.saving), 'ordinate dalla più grande');
+    ok(ideas.some((x) => x.kind === 'basalt'), 'carbon -> basalt missing');
+    ok(ideas.every((x, i) => i === 0 || ideas[i - 1].saving >= x.saving), 'sorted from the largest');
   });
-  test('confronto S1 → S2 2026 (Tab. 2.10)', async () => {
+  test('S1 → S2 comparison 2026 (Table 2.10)', async () => {
     const c = await loadContext();
     const a = answer("cosa è cambiato rispetto all'S1?", { ev: c.evS2, checks: runChecks(c.evS2), spec: c.spec, evBase: c.evS1 });
-    ok(a.text.includes('+1.533,44 SM$'), 'Δ totale');
-    ok(a.text.includes('da 214,51 SM$ a 4.000,00 SM$'), 'foils');
+    ok(a.text.includes('+1.533,44 SM$'), 'total Δ');
+    ok(a.text.includes('from 214,51 SM$ to 4.000,00 SM$'), 'foils');
   });
-  test('domanda non riconosciuta: riepilogo generale', async () => {
+  test('question not recognized: general summary', async () => {
     const a = await ask('di che colore è la vela?');
     eq(a.understood, false);
     eq(a.blocks[0].id, 'summary');
   });
-  test('saluto: Brumoth si presenta', async () => {
+  test('greeting: Brumoth introduces itself', async () => {
     const a = await ask('ciao Brumoth!');
     eq(a.blocks[0].id, 'help');
-    ok(a.text.includes('Sono Brumoth'), 'presentazione');
-    ok(buildMessages(a)[0].content.includes('Sei Brumoth'), 'nome nel prompt di sistema');
+    ok(a.text.includes('I am Brumoth'), 'presentazione');
+    ok(buildMessages(a)[0].content.includes('You are Brumoth'), 'name in the system prompt');
   });
 });
 
-suite('Assistente – IA locale', () => {
-  test('controllo dei numeri: accetta quelli dei dati (anche arrotondati), segnala gli inventati', async () => {
+suite('Assistant – local AI', () => {
+  test('number check: accepts those in the data (also rounded), flags invented ones', async () => {
     const a = await ask('quanto budget rimane?');
     eq(verifyNumbers('Restano 1.577,64 SM$ (circa 1578), il 84,2% è usato. Nel 2027 sotto i 10.000 SM$.', a.facts).length, 0);
     eq(verifyNumbers('Restano 1577.64 SM$ di margine.', a.facts).length, 0);
     eq(verifyNumbers('Restano circa 1.600 SM$ e lo scafo costa 4.200 SM$.', a.facts).join(), '1.600,4.200');
     eq(verifyNumbers('Vedi §10.1 e la Tab. 2, ci sono 3 voci.', a.facts).length, 0);
   });
-  test('messaggi per il modello: istruzioni, dati e domanda', async () => {
+  test('messages for the model: instructions, data and question', async () => {
     const a = await ask('quanto budget rimane?');
     const m = buildMessages(a, [{ question: 'ciao', reply: 'Ciao!' }]);
     eq(m[0].role, 'system');
     eq(m.length, 4);
-    ok(m[3].content.startsWith('DATI'), 'dati prima della domanda');
-    ok(m[3].content.includes('DOMANDA: quanto budget rimane?'));
+    ok(m[3].content.startsWith('DATA'), 'data before the question');
+    ok(m[3].content.includes('QUESTION: quanto budget rimane?'));
   });
 });

@@ -1,10 +1,10 @@
-// Golden test: il motore deve dare, al grammo, i numeri dell'Appendice G del report S1 2026
-// (screenshot del Layup Calculator ufficiale compilato dal team).
+// Golden test: the engine must give, to the gram, the numbers in Appendix G of the 2026 S1 report
+// (screenshots of the official Layup Calculator completed by the team).
 
 import { suite, test, eq, close, g } from './lib.js';
 import { loadContext } from './context.js';
 
-// [fibra g, resina g] per substack e totali [composito, fibre, resina], letti dall'Appendice G.
+// [fibre g, resin g] per substack and totals [composite, fibres, resin], read from Appendix G.
 const APPENDIX_G = {
   hull: { subs: [[5436, 4003]], totals: [9439, 5436, 4003], fibrePct: 0.5759 },
   'wing-panel': { subs: [[4625, 3406]], totals: [8031, 4625, 3406] },
@@ -18,11 +18,11 @@ const APPENDIX_G = {
 
 suite('Layup Calculator – Appendice G S1 2026', () => {
   for (const [id, exp] of Object.entries(APPENDIX_G)) {
-    test(`${id}: masse per substack e totali al grammo`, async () => {
+    test(`${id}: masses per substack and totals to the gram`, async () => {
       const { evS1 } = await loadContext();
       const pr = evS1.parts.find((p) => p.part.id === id);
-      eq(pr.errors.length, 0, 'errori nel pezzo');
-      eq(pr.substacks.length, exp.subs.length, 'numero substack');
+      eq(pr.errors.length, 0, 'errors in the part');
+      eq(pr.substacks.length, exp.subs.length, 'number of substacks');
       exp.subs.forEach(([f, r], i) => {
         eq(g(pr.substacks[i].fibre), f, `substack ${'ABCDE'[i]} fibra`);
         eq(g(pr.substacks[i].resin), r, `substack ${'ABCDE'[i]} resina`);
@@ -34,7 +34,7 @@ suite('Layup Calculator – Appendice G S1 2026', () => {
     });
   }
 
-  test('frazioni in peso come nel foglio: basalto 57.6%, carbonio 45.3%, basalto in infusione 67.4%', async () => {
+  test('weight fractions as in the sheet: basalt 57.6%, carbon 45.3%, infused basalt 67.4%', async () => {
     const { evS1 } = await loadContext();
     const wf = (id, i) => evS1.parts.find((p) => p.part.id === id).substacks[i].wf;
     close(wf('hull', 0), 0.576, 0.0005);
@@ -43,14 +43,14 @@ suite('Layup Calculator – Appendice G S1 2026', () => {
   });
 });
 
-suite('Limiti di carbonio (Tab. 2) sui foil S1 2026', () => {
-  test('main vertical: CF secco 0.671 kg su 0.75, CFRP 1.481 kg su 1.50', async () => {
+suite('Carbon limits (Table 2) on the S1 2026 foils', () => {
+  test('main vertical: dry CF 0.671 kg of 0.75, CFRP 1.481 kg of 1.50', async () => {
     const { evS1 } = await loadContext();
     const mv = evS1.carbon.find((c) => c.id === 'main_vertical').checks;
     close(mv.find((c) => c.key === 'cf').value, 0.6712, 0.0000001);
     close(mv.find((c) => c.key === 'cfrp').value, 1.4810822, 0.0000001);
   });
-  test('main horizontal: CFRP 1000.04 g, sopra il limite di 1.00 kg per 0.04 g', async () => {
+  test('main horizontal: CFRP 1000.04 g, over the 1.00 kg limit by 0.04 g', async () => {
     const { evS1 } = await loadContext();
     const mh = evS1.carbon.find((c) => c.id === 'main_horizontal').checks.find((c) => c.key === 'cfrp');
     close(mh.value, 1.0000394, 0.0000001);

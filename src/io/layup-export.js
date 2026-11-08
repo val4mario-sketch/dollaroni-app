@@ -1,18 +1,18 @@
-// Export nel template ufficiale "SMC Composite Layup Calculator": UN FILE PER PEZZO.
+// Export to the official "SMC Composite Layup Calculator" template: ONE FILE PER PART.
 //
-// Si parte da una copia del file ufficiale e si modificano solo:
-//   - le celle di input (nome parte, rinforzo, matrice, area, n. ply, grammatura, processo)
-//   - i valori in cache delle formule (così il file mostra i numeri giusti anche in anteprima)
-// Formule, menu a tendina, stili e foglio nascosto restano quelli dell'organizzazione;
-// all'apertura Excel/Google Sheets/LibreOffice ricalcolano tutto (fullCalcOnLoad).
-// I substack non usati vengono azzerati e le loro righe nascoste, come nell'Appendice G del 2026.
+// It starts from a copy of the official file and changes only:
+//   - the input cells (part name, reinforcement, matrix, area, no. of plies, areal weight, process)
+//   - the cached formula values (so the file shows the right numbers even in preview)
+// Formulas, drop-down menus, styles and hidden sheet remain the organizers';
+// on opening, Excel/Google Sheets/LibreOffice recalculate everything (fullCalcOnLoad).
+// Unused substacks are zeroed and their rows hidden, as in Appendix G of 2026.
 
 import { openXlsx, parseXml, NS, splitRef } from './xlsx.js';
 import { computePart } from '../engine/layup.js';
 
 const XML_DECL = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
 
-/** Divide una parte in blocchi da `max` substack (il template ne ha 5). */
+/** Splits a part into blocks of `max` substacks (the template has 5). */
 export function chunkPart(part, max = 5) {
   const subs = part.substacks || [];
   const count = Math.max(1, Math.ceil(subs.length / max));
@@ -31,8 +31,8 @@ function serialize(doc) {
 }
 
 /**
- * Crea il file xlsx per un blocco di una parte.
- * Ritorna Uint8Array. Lancia un errore se il pezzo usa materiali assenti dal calcolatore.
+ * Creates the xlsx file for a block of a part.
+ * Returns Uint8Array. Throws an error if the part uses materials absent from the calculator.
  */
 export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZipLib) {
   const L = spec.layout;
@@ -41,9 +41,9 @@ export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZi
   const outside = result.substacks.filter((r) => !r.inCalculator);
   if (outside.length) {
     const names = [...new Set(outside.flatMap((r) => [r.reinforcement, r.matrix].filter((m) => !m.calc).map((m) => m.entry.name)))];
-    throw new Error(`${chunk.title}: ${names.join(', ')} non esiste nel Layup Calculator ufficiale`);
+    throw new Error(`${chunk.title}: ${names.join(', ')} does not exist in the official Layup Calculator`);
   }
-  if (!result.substacks.length || result.totals.composite <= 0) throw new Error(`${chunk.title}: nessun materiale da esportare`);
+  if (!result.substacks.length || result.totals.composite <= 0) throw new Error(`${chunk.title}: no material to export`);
 
   const x = await openXlsx(templateBytes, JSZipLib);
   const sheet = x.sheets.find((s) => s.name === L.sheet);
@@ -59,7 +59,7 @@ export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZi
     if (c) return c;
     const { col, row } = splitRef(ref);
     const rowEl = rows.get(row);
-    if (!rowEl) throw new Error(`Riga ${row} assente nel template`);
+    if (!rowEl) throw new Error(`Row ${row} missing from the template`);
     c = doc.createElementNS(NS, 'c');
     c.setAttribute('r', ref);
     const after = [...rowEl.getElementsByTagNameNS(NS, 'c')].find((o) => splitRef(o.getAttribute('r')).col > col);
@@ -105,7 +105,7 @@ export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZi
   L.substackRows.forEach((r, i) => {
     const res = result.substacks[i];
     const used = Boolean(res);
-    const s = res || first; // substack vuoto: stessi materiali del primo, area e ply a zero
+    const s = res || first; // empty substack: same materials as the first, area and plies at zero
     const fibre = used ? res.fibre : 0;
     const resin = used ? res.resin : 0;
 
@@ -116,7 +116,7 @@ export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZi
     setNumber(`G${r}`, Number(s.input.arealWeight));
     setString(`H${r}`, s.process.exact);
 
-    // valori in cache delle formule
+    // cached formula values
     setNumber(`C${r}`, s.reinforcement.density);
     setNumber(`C${r + 1}`, s.matrix.density);
     setNumber(`I${r}`, s.vf);
@@ -147,7 +147,7 @@ export async function exportLayupChunk(templateBytes, spec, catalog, chunk, JSZi
 
   x.zip.file(sheet.path, serialize(doc));
 
-  // Ricalcolo completo all'apertura.
+  // Full recalculation on opening.
   const wb = await x.read('xl/workbook.xml');
   let calcPr = wb.getElementsByTagNameNS(NS, 'calcPr')[0];
   if (!calcPr) {
@@ -168,7 +168,7 @@ export function layupFileName(prefix, chunk) {
   return `${prefix} - Layup - ${safe}.xlsx`;
 }
 
-/** Esporta tutte le parti laminate: [{fileName, bytes, chunk, error}] (un file per pezzo). */
+/** Exports all the laminated parts: [{fileName, bytes, chunk, error}] (one file per part). */
 export async function exportAllLayups(templateBytes, spec, catalog, parts, prefix, JSZipLib) {
   const out = [];
   for (const part of parts) {

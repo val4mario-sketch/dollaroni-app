@@ -14,14 +14,14 @@ export function Catalog({ project, ctx, update }) {
   const provisional = ctx.rules.official.provisional;
 
   return html`
-    <div class="page-head"><div><h1>Listino</h1><p class="muted">Prezzi SM$ ufficiali (2026_SMC_Standardized_Costs) più le voci aggiunte dal team.</p></div></div>
-    ${provisional && html`<div class="notice notice-warn">Regole ${ctx.rules.id}: il listino ufficiale sta sulla SuMoth Agora Platform (§10.1.1), aperta solo ai team ammessi.
-      Finché non lo vediamo si usano i prezzi 2026 qui sotto. I materiali nuovi e le correzioni di prezzo si propongono su Agora con evidenze scientifiche (§10.3).</div>`}
+    <div class="page-head"><div><h1>Price list</h1><p class="muted">Official SM$ prices (2026_SMC_Standardized_Costs) plus the items added by the team.</p></div></div>
+    ${provisional && html`<div class="notice notice-warn">Rules ${ctx.rules.id}: the official price list is on the SuMoth Agora Platform (§10.1.1), open only to admitted teams.
+      Until we can see it, the 2026 prices below are used. New materials and price corrections are proposed on Agora with scientific evidence (§10.3).</div>`}
 
-    <${Card} title="Voci del team" actions=${html`<${Button} small icon="plus" onClick=${addExtra}>Aggiungi voce</${Button}>`}>
+    <${Card} title="Team items" actions=${html`<${Button} small icon="plus" onClick=${addExtra}>Add item</${Button}>`}>
       <p class="muted small">${ctx.rules.help.catalogExtras}</p>
-      ${extras.length === 0 ? html`<p class="muted">Nessuna voce aggiunta.</p>` : html`<div class="table-scroll"><table class="tbl">
-        <thead><tr><th>Nome</th><th>Tipo</th><th>Unità</th><th class="r">SM$/unità</th><th>Densità g/cm³</th><th>Fonte del prezzo</th><th></th></tr></thead>
+      ${extras.length === 0 ? html`<p class="muted">No items added.</p>` : html`<div class="table-scroll"><table class="tbl">
+        <thead><tr><th>Name</th><th>Type</th><th>Unit</th><th class="r">SM$/unit</th><th>Density g/cm³</th><th>Price source</th><th></th></tr></thead>
         <tbody>${extras.map((e) => html`<tr>
           <td><${TextInput} value=${e.name} width=${200} onChange=${(v) => setExtra(e.id, (x) => { x.name = v; }, 'n')} /></td>
           <td><${Select} value=${e.kind || 'hardware'} options=${EXTRA_KINDS} width=${170} onChange=${(v) => setExtra(e.id, (x) => { x.kind = v; })} /></td>
@@ -33,7 +33,7 @@ export function Catalog({ project, ctx, update }) {
         </tr>`)}</tbody></table></div>`}
     </${Card}>
 
-    <${Card} title=${provisional ? `Listino ufficiale 2026 (provvisorio per il ${ctx.rules.id})` : 'Listino ufficiale 2026'} actions=${html`<${TextInput} value=${q} onChange=${setQ} placeholder="Cerca (es. basalt, PET, CNC)" width=${240} />`}>
+    <${Card} title=${provisional ? `Official 2026 price list (provisional for ${ctx.rules.id})` : 'Official 2026 price list'} actions=${html`<${TextInput} value=${q} onChange=${setQ} placeholder="Cerca (es. basalt, PET, CNC)" width=${240} />`}>
       ${ctx.catalogWarnings.length > 0 && html`<div class="notice notice-warn">${ctx.catalogWarnings.map((w) => html`<div>${w}</div>`)}</div>`}
       <div class="table-scroll"><table class="tbl tbl-compact">
         <thead><tr><th>Categoria</th><th>Voce</th><th>Unità</th><th class="r">SM$/unità</th><th>Nota</th></tr></thead>
@@ -41,7 +41,7 @@ export function Catalog({ project, ctx, update }) {
           <td class="muted">${kindLabel(e.kind)}</td>
           <td>${shortName(e)}</td>
           <td>${unitLabel(e.unit)}</td>
-          <td class="r">${e.price === null ? html`<${Badge} tone="warn">da chiedere</${Badge}>` : num(e.price, 2)}</td>
+          <td class="r">${e.price === null ? html`<${Badge} tone="warn">to request</${Badge}>` : num(e.price, 2)}</td>
           <td class="muted small">${e.note}</td>
         </tr>`)}</tbody>
       </table></div>

@@ -1,15 +1,15 @@
-// Aggiornamenti "come nelle app vere": all'avvio, ogni 30 minuti e quando si torna sulla finestra
-// si controlla se su GitHub c'è una versione più nuova; se c'è compare un avviso con le novità
-// (e, se l'utente le ha permesse, anche una notifica di Windows).
+// "Real app" updates: at start-up, every 30 minutes and when you return to the window
+// we check whether GitHub has a newer version; if so, a notice appears with the changes
+// (and, if the user allowed it, a Windows notification too).
 //
-// Due modi di usare Dollaroni, un solo avviso:
-//  - sito pubblicato (GitHub Pages, app installata): il service worker scarica la versione nuova
-//    e "Aggiorna ora" la attiva (src/app/pwa.js chiama offerUpdate);
-//  - in locale con "Avvia Dollaroni.bat": il server locale (tools/devserver.py) sa da quale repository
-//    aggiornarsi; qui si confronta version.json con quello su GitHub e "Aggiorna ora" chiede al server
-//    di scaricare e sostituire i file dell'app (i progetti .dollaroni.json non si toccano).
+// Two ways of using Dollaroni, a single notice:
+//  - published site (GitHub Pages, installed app): the service worker downloads the new version
+//    and "Update now" activates it (src/app/pwa.js calls offerUpdate);
+//  - locally with "Avvia Dollaroni.bat": the local server (tools/devserver.py) knows which repository
+//    to update from; here version.json is compared with the one on GitHub and "Update now" asks the server
+//    to download and replace the app files (the .dollaroni.json projects are not touched).
 //
-// version.json: {version, date, notes[]}. Per pubblicare una versione: python tools/release.py (vedi README).
+// version.json: {version, date, notes[]}. To publish a version: python tools/release.py (see README).
 
 const LAST_SEEN = 'dollaroni.lastSeenVersion';
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
@@ -19,7 +19,7 @@ const store = {
   set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* niente */ } },
 };
 
-/** -1, 0, 1 confrontando "0.5.0" con "0.10.1". */
+/** -1, 0, 1 comparing "0.5.0" with "0.10.1". */
 export function compareVersions(a, b) {
   const pa = String(a || '0').split('.').map((x) => parseInt(x, 10) || 0);
   const pb = String(b || '0').split('.').map((x) => parseInt(x, 10) || 0);
@@ -35,10 +35,10 @@ async function getJson(url, opts = {}) {
   return r.json();
 }
 
-/** Versione in uso (version.json servito insieme all'app). */
+/** Version in use (version.json served with the app). */
 export const installedVersion = () => getJson('version.json').catch(() => null);
 
-/** Info del server locale (solo con Avvia Dollaroni.bat); null altrove. */
+/** Local server info (only with Avvia Dollaroni.bat); null elsewhere. */
 async function serverInfo() {
   if (!LOCAL) return null;
   try {
@@ -49,7 +49,7 @@ async function serverInfo() {
   }
 }
 
-/** Stato condiviso per la barra laterale: {installed, latest, mode, repository, available, checkedAt, error}. */
+/** Shared state for the sidebar: {installed, latest, mode, repository, available, checkedAt, error}. */
 const state = { installed: null, latest: null, mode: null, repository: null, available: false, checkedAt: null, error: null };
 const listeners = new Set();
 export function subscribeUpdates(fn) {
@@ -62,11 +62,11 @@ const emit = (patch) => { Object.assign(state, patch); for (const fn of listener
 let server = null;
 let timer = null;
 
-/** Avvio: versione installata, "Novità" dopo un aggiornamento, controlli periodici in locale. */
+/** Start-up: installed version, "What's new" after an update, periodic checks locally. */
 export async function startUpdates() {
   const installed = await installedVersion();
   emit({ installed });
-  // dopo un aggiornamento: mostra una volta le novità della versione
+  // after an update: show the version's changes once
   const seen = store.get(LAST_SEEN);
   if (installed?.version) {
     if (seen && compareVersions(installed.version, seen) > 0) showNews(installed, { updated: true });
@@ -86,7 +86,7 @@ export async function startUpdates() {
   }
 }
 
-/** In locale: confronta con version.json del branch su GitHub. */
+/** Locally: compares with version.json of the branch on GitHub. */
 export async function checkNow() {
   if (!server?.canUpdate) return null;
   try {
@@ -102,26 +102,26 @@ export async function checkNow() {
   }
 }
 
-/** In locale: il server scarica la versione nuova e sostituisce i file; poi si ricarica la pagina. */
+/** Locally: the server downloads the new version and replaces the files; then the page reloads. */
 async function applyLocalUpdate(setMessage) {
-  setMessage('Scarico e installo la nuova versione…');
+  setMessage('Downloading and installing the new version…');
   const r = await fetch('/__dollaroni/update', { method: 'POST', headers: { 'X-Dollaroni': 'update' } });
-  const res = await r.json().catch(() => ({ ok: false, error: `risposta non valida (${r.status})` }));
-  if (!res.ok) throw new Error(res.error || 'aggiornamento non riuscito');
+  const res = await r.json().catch(() => ({ ok: false, error: `invalid answer (${r.status})` }));
+  if (!res.ok) throw new Error(res.error || 'update failed');
   if (res.restartNeeded) {
-    setMessage(`Aggiornato alla ${res.to}. È cambiato anche il server: chiudi la finestra nera di Dollaroni e riapri "Avvia Dollaroni.bat".`, true);
+    setMessage(`Updated to ${res.to}. The server changed too: close the black Dollaroni window and reopen "Avvia Dollaroni.bat".`, true);
     return;
   }
-  setMessage(`Aggiornato alla ${res.to}: ricarico…`);
+  setMessage(`Updated to ${res.to}: reloading…`);
   setTimeout(() => location.reload(), 700);
 }
 
-// ------------------------------------------------------------------ avviso (DOM semplice, fuori da Preact)
+// ------------------------------------------------------------------ notice (plain DOM, outside Preact)
 let shownFor = null;
 
 /**
- * Mostra "È disponibile una nuova versione". latest = version.json nuovo (se noto);
- * apply(setMessage) esegue l'aggiornamento.
+ * Shows "A new version is available". latest = new version.json (if known);
+ * apply(setMessage) runs the update.
  */
 export function offerUpdate({ latest, apply }) {
   const key = latest?.version || 'sw';
@@ -137,7 +137,7 @@ export function offerUpdate({ latest, apply }) {
   const text = document.createElement('div');
   text.className = 'update-text';
   const title = document.createElement('strong');
-  title.textContent = latest?.version ? `È disponibile Dollaroni ${latest.version}` : 'È disponibile una nuova versione di Dollaroni';
+  title.textContent = latest?.version ? `Dollaroni is available: ${latest.version}` : 'A new version of Dollaroni is available';
   text.append(title);
   if (latest?.notes?.length) {
     const ul = document.createElement('ul');
@@ -150,11 +150,11 @@ export function offerUpdate({ latest, apply }) {
   }
   const hint = document.createElement('span');
   hint.className = 'update-hint';
-  hint.textContent = "Il progetto aperto è già salvato nel browser: dopo l'aggiornamento scegli \"Riprendi\".";
+  hint.textContent = "The open project is already saved in the browser: after the update choose \"Resume\".";
   text.append(hint);
 
-  const later = Object.assign(document.createElement('button'), { className: 'btn btn-sm', textContent: 'Più tardi' });
-  const now = Object.assign(document.createElement('button'), { className: 'btn btn-sm btn-primary', textContent: 'Aggiorna ora' });
+  const later = Object.assign(document.createElement('button'), { className: 'btn btn-sm', textContent: 'Later' });
+  const now = Object.assign(document.createElement('button'), { className: 'btn btn-sm btn-primary', textContent: 'Update now' });
   later.onclick = () => bar.remove();
   const setMessage = (msg, final = false) => {
     hint.textContent = msg;
@@ -163,21 +163,21 @@ export function offerUpdate({ latest, apply }) {
   };
   now.onclick = async () => {
     now.disabled = true;
-    now.textContent = 'Aggiorno…';
+    now.textContent = 'Updating…';
     later.remove();
     try {
       await apply(setMessage);
     } catch (e) {
-      hint.textContent = `Aggiornamento non riuscito: ${e.message}`;
+      hint.textContent = `Update failed: ${e.message}`;
       now.disabled = false;
-      now.textContent = 'Riprova';
+      now.textContent = 'Retry';
     }
   };
   const actions = document.createElement('div');
   actions.className = 'update-actions';
   actions.append(later, now);
   if ('Notification' in window && Notification.permission === 'default') {
-    const ask = Object.assign(document.createElement('button'), { className: 'link small', textContent: 'Avvisami anche con le notifiche' });
+    const ask = Object.assign(document.createElement('button'), { className: 'link small', textContent: 'Also notify me with notifications' });
     ask.onclick = () => Notification.requestPermission().then(() => ask.remove());
     text.append(ask);
   }
@@ -185,17 +185,17 @@ export function offerUpdate({ latest, apply }) {
   document.body.append(bar);
 }
 
-/** Notifica di sistema se la finestra non è in primo piano e l'utente le ha permesse. */
+/** System notification if the window is not in the foreground and the user allowed it. */
 function notifySystem(latest) {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted' || document.visibilityState === 'visible') return;
-    new Notification(latest?.version ? `Dollaroni ${latest.version} disponibile` : 'Nuova versione di Dollaroni', {
-      body: latest?.notes?.[0] || 'Apri Dollaroni e clicca "Aggiorna ora".', icon: 'icons/icon-192.png', tag: 'dollaroni-update',
+    new Notification(latest?.version ? `Dollaroni ${latest.version} available` : 'New version of Dollaroni', {
+      body: latest?.notes?.[0] || 'Open Dollaroni and click "Update now".', icon: 'icons/icon-192.png', tag: 'dollaroni-update',
     });
-  } catch { /* alcune piattaforme non permettono new Notification */ }
+  } catch { /* some platforms do not allow new Notification */ }
 }
 
-/** Finestra "Novità": note della versione installata (o appena installata). */
+/** "What's new" window: notes of the installed (or just installed) version. */
 export function showNews(v, { updated = false } = {}) {
   if (!v) return;
   document.querySelector('.news-modal')?.remove();
@@ -205,10 +205,10 @@ export function showNews(v, { updated = false } = {}) {
   const box = document.createElement('div');
   box.className = 'news-box';
   const h = document.createElement('h3');
-  h.textContent = updated ? `Dollaroni aggiornato alla ${v.version}` : `Dollaroni ${v.version}`;
+  h.textContent = updated ? `Dollaroni updated to ${v.version}` : `Dollaroni ${v.version}`;
   const date = document.createElement('p');
   date.className = 'muted small';
-  date.textContent = v.date ? `Versione del ${new Date(v.date).toLocaleDateString('it-IT')}` : '';
+  date.textContent = v.date ? `Version of ${new Date(v.date).toLocaleDateString('it-IT')}` : '';
   const ul = document.createElement('ul');
   for (const n of v.notes || []) {
     const li = document.createElement('li');

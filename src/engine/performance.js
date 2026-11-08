@@ -1,9 +1,9 @@
-// SuMoth Performance Rating (regolamento 2027, §11 e Tab. 3).
-// Per ogni componente si sommano i punti delle condizioni a)–g) vere; in più le vele, gli alberi e i foil
-// commerciali prodotti dal 2017 in poi valgono −100 ciascuno, salvo danni compromettenti (§11.1.5).
+// SuMoth Performance Rating (2027 rulebook, §11 and Table 3).
+// For each component the points of the true conditions a)–g) add up; in addition sails, masts and foils
+// commercially produced from 2017 onwards are worth −100 each, barring compromising damage (§11.1.5).
 //
-// Nel progetto: project.performance.conditions = { <id componente>: ['c', 'd', …] }
-// Le parti commerciali sono le voci con usedPart (element, year, commercial, damaged).
+// In the project: project.performance.conditions = { <component id>: ['c', 'd', …] }
+// Commercial parts are the items with usedPart (element, year, commercial, damaged).
 
 export function performanceRating(project, rules) {
   const P = rules.performance;
@@ -27,7 +27,7 @@ export function performanceRating(project, rules) {
       const u = l.usedPart;
       const year = typeof u.year === 'number' ? u.year : null;
       const isCommercial = u.commercial !== false;
-      // senza prova dell'anno di produzione la penalità si applica (§11.1.5.1)
+      // without proof of the year of production the penalty applies (§11.1.5.1)
       const recent = year === null || year >= C.fromYear;
       const damaged = Boolean(u.damaged);
       return {

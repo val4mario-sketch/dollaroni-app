@@ -1,9 +1,9 @@
 @echo off
-rem Avvia Dollaroni in locale e lo apre nel browser. Chiudi questa finestra per spegnerlo.
+rem Starts Dollaroni locally and opens it in the browser. Close this window to shut it down.
 cd /d "%~dp0"
 python tools\devserver.py 8765 --open
 if errorlevel 1 (
   echo.
-  echo Serve Python installato: https://www.python.org/downloads/
+  echo Python must be installed: https://www.python.org/downloads/
   pause
 )

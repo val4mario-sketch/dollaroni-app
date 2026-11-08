@@ -1,4 +1,4 @@
-// Mini framework di test nel browser (nessuna dipendenza).
+// Mini test framework in the browser (no dependencies).
 
 export const suites = [];
 let current = null;
@@ -11,7 +11,7 @@ export function suite(name, fn) {
 }
 
 export function test(name, fn) {
-  if (!current) throw new Error('test() fuori da suite()');
+  if (!current) throw new Error('test() outside suite()');
   current.tests.push({ name, fn });
 }
 
@@ -28,10 +28,10 @@ export function close(actual, expected, tol, msg = '') {
 }
 
 export function ok(cond, msg = '') {
-  if (!cond) throw new AssertionError(msg || 'condizione falsa');
+  if (!cond) throw new AssertionError(msg || 'condition false');
 }
 
-/** Arrotonda come le tabelle del report (grammi interi, centesimi di SM$). */
+/** Rounds like the report tables (whole grams, cents of SM$). */
 export const g = (x) => Math.round(x);
 export const cents = (x) => Math.round(x * 100) / 100;
 

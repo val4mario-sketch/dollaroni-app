@@ -1,8 +1,8 @@
-// "Esporta S1": raccoglie tutto quello che serve per il report S1 e lo mette nei formati ufficiali.
-//  - Layup Calculator/  un file xlsx per pezzo (template ufficiale compilato)
-//  - Appendice/         immagini PNG delle tabelle di layup (come l'Appendice G 2026)
-//  - Report S1/         documento Word/Google Docs con le tabelle SM$, riepilogo, limiti carbonio, masse
-// Tutto anche in un unico zip.
+// "Export S1": collects everything needed for the S1 report and puts it in the official formats.
+//  - Layup Calculator/  one xlsx file per part (official template filled in)
+//  - Appendice/         PNG images of the layup tables (like the 2026 Appendix G)
+//  - Report S1/         Word/Google Docs document with SM$ tables, summary, carbon limits, masses
+// Everything also in a single zip.
 
 import { exportAllLayups } from './layup-export.js';
 import { layupTableSvg, svgToPng } from './layup-svg.js';
@@ -19,7 +19,7 @@ const MIME = {
 const trim = (x) => (x === null || x === undefined || x === '' ? '' : String(Number(Number(x).toFixed(4))));
 const kg3 = (x) => x.toFixed(3);
 
-/** Le tabelle del report S1 già formattate (in inglese), riusate da docx, clipboard e anteprima. */
+/** The S1 report tables already formatted (in English), reused by docx, clipboard and preview. */
 export function s1Tables(ev) {
   const cost = s1CostTable(ev);
   const costTable = {
@@ -51,7 +51,7 @@ export function s1Tables(ev) {
     const cfrp = get('cfrp');
     const worst = Math.max(cf.ratio, cfrp.ratio);
     const status = cf.value > cf.limit + 1e-9 || cfrp.value > cfrp.limit + 1e-9 ? 'Over limit' : worst >= 0.95 ? 'Near limit' : 'OK';
-    // margine in grammi: rende leggibili differenze che in kg a 3 decimali non si vedono (es. 1000,04 g su 1000 g)
+    // margin in grams: makes differences readable that are invisible in kg to 3 decimals (e.g. 1000,04 g of 1000 g)
     const margin = Math.min(cf.limit - cf.value, cfrp.limit - cfrp.value) * 1000;
     return [g.en, kg3(cf.value), cf.limit.toFixed(2), kg3(cfrp.value), cfrp.limit.toFixed(2), margin.toFixed(2), status];
   });
@@ -77,7 +77,7 @@ export function s1Tables(ev) {
   return out;
 }
 
-/** 2027 – Performance Rating (Tab. 3 del regolamento), riusata anche dall'export S2. */
+/** 2027 – Performance Rating (Table 3 of the rulebook), also reused by the S2 export. */
 export function performanceTable(ev) {
   const p = performanceRows(ev.performance);
   if (!p) return null;
@@ -90,15 +90,15 @@ export function performanceTable(ev) {
 }
 
 /**
- * Esegue l'export. Ritorna {files: [{folder, name, bytes, mime}], zip: {name, bytes, mime}, errors: [...], tables}.
- * onProgress(testo) facoltativo per aggiornare l'interfaccia.
+ * Runs the export. Returns {files: [{folder, name, bytes, mime}], zip: {name, bytes, mime}, errors: [...], tables}.
+ * onProgress(text) optional for updating the interface.
  */
 export async function buildS1Export({ project, ev, spec, catalog, templateBytes, onProgress = () => {} }) {
   const prefix = `${project.team || 'Team'} S1 ${project.season || ''}`.trim();
   const files = [];
   const errors = [];
 
-  onProgress('Compilo il Layup Calculator, un file per pezzo…');
+  onProgress('Filling in the Layup Calculator, one file per part…');
   const layups = await exportAllLayups(templateBytes, spec, catalog, project.parts || [], prefix);
   const images = [];
   for (const l of layups) {
@@ -107,14 +107,14 @@ export async function buildS1Export({ project, ev, spec, catalog, templateBytes,
       continue;
     }
     files.push({ folder: 'Layup Calculator', name: l.fileName, bytes: l.bytes, mime: MIME.xlsx });
-    onProgress(`Disegno la tabella di ${l.chunk.title}…`);
+    onProgress(`Drawing the table of ${l.chunk.title}…`);
     const png = await svgToPng(layupTableSvg(l.result, l.chunk.title), 2);
     const name = l.fileName.replace(/\.xlsx$/, '.png');
-    files.push({ folder: 'Appendice', name, bytes: png.bytes, mime: MIME.png });
+    files.push({ folder: 'Appendix', name, bytes: png.bytes, mime: MIME.png });
     images.push({ title: l.chunk.title, ...png });
   }
 
-  onProgress('Preparo il documento con le tabelle…');
+  onProgress('Preparing the document with the tables…');
   const t = s1Tables(ev);
   const blocks = [
     { type: 'heading', level: 1, text: `${project.name || 'SuMoth'} – S1 cost analysis (SM$)` },
@@ -134,9 +134,9 @@ export async function buildS1Export({ project, ev, spec, catalog, templateBytes,
     }
   }
   const docx = await buildDocx(blocks);
-  files.push({ folder: 'Report S1', name: `${prefix} - Tabelle SM$.docx`, bytes: docx, mime: MIME.docx });
+  files.push({ folder: 'Report S1', name: `${prefix} - SM$ tables.docx`, bytes: docx, mime: MIME.docx });
 
-  onProgress('Creo lo zip…');
+  onProgress('Creating the zip…');
   const zip = new globalThis.JSZip();
   for (const f of files) zip.file(`${f.folder}/${f.name}`, f.bytes);
   const zipBytes = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });

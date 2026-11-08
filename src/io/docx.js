@@ -1,6 +1,6 @@
-// Generatore minimale di file .docx (WordprocessingML), senza dipendenze oltre a JSZip.
-// Pensato per essere importato in Google Docs: font Montserrat, A4, margini 2,5 cm,
-// interlinea 1,15 come chiede il template SuMoth.
+// Minimal .docx (WordprocessingML) generator, with no dependencies other than JSZip.
+// Designed to be imported into Google Docs: Montserrat font, A4, 2.5 cm margins,
+// 1.15 line spacing as the SuMoth template requires.
 //
 // blocks: [
 //   {type: 'heading', text, level: 1|2},
@@ -11,7 +11,7 @@
 // ]
 
 const W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
-const TEXT_WIDTH_TWIPS = 9072; // 21 cm − 2 × 2,5 cm = 16 cm
+const TEXT_WIDTH_TWIPS = 9072; // 21 cm − 2 × 2.5 cm = 16 cm
 const EMU_PER_CM = 360000;
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -80,7 +80,7 @@ export async function buildDocx(blocks, JSZipLib = globalThis.JSZip) {
       case 'pageBreak':
         return '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
       default:
-        throw new Error('Blocco docx sconosciuto: ' + b.type);
+        throw new Error('Unknown docx block: ' + b.type);
     }
   }).join('');
 
@@ -98,7 +98,7 @@ export async function buildDocx(blocks, JSZipLib = globalThis.JSZip) {
   return zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
 }
 
-/** Tabella HTML con stile in linea: incollata in Google Docs mantiene bordi e font. */
+/** HTML table with inline style: pasted into Google Docs it keeps borders and font. */
 export function tableHtml({ caption, columns, rows, totalRow, size = 8 }) {
   const td = (v, c, extra = '') => `<td style="border:1px solid #999;padding:2px 4px;font-family:Montserrat,Arial,sans-serif;font-size:${size}pt;text-align:${c.align || 'left'};${extra}">${esc(v)}</td>`;
   const th = columns.map((c) => `<th style="border:1px solid #999;padding:2px 4px;background:#d9e2f3;font-family:Montserrat,Arial,sans-serif;font-size:${size}pt;text-align:center">${esc(c.title)}</th>`).join('');

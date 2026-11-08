@@ -1,4 +1,4 @@
-// Carica i file ufficiali e i progetti 2026 una sola volta per tutti i test.
+// Loads the official files and 2026 projects once for all the tests.
 
 import { importCostCatalog, importLayupSpec } from '../src/io/official.js';
 import { RULES_2026 } from '../src/engine/rules-2026.js';

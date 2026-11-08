@@ -1,4 +1,4 @@
-// Avvio: carica i file ufficiali (listino e Layup Calculator) di ogni regolamento e monta l'app.
+// Start-up: loads the official files (price list and Layup Calculator) of each rulebook and mounts the app.
 
 import { html, render } from '../../vendor/preact-htm.js';
 import { importCostCatalog, importLayupSpec } from '../io/official.js';
@@ -11,11 +11,11 @@ setupPwa();
 
 async function bytes(url) {
   const r = await fetch(url);
-  if (!r.ok) throw new Error(`Non trovo ${url} (${r.status})`);
+  if (!r.ok) throw new Error(`Cannot find ${url} (${r.status})`);
   return r.arrayBuffer();
 }
 
-/** Listino + Layup Calculator; se due regolamenti usano gli stessi file si leggono una volta sola. */
+/** Price list + Layup Calculator; if two rulebooks use the same files they are read once. */
 const loaded = new Map();
 function officialData({ costs, layup }) {
   const key = `${costs}|${layup}`;
@@ -33,15 +33,15 @@ function officialData({ costs, layup }) {
 async function boot() {
   const root = document.getElementById('app');
   try {
-    // un contesto per regolamento: {spec, catalogEntries, catalogWarnings, templateBytes, rules}
+    // one context per rulebook: {spec, catalogEntries, catalogWarnings, templateBytes, rules}
     const contexts = {};
     for (const rules of Object.values(RULES)) contexts[rules.id] = { ...(await officialData(rules.official)), rules };
     root.innerHTML = '';
     render(html`<${App} contexts=${contexts} />`, root);
-    startUpdates().catch((e) => console.warn('Controllo aggiornamenti non riuscito:', e));
+    startUpdates().catch((e) => console.warn('Update check failed:', e));
   } catch (e) {
     console.error(e);
-    root.innerHTML = `<div class="boot-error"><h2>Dollaroni non riesce a partire</h2><p>${e.message}</p><p>L'app va aperta tramite un server (es. <code>python tools/devserver.py</code>), non con doppio clic sul file.</p></div>`;
+    root.innerHTML = `<div class="boot-error"><h2>Dollaroni cannot start</h2><p>${e.message}</p><p>The app must be opened through a server (e.g. <code>python tools/devserver.py</code>), not by double-clicking the file.</p></div>`;
   }
 }
 

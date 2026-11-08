@@ -3,50 +3,48 @@
 An app that calculates the boat's SuMoth Dollars (SM$) and automatically produces the files in the format required by the SuMoth
 Challenge. You work in a convenient internal view; when needed, one button fills in the official templates.
 
-**Version 0.5.0 (phase 5).** It includes the calculation engine, the 2026 data, the interface, "Export S1", the S1→S2 transition with comparison and "Export S2",
+**Version 0.6.0.** It includes the calculation engine, the 2026 data, the interface, "Export S1", the S1→S2 transition with comparison and "Export S2",
 the **2027 rules**, **Brumoth**, the assistant with local AI (the little boat at the bottom right) and **update notices** for every PC.
 Still missing are the 2027 price list (it is on SuMoth Agora) and saving to Google Drive.
-
-The app's interface is in Italian, so the labels below are given as they appear on screen, with their meaning where useful.
 
 ## How to use it
 
 1. Double-click **`Avvia Dollaroni.bat`**: the browser opens at http://127.0.0.1:8765/. Python is required; close the black window to shut it down.
 2. On the start screen choose one of these:
-   - **Nuova barca 2027** (new 2027 boat): start from scratch.
-   - **Nuova barca partendo da Meravijosa S1 2026** (new boat from Meravijosa S1 2026): the same parts and items, to be updated.
+   - **New 2027 boat**: start from scratch.
+   - **New boat from Meravijosa S1 2026**: the same parts and items, to be updated.
    - Open a `.dollaroni.json` file, or look at the 2026 examples.
 3. The sections on the left:
-   - **Panoramica** (overview): where the dollars go, Table 2 carbon limits, §2.5 masses, things to fix.
-   - **Pezzi laminati** (laminated parts): one part corresponds to one Layup Calculator sheet.
+   - **Overview**: where the dollars go, Table 2 carbon limits, §2.5 masses, things to fix.
+   - **Laminated parts**: one part corresponds to one Layup Calculator sheet.
      - For each substack choose fibre, matrix, process, area, number of plies and areal weight, with the origin (expired −50%, surplus −25%, upcycled).
      - Masses and costs are calculated as you type.
      - There is a preview of how the official sheet will look.
-   - **Voci di costo** (cost items): everything else (moulds, consumables, hourly processes, MSRP hardware, Table 3 used parts, upcycled elements), divided into the 7 categories of the S2 template. Grey rows come automatically from the parts.
-   - **Controlli** (checks): errors and things to verify, with a "Vai" (go) button that takes you to the point to correct.
-   - **Listino** (price list): the official 2026 price list and the items added by the team (MSRP, prices given on Discord, always with the source).
-   - **Esporta S1** (export S1): one click produces three things, downloadable one by one or all in a zip:
+   - **Cost items**: everything else (moulds, consumables, hourly processes, MSRP hardware, Table 3 used parts, upcycled elements), divided into the 7 categories of the S2 template. Grey rows come automatically from the parts.
+   - **Checks**: errors and things to verify, with a "Go" button that takes you to the point to correct.
+   - **Price list**: the official 2026 price list and the items added by the team (MSRP, prices given on Discord, always with the source).
+   - **Export S1**: one click produces three things, downloadable one by one or all in a zip:
      - the completed official Layup Calculator, one file per part;
      - images of the tables for the appendix;
      - a Word/Google Docs document with all the tables.
 
-     Each table also has a "Copia per Google Docs" (copy for Google Docs) button.
-4. **Salva** (save, Ctrl+S) writes the project file. In the meantime a copy is saved automatically in the browser anyway.
+     Each table also has a "Copy for Google Docs" button.
+4. **Save** (Ctrl+S) writes the project file. In the meantime a copy is saved automatically in the browser anyway.
 5. Ctrl+Z / Ctrl+Y undo and redo any change.
 
 ## Brumoth, the assistant with local AI
 
 At the bottom right is a **little boat** (a Moth on its foils): that is **Brumoth**. When you enter the app the bubble
-"Chiedi a Brumoth!" (ask Brumoth) appears, and it goes away as soon as you scroll or touch somewhere else (clicking it opens the chat).
-The chat answers about the open project, in Italian. It handles questions such as how much budget is left, how much carbon would use up
+"Ask Brumoth!" appears, and it goes away as soon as you scroll or touch somewhere else (clicking it opens the chat).
+The chat answers about the open project, and understands both English and Italian. It handles questions such as how much budget is left, how much carbon would use up
 the budget, where there is too much carbon, a cost ranking, "what if" simulations (a different fibre on a part, 2 kg more carbon in the
 hull), how to save money, what needs fixing, what the rules say about discounts, and what changed since S1.
 
 **Two modes**, chosen from the drop-down menu under the chat box (like choosing a model in AI apps):
-- **Istantaneo** (instant, the default): the Dollaroni engine answers with the calculated numbers, **immediately** and always exactly;
-- **Completo** (complete): after the answer from the data, the local AI rewrites it in its own words. It takes as long as it needs
+- **Instant** (the default): the Dollaroni engine answers with the calculated numbers, **immediately** and always exactly;
+- **Complete**: after the answer from the data, the local AI rewrites it in its own words. It takes as long as it needs
   (from half a minute to a few minutes on laptops); under the answer you can see how long it has been working.
-  If the laptop is on battery, "A batteria: più lento" (on battery: slower) appears, because Windows can slow the processor by as much as half.
+  If the laptop is on battery, "On battery: slower" appears, because Windows can slow the processor by as much as half.
 
 How it works (in two layers, so the numbers are always right):
 1. **Answer engine** (`src/engine/assistant.js`): works out the topic from keywords, identifies parts and materials, and prepares
@@ -55,13 +53,13 @@ How it works (in two layers, so the numbers are always right):
    This is the answer in Instant mode and it is always available, even without AI.
 2. **Brumoth's local AI** (`src/ai/llm.js`, Complete mode only): a small language model (Qwen, Apache 2.0 licence)
    that runs **inside the browser** with llama.cpp in WebAssembly (the wllama library). It receives the facts and explains them in words; it calculates nothing.
-   If it writes a number that is not among the facts, "Da controllare" (to check) appears under the answer. "Dati usati" (data used) shows the starting facts.
+   If it writes a number that is not among the facts, "To check" appears under the answer. "Data used" shows the starting facts.
 
 **Project changes (always with Apply / Cancel).** Brumoth can also change the project data: add 2 kg of carbon to the hull (new substack),
 put 20 kg of MDF in the hull (new item), create a new part, add a material to the price list with its price and density, change the fibre
 of a part, or delete a part.
 It never changes anything by itself: it shows a card with what changes, the total and margin after the change, and any new problems
-(for example a carbon limit exceeded), with **Applica** (apply) and **Annulla** (cancel); after applying there is "Torna indietro" (go back, like Ctrl+Z).
+(for example a carbon limit exceeded), with **Apply** and **Cancel**; after applying there is "Go back" (like Ctrl+Z).
 "What if" simulations that can be applied also offer the card. If the request is too generic (just "add carbon")
 it says so and asks what is missing (quantity, part, price, density…). Brumoth changes the **data**, not the app: new pages and functions are development work.
 
@@ -70,7 +68,7 @@ saving, waste, Performance Rating, updates) and, where possible, the card to do 
 do not go through the AI: they are fixed texts from the engine (`src/engine/actions.js`), so they are exact even on a slow PC.
 
 The model (Complete mode):
-- is downloaded **only once** from Hugging Face the first time "Completo" is chosen (or when the app opens, if set
+- is downloaded **only once** from Hugging Face the first time "Complete" is chosen (or when the app opens, if set
   in Brumoth's ⚙ settings), and then stays on the PC, in the browser storage for that address: it also works offline;
 - **Standard** (Qwen3.5 2B, about 1.3 GB): better answers, CPU only, 2-4 minutes on a laptop; **Light** (Qwen3 0.6B,
   about 0.4 GB): about 25 s with a graphics card, but gets numbers wrong more often. Choose and delete models from the ⚙ settings;
@@ -84,13 +82,13 @@ The model (Complete mode):
 ## Updates for the whole team
 
 Each PC knows which version it has (`version.json`) and checks whether a newer one exists **on opening, every 30 minutes and when you return
-to the window**. If there is one, **"È disponibile Dollaroni x.y.z"** (Dollaroni x.y.z is available) appears at the bottom with the list of changes and the **"Aggiorna ora"** (update now) button;
-if notifications are allowed, a Windows notification also arrives. After updating, the "Novità" (what's new) window appears once.
-At the bottom of the sidebar are the version, "Novità" and "Controlla" (check).
+to the window**. If there is one, **"Dollaroni x.y.z is available"** appears at the bottom with the list of changes and the **"Update now"** button;
+if notifications are allowed, a Windows notification also arrives. After updating, the "What's new" window appears once.
+At the bottom of the sidebar are the version, "What's new" and "Check".
 
 It works in both ways of using the app:
-- **published site** (GitHub Pages, also installed as a program): the service worker downloads the new version and "Aggiorna ora" activates it;
-- **locally** with "Avvia Dollaroni.bat": the local server compares `version.json` with the one in the GitHub repository; "Aggiorna ora"
+- **published site** (GitHub Pages, also installed as a program): the service worker downloads the new version and "Update now" activates it;
+- **locally** with "Avvia Dollaroni.bat": the local server compares `version.json` with the one in the GitHub repository; "Update now"
   downloads the branch zip and replaces the app files. It first copies the old ones to `out/backup-<version>-<date>/`.
   It never touches `out/`, the `*.dollaroni.json` files or "Avvia Dollaroni.bat". If the folder is a git clone, it runs `git pull --ff-only`.
   If `tools/devserver.py` has also changed, it asks you to close and reopen the .bat.
@@ -106,11 +104,11 @@ Note: the automatic save in the browser (and the AI model) apply only to that ad
 
 ## From S1 to S2
 
-1. Once S1 has been submitted: **Panoramica → "Congela S1 e crea S2"** (freeze S1 and create S2; also at the bottom of "Esporta").
+1. Once S1 has been submitted: **Overview → "Freeze S1 and create S2"** (also at the bottom of "Export").
    - S1 is saved inside the project as a fixed reference (`baseline`).
-   - The project becomes S2, with the same parts and items marked "stimata" (estimated).
+   - The project becomes S2, with the same parts and items marked "estimated".
    - The first Save asks for a new file, so the S1 file stays intact.
-2. During construction, update each item and part to its real value, then click **"stimata" → "✓ misurata"** (measured).
+2. During construction, update each item and part to its real value, then click **"estimated" → "✓ measured"**.
    - Parts also have the **real weighed weight**: it is used for the 2.4 self-assessment.
    - Under each total you can see the value it had in S1.
 3. **S1→S2 comparison**:
@@ -118,28 +116,28 @@ Note: the automatic save in the browser (and the AI model) apply only to that ad
    - differences item by item, from the largest;
    - S1 masses, S2 calculated and weighed masses;
    - how much of the cost has already been measured.
-4. **Esporta S2** (export S2) produces:
+4. **Export S2** produces:
    - the document with the 2.2 tables (one per component, with notes on discounts and the summary);
    - the 2.3 tables (total and comparison with S1);
    - supporting data for 2.4 and the as-built mass breakdown;
    - the Layup Calculator and the images of the as-built parts.
 
    The texts (2.1, explanations in 2.3, 2.4 self-assessment) are written by the team.
-5. If an S2 project does not contain S1 (for example, created by hand), the submitted S1 file can be linked from "Confronto" (comparison).
+5. If an S2 project does not contain S1 (for example, created by hand), the submitted S1 file can be linked from "S1→S2 comparison".
 
 ## 2027 rules
 
 Each project states which rulebook it uses (the `rules` field; old files without the field are 2026). New projects start with the 2027 rules;
-a 2027 project created earlier with the 2026 rules shows the **"Passa alle regole 2027"** (switch to the 2027 rules) button in Overview. The "Regole 2026/2027" badge is always at the top.
+a 2027 project created earlier with the 2026 rules shows the **"Switch to the 2027 rules"** button in Overview. The "Rules 2026/2027" badge is always at the top.
 
 What changes with the 2027 SMC Competition Rulebook v1.0 (7 September 2026):
 - **Budget**: must be kept *under* 10,000 SM$; exceeding it costs 500 points (§10.1).
 - **Table 2** (carbon): same limits as 2026, "Wingbars" becomes "Hiking racks".
 - **Price list**: in 2027 it is on the SuMoth Agora Platform, open only to admitted teams. Until we can see it, the 2026 price list and Layup Calculator are used, marked **provisional**.
 - **Origin discounts** (−25/−50/−100%): the 2027 rulebook no longer mentions them. They stay active with a "to be confirmed on Agora" warning.
-- **Used parts**: the fixed cost of the old Table 3 is gone. They are entered as "Parte usata o commerciale" (used or commercial part) with the price (from Agora) and the year of production.
+- **Used parts**: the fixed cost of the old Table 3 is gone. They are entered as "Used or commercial part" with the price (from Agora) and the year of production.
 - **Performance Rating** (new Table 3, §11): in the section of the same name, tick conditions a)–g) for the 15 components; commercial sails, masts and foils produced since 2017 are worth −100 each (§11.1.5), barring compromising damage. The rating also goes into the exports.
-- **S2 waste** (§9.2.2): in laminated parts (extra material consumed, added to quantity and cost) and in item details ("di cui scarto", of which waste). "Material use and waste" table in the S2 export.
+- **S2 waste** (§9.2.2): in laminated parts (extra material consumed, added to quantity and cost) and in item details ("of which waste"). "Material use and waste" table in the S2 export.
 - **Upcycled hull** allowed only if it originally came from a non-foiling boat (§6.2.1): a reminder in the checks.
 - The as-built mass breakdown is no longer required (it stays as a useful table); the 2027 exports do not use the 2.1–2.4 numbering of the 2026 S2 template.
 

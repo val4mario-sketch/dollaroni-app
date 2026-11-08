@@ -1,6 +1,6 @@
-// Stato del progetto: modifiche con annulla/ripeti, salvataggio automatico nel browser,
-// apertura/salvataggio del file .dollaroni.json.
-// (Il salvataggio su Google Drive si aggancerà qui: stesse funzioni open/save.)
+// Project state: undo/redo changes, automatic save in the browser,
+// opening/saving the .dollaroni.json file.
+// (Saving to Google Drive will hook in here: same open/save functions.)
 
 import { useState, useRef, useEffect, useCallback } from '../../vendor/preact-htm.js';
 
@@ -10,8 +10,8 @@ const HISTORY_LIMIT = 100;
 const COALESCE_MS = 1200;
 
 /**
- * Hook principale. update(fn, key): fn riceve una copia modificabile del progetto.
- * Modifiche consecutive con la stessa key (es. mentre scrivi in un campo) diventano un solo passo di annulla.
+ * Main hook. update(fn, key): fn receives an editable copy of the project.
+ * Consecutive changes with the same key (e.g. while typing in a field) become a single undo step.
  */
 export function useProject(initial) {
   const [state, setState] = useState({ past: [], present: initial, future: [] });
@@ -42,7 +42,7 @@ export function useProject(initial) {
   return { project: state.present, update, replace, undo, redo, canUndo: state.past.length > 0, canRedo: state.future.length > 0 };
 }
 
-// ---------------------------------------------------------------- salvataggio automatico
+// ---------------------------------------------------------------- automatic save
 export function loadAutosave() {
   try {
     const raw = localStorage.getItem(AUTOSAVE_KEY);
@@ -59,7 +59,7 @@ export function useAutosave(project, meta) {
       try {
         localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ project, ...meta, autosavedAt: new Date().toISOString() }));
       } catch {
-        /* spazio pieno o storage bloccato: il file resta la copia buona */
+        /* storage full or blocked: the file stays the good copy */
       }
     }, 400);
     return () => clearTimeout(t);
@@ -67,8 +67,8 @@ export function useAutosave(project, meta) {
 }
 
 /**
- * true se il progetto contiene lavoro che non è su nessun file: diverso sia dall'ultimo salvataggio
- * sia da com'era appena aperto (savedJson e pristineJson possono mancare).
+ * true if the project contains work that is on no file: different both from the last save
+ * and from how it was when just opened (savedJson and pristineJson may be missing).
  */
 export function hasUnsavedWork(project, savedJson, pristineJson) {
   if (!project) return false;
@@ -76,7 +76,7 @@ export function hasUnsavedWork(project, savedJson, pristineJson) {
   return json !== savedJson && json !== pristineJson;
 }
 
-/** Copia di recupero del lavoro che sta per essere sostituito (una sola, l'ultima). Ritorna false se non riesce. */
+/** Recovery copy of the work about to be replaced (only one, the latest). Returns false if it fails. */
 export function saveRecoveryCopy({ project, fileName = null, savedJson = null, pristineJson = null }) {
   try {
     localStorage.setItem(RECOVERY_KEY, JSON.stringify({ project, fileName, savedJson, pristineJson, keptAt: new Date().toISOString() }));
@@ -99,63 +99,63 @@ export function clearRecoveryCopy() {
   try {
     localStorage.removeItem(RECOVERY_KEY);
   } catch {
-    /* storage bloccato: non c'è niente da togliere */
+    /* storage blocked: there is nothing to remove */
   }
 }
 
 // ---------------------------------------------------------------- file
 const isObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 
-/** I campi numerici possono mancare o essere null, ma non essere testo o altro. */
+/** Numeric fields may be missing or null, but not text or anything else. */
 function checkNumbers(obj, fields, where) {
   if (!obj) return;
   for (const f of fields) {
     const v = obj[f];
-    if (v !== undefined && v !== null && !Number.isFinite(v)) throw new Error(`${where}: "${f}" deve essere un numero (trovato ${JSON.stringify(v)})`);
+    if (v !== undefined && v !== null && !Number.isFinite(v)) throw new Error(`${where}: "${f}" must be a number (found ${JSON.stringify(v)})`);
   }
 }
 
 function checkList(p, key, what) {
   if (p[key] === undefined || p[key] === null) { p[key] = []; return; }
-  if (!Array.isArray(p[key])) throw new Error(`"${key}" deve essere un elenco di ${what}`);
+  if (!Array.isArray(p[key])) throw new Error(`"${key}" must be a list of ${what}`);
   p[key].forEach((x, i) => {
-    if (!isObject(x)) throw new Error(`${what} n. ${i + 1} non valido (trovato ${JSON.stringify(x)})`);
+    if (!isObject(x)) throw new Error(`${what} n. ${i + 1} not valid (found ${JSON.stringify(x)})`);
   });
 }
 
 export function validateProject(p) {
-  if (!isObject(p)) throw new Error('Il file non contiene un progetto');
-  if (p.schema !== 'dollaroni/1') throw new Error(`Formato non riconosciuto (${p.schema ?? 'senza schema'}): serve un file di Dollaroni`);
+  if (!isObject(p)) throw new Error('The file does not contain a project');
+  if (p.schema !== 'dollaroni/1') throw new Error(`Format not recognized (${p.schema ?? 'no schema'}): a Dollaroni file is needed`);
   checkList(p, 'parts', 'pezzi');
-  checkList(p, 'lines', 'voci');
-  checkList(p, 'catalogExtras', 'voci del team');
-  checkNumbers(p, ['budget'], 'Progetto');
+  checkList(p, 'lines', 'items');
+  checkList(p, 'catalogExtras', 'team items');
+  checkNumbers(p, ['budget'], 'Project');
   for (const part of p.parts) {
-    const where = `Pezzo "${part.name ?? part.id}"`;
-    if (part.substacks !== undefined && part.substacks !== null && !Array.isArray(part.substacks)) throw new Error(`${where}: "substacks" deve essere un elenco`);
+    const where = `Part "${part.name ?? part.id}"`;
+    if (part.substacks !== undefined && part.substacks !== null && !Array.isArray(part.substacks)) throw new Error(`${where}: "substacks" must be a list`);
     (part.substacks || []).forEach((s, i) => {
-      if (!isObject(s)) throw new Error(`${where}: substack n. ${i + 1} non valido`);
+      if (!isObject(s)) throw new Error(`${where}: substack n. ${i + 1} not valid`);
       checkNumbers(s, ['plyArea', 'plies', 'arealWeight'], `${where}, substack n. ${i + 1}`);
     });
-    checkNumbers(part.core, ['mass', 'area', 'thickness', 'density', 'resinUptake'], `${where}, anima`);
+    checkNumbers(part.core, ['mass', 'area', 'thickness', 'density', 'resinUptake'], `${where}, core`);
     checkNumbers(part, ['measuredMass'], where);
-    if (isObject(part.waste)) checkNumbers(part.waste, Object.keys(part.waste), `${where}, scarti`);
+    if (isObject(part.waste)) checkNumbers(part.waste, Object.keys(part.waste), `${where}, waste`);
   }
   for (const line of p.lines) {
-    const where = `Voce "${line.name ?? line.id}"`;
+    const where = `Item "${line.name ?? line.id}"`;
     checkNumbers(line.material, ['qty', 'price', 'waste'], where);
     checkNumbers(line.process, ['hours', 'rate'], where);
   }
-  for (const extra of p.catalogExtras) checkNumbers(extra, ['price', 'density'], `Voce del team "${extra.name ?? extra.id}"`);
+  for (const extra of p.catalogExtras) checkNumbers(extra, ['price', 'density'], `Team item "${extra.name ?? extra.id}"`);
   if (p.baseline?.project) validateProject(p.baseline.project);
   return p;
 }
 
 export const serialize = (p) => JSON.stringify(p, null, 2);
 
-const PICKER_TYPES = [{ description: 'Progetto Dollaroni', accept: { 'application/json': ['.json'] } }];
+const PICKER_TYPES = [{ description: 'Dollaroni project', accept: { 'application/json': ['.json'] } }];
 
-/** Apre un progetto. Ritorna {project, handle, fileName, lastModified} oppure null se annullato. */
+/** Opens a project. Returns {project, handle, fileName, lastModified} or null if cancelled. */
 export async function openProjectFile() {
   if (window.showOpenFilePicker) {
     let handle;
@@ -183,8 +183,8 @@ export function suggestedFileName(p) {
 }
 
 /**
- * Salva: sullo stesso file se possibile, altrimenti chiede dove (o scarica). Ritorna {handle, fileName, lastModified} o null.
- * Se il file è cambiato dopo l'apertura o l'ultimo salvataggio (knownModified), lo sovrascrive solo se confirmOverwrite(lastModified) dice sì.
+ * Saves: to the same file if possible, otherwise asks where (or downloads). Returns {handle, fileName, lastModified} or null.
+ * If the file changed after opening or the last save (knownModified), overwrites it only if confirmOverwrite(lastModified) says yes.
  */
 export async function saveProjectFile(project, handle, { saveAs = false, knownModified = null, confirmOverwrite = () => true } = {}) {
   const text = serialize({ ...project, savedAt: new Date().toISOString() });

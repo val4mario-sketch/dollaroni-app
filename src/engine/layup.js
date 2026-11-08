@@ -1,24 +1,24 @@
-// Calcolo del layup con le STESSE formule del foglio ufficiale
+// Layup calculation with the SAME formulas as the official sheet
 // "2026_SMC_Composite_Layup_Calculator" (foglio "Composite stacking calculation"):
 //
-//   I  (Vf)            = Vf del processo scelto (colonna W del template)
-//   J  (Wf fibra)      = ρf·Vf / (ρf·Vf + ρm·(1−Vf))              [regola delle miscele]
-//   K  (massa fibra g) = area ply [m²] × n. ply × grammatura [g/m²]
-//   K+1(massa resina g)= (1−Wf) · massa fibra / Wf
+//   I  (Vf)            = Vf of the chosen process (column W of the template)
+//   J  (Wf fibre)      = ρf·Vf / (ρf·Vf + ρm·(1−Vf))              [rule of mixtures]
+//   K  (fibre mass g)  = ply area [m²] × no. of plies × areal weight [g/m²]
+//   K+1(resin mass g)  = (1−Wf) · fibre mass / Wf
 //
-// Così i numeri dell'app coincidono con quelli che la giuria ricalcola nel file ufficiale.
+// This way the app numbers match those the jury recalculates in the official file.
 
 import { layupMaterialFor } from './rules-2026.js';
 
-/** Risolve la fibra/matrice di un substack: voce di listino + materiale del calcolatore + densità. */
+/** Resolves the fibre/matrix of a substack: price-list item + calculator material + density. */
 function resolveMaterial(spec, catalog, ref, role) {
   const entry = catalog.get(ref);
-  if (!entry) return { ref, error: `Materiale "${ref}" non presente nel listino` };
+  if (!entry) return { ref, error: `Material "${ref}" not in the price list` };
   const map = layupMaterialFor(entry);
   const options = role === 'reinforcement' ? spec.reinforcements : spec.matrices;
   const opt = map.calc ? options.find((o) => o.name === map.calc) : null;
   const density = opt ? opt.density : map.density;
-  if (!density) return { ref, entry, error: `Densità sconosciuta per "${entry.name}"` };
+  if (!density) return { ref, entry, error: `Unknown density for "${entry.name}"` };
   return { ref, entry, calc: opt || null, density, carbon: map.carbon, inCalculator: Boolean(opt) };
 }
 
@@ -29,7 +29,7 @@ export function computeSubstack(spec, catalog, s) {
   if (reinforcement.error) errors.push(reinforcement.error);
   if (matrix.error) errors.push(matrix.error);
   const process = spec.processes.find((p) => p.name === String(s.process).trim());
-  if (!process) errors.push(`Processo "${s.process}" non previsto dal Layup Calculator`);
+  if (!process) errors.push(`Process "${s.process}" not provided for by the Layup Calculator`);
 
   const area = Number(s.plyArea) || 0;
   const plies = Number(s.plies) || 0;
@@ -50,8 +50,8 @@ export function computeSubstack(spec, catalog, s) {
 }
 
 /**
- * Risultato di una parte laminata.
- * Masse in grammi, come nel calcolatore. carbon: masse di carbonio per fonte (virgin/recycled/upcycled).
+ * Result of a laminated part.
+ * Masses in grams, as in the calculator. carbon: carbon masses by source (virgin/recycled/upcycled).
  */
 export function computePart(spec, catalog, part) {
   const substacks = (part.substacks || []).map((s) => computeSubstack(spec, catalog, s));
@@ -59,8 +59,8 @@ export function computePart(spec, catalog, part) {
   const fibres = substacks.reduce((a, r) => a + r.fibre, 0);
   const resin = composite - fibres;
   for (const r of substacks) {
-    r.shareFibre = composite ? r.fibre / composite : 0; // colonna L, riga fibra
-    r.shareResin = composite ? r.resin / composite : 0; // colonna L, riga resina
+    r.shareFibre = composite ? r.fibre / composite : 0; // column L, fibre row
+    r.shareResin = composite ? r.resin / composite : 0; // column L, resin row
     r.share = r.shareFibre + r.shareResin; //               colonna M
   }
 
@@ -86,7 +86,7 @@ export function computePart(spec, catalog, part) {
   };
 }
 
-/** Somma per materiale (per le righe di costo): {`${role}|${ref}|${source}`: grammi}. */
+/** Sum by material (for the cost rows): {`${role}|${ref}|${source}`: grams}. */
 export function partMaterialMasses(result) {
   const out = [];
   const add = (role, ref, source, grams) => {

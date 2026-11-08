@@ -1,7 +1,11 @@
-// "Esporta S2": sezione 2 "Final cost analysis" del template S2.
-//  2.2 Components Build   – una tabella Item / Quantity / Cost per componente, note sugli sconti, riepilogo
-//  2.3 Cost Summary       – total cost breakdown e confronto con la stima S1 (Δ e variazione)
-//  2.4 Self-Assessment    – dati di supporto: quanto è misurato/stimato, differenze maggiori, pesato vs calcolato
+// "Export S2": section 2 "Final cost analysis" of the S2 template.
+
+//  2.2 Components Build   – one Item / Quantity / Cost table per component, notes on discounts, summary
+
+//  2.3 Cost Summary       – total cost breakdown and comparison with the S1 estimate (Δ and change)
+
+//  2.4 Self-Assessment    – supporting data: how much is measured/estimated, largest differences, weighed vs calculated
+
 //  + mass breakdown as-built (§2.5 del regolamento), Layup Calculator dei pezzi as-built e immagini.
 
 import { exportAllLayups } from './layup-export.js';
@@ -14,9 +18,10 @@ import { MIME, performanceTable } from './s1-export.js';
 const pct1 = (x) => `${(x * 100).toFixed(1)}%`;
 const ITEM_COLS = [{ title: 'Item', width: 6 }, { title: 'Quantity', width: 2, align: 'right' }, { title: 'Cost [SM$]', width: 2, align: 'right' }];
 
-/** Tabelle S2 già formattate (inglese). evS1 è la stima S1 congelata (può mancare). */
+/** S2 tables already formatted (English). evS1 is the frozen S1 estimate (may be missing). */
 export function s2Tables(ev, evS1, rules) {
-  // numerazione del template S2 2026 (Table 2.1…); nel 2027 i template non sono ancora noti
+  // numbering of the 2026 S2 template (Table 2.1…); in 2027 the templates are not known yet
+
   const tab = (i) => (rules.reportNumbering ? `Table 2.${i}` : 'Table');
   const components = s2ComponentTables(ev, rules).map((t, i) => ({
     key: `comp-${t.component}`, component: t.component, title: t.title,
@@ -88,7 +93,8 @@ export function s2Tables(ev, evS1, rules) {
     rows: massTable(ev).map((m) => [m.group, m.fibre.toFixed(2), m.resin.toFixed(2), m.core.toFixed(2), m.resinUptake.toFixed(2), m.other.toFixed(2), m.total.toFixed(2)]),
   };
 
-  // 2027 §9.2.2: materiale usato e scarti
+  // 2027 §9.2.2: material used and waste
+
   const w2 = rules.wasteTracking ? wasteRows(ev) : [];
   const waste = w2.length ? {
     key: 'waste', caption: 'Table – Material use and waste (Rule 9.2.2)',
@@ -111,19 +117,19 @@ export async function buildS2Export({ project, ev, evS1, rules, spec, catalog, t
   const files = [];
   const errors = [];
 
-  onProgress('Compilo il Layup Calculator dei pezzi as-built…');
+  onProgress('Filling in the Layup Calculator of the as-built parts…');
   const layups = await exportAllLayups(templateBytes, spec, catalog, project.parts || [], prefix);
   const images = [];
   for (const l of layups) {
     if (l.error) { errors.push(l.error); continue; }
     files.push({ folder: 'Layup Calculator', name: l.fileName, bytes: l.bytes, mime: MIME.xlsx });
-    onProgress(`Disegno la tabella di ${l.chunk.title}…`);
+    onProgress(`Drawing the table of ${l.chunk.title}…`);
     const png = await svgToPng(layupTableSvg(l.result, l.chunk.title), 2);
-    files.push({ folder: 'Appendice', name: l.fileName.replace(/\.xlsx$/, '.png'), bytes: png.bytes, mime: MIME.png });
+    files.push({ folder: 'Appendix', name: l.fileName.replace(/\.xlsx$/, '.png'), bytes: png.bytes, mime: MIME.png });
     images.push({ title: l.chunk.title, ...png });
   }
 
-  onProgress('Preparo il documento della sezione 2…');
+  onProgress('Preparing the section 2 document…');
   const t = s2Tables(ev, evS1, rules);
   const table = (x, size = 9) => [{ type: 'paragraph', italic: true, keepNext: true, text: x.caption }, { type: 'table', ...x, size }];
   const sec = (n, title) => (rules.reportNumbering ? `${n} ${title}` : title);
@@ -150,9 +156,9 @@ export async function buildS2Export({ project, ev, evS1, rules, spec, catalog, t
     for (const img of images) blocks.push({ type: 'heading', level: 2, text: img.title }, { type: 'image', png: img.bytes, width: img.width, height: img.height, scale: 2 });
   }
   const docx = await buildDocx(blocks);
-  files.push({ folder: 'Report S2', name: `${prefix} - Sezione 2 tabelle.docx`, bytes: docx, mime: MIME.docx });
+  files.push({ folder: 'Report S2', name: `${prefix} - Section 2 tables.docx`, bytes: docx, mime: MIME.docx });
 
-  onProgress('Creo lo zip…');
+  onProgress('Creating the zip…');
   const zip = new globalThis.JSZip();
   for (const f of files) zip.file(`${f.folder}/${f.name}`, f.bytes);
   const zipBytes = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });

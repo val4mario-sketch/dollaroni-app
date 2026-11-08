@@ -1,36 +1,36 @@
-// IA locale di Brumoth, l'assistente di Dollaroni: un piccolo modello linguistico che gira dentro il browser
-// (llama.cpp compilato in WebAssembly, libreria wllama in vendor/). Niente server, niente account, niente costi.
+// Local AI of Brumoth, the Dollaroni assistant: a small language model that runs inside the browser
+// (llama.cpp compiled to WebAssembly, the wllama library in vendor/). No server, no account, no costs.
 //
-// - Il modello si scarica UNA volta da Hugging Face e resta nella memoria del browser (OPFS) di questo PC:
-//   alle aperture successive si carica dal disco, anche senza internet.
-// - Funziona con la sola CPU (tutti i PC); se il browser ha WebGPU usa anche la scheda video.
-// - Usa più core solo se la pagina è "cross-origin isolated" (header COOP/COEP: li mettono
-//   tools/devserver.py in locale e sw.js sul sito pubblicato); altrimenti va con un core solo, più lenta.
-// - Non calcola niente: riceve i fatti dal motore (src/engine/assistant.js) e li mette in parole.
+// - The model is downloaded ONCE from Hugging Face and stays in this PC's browser storage (OPFS):
+//   on later openings it loads from disk, even offline.
+// - It works with the CPU alone (all PCs); if the browser has WebGPU it also uses the graphics card.
+// - It uses several cores only if the page is "cross-origin isolated" (COOP/COEP headers, set by
+//   tools/devserver.py locally and sw.js on the published site); otherwise it runs on one core, more slowly.
+// - It calculates nothing: it receives the facts from the engine (src/engine/assistant.js) and puts them in words.
 
 import { Wllama, ModelManager } from '../../vendor/wllama-3.8.1/index.js';
 
 const WASM_URL = new URL('../../vendor/wllama-3.8.1/wllama.wasm', import.meta.url).href;
 const SETTINGS_KEY = 'dollaroni.ai.v1';
 
-// Brumoth ha due modalità, scelte dal menu a tendina della chat:
-// - Istantaneo: risponde il motore di Dollaroni con i dati calcolati (subito, numeri esatti, niente IA);
-// - Completo: la stessa risposta viene riscritta a parole dall'IA locale, che ci mette il tempo che serve.
+// Brumoth has two modes, chosen from the chat drop-down menu:
+// - Instant: the Dollaroni engine answers with the calculated data (immediately, exact numbers, no AI);
+// - Complete: the same answer is rewritten in words by the local AI, taking as long as it needs.
 //
-// Modelli (Apache 2.0, buon italiano). I candidati si provano in ordine: il primo repository che esiste
-// e ha il file Q4_K_M viene usato e ricordato. Misure su un portatile Intel di 9ª generazione (ott. 2026):
-// Qwen3 0,6B con la scheda video ~25 s a risposta, solo CPU ~80 s; Qwen3.5 2B solo CPU 2-4 minuti.
-// Il 2B e il Qwen3 1,7B con WebGPU su schede video integrate Intel si bloccano: per loro la scheda video
-// resta spenta, salvo che la si accenda dalle impostazioni.
+// Models (Apache 2.0). Candidates are tried in order: the first repository that exists
+// and has the Q4_K_M file is used and remembered. Measurements on a 9th-generation Intel laptop (Oct 2026):
+// Qwen3 0.6B with the graphics card ~25 s per answer, CPU only ~80 s; Qwen3.5 2B CPU only 2-4 minutes.
+// The 2B and Qwen3 1.7B hang with WebGPU on integrated Intel graphics: for them the graphics card
+// stays off, unless it is turned on from the settings.
 export const MODES = {
-  instant: { id: 'instant', label: 'Istantaneo', icon: 'bolt', desc: 'Risposte subito, calcolate dai dati dell\'app. Numeri sempre esatti.' },
-  full: { id: 'full', label: 'Completo', icon: 'sparkle', desc: "Brumoth ragiona con l'IA locale e risponde a parole sue. Più lento: da mezzo minuto a qualche minuto." },
+  instant: { id: 'instant', label: 'Instant', icon: 'bolt', desc: 'Immediate answers, calculated from the app data. Numbers always exact.' },
+  full: { id: 'full', label: 'Complete', icon: 'sparkle', desc: "Brumoth reasons with the local AI and answers in its own words. Slower: from half a minute to a few minutes." },
 };
 
 export const MODELS = {
   leggero: {
-    id: 'leggero', label: 'Leggera', name: 'Qwen3 0,6B',
-    desc: 'più veloce (soprattutto con la scheda video), ma sbaglia più spesso: controlla i numeri',
+    id: 'leggero', label: 'Light', name: 'Qwen3 0,6B',
+    desc: 'faster (especially with a graphics card), but wrong more often: check the numbers',
     approxGB: 0.4, gpu: true,
     candidates: [
       { repo: 'unsloth/Qwen3-0.6B-GGUF', quant: 'Q4_K_M' },
@@ -39,7 +39,7 @@ export const MODELS = {
   },
   standard: {
     id: 'standard', label: 'Standard', name: 'Qwen3.5 2B',
-    desc: 'risposte scritte meglio e più affidabili, ma lenta: anche qualche minuto sui portatili',
+    desc: 'better written and more reliable answers, but slow: even a few minutes on laptops',
     approxGB: 1.3, gpu: false,
     candidates: [
       { repo: 'unsloth/Qwen3.5-2B-GGUF', quant: 'Q4_K_M' },
@@ -49,7 +49,7 @@ export const MODELS = {
   },
 };
 
-/** Modello consigliato per la modalità Completa (deviceMemory nei browser arriva al massimo a 8). */
+/** Recommended model for Complete mode (deviceMemory in browsers reaches at most 8). */
 export function recommendedModel() {
   const mem = navigator.deviceMemory || 4;
   const cores = navigator.hardwareConcurrency || 2;
@@ -67,22 +67,22 @@ export function loadSettings() {
   }
   if (!MODES[s.mode]) s.mode = 'instant';
   if (s.model && !MODELS[s.model]) s.model = null;
-  // file trovati per modelli che non sono più tra i candidati (es. il vecchio Qwen3.5 0,8B): si cercano di nuovo
+  // files found for models no longer among the candidates (e.g. the old Qwen3.5 0.8B): searched for again
   const resolved = {};
   for (const [id, r] of Object.entries(s.resolved || {})) {
     if (MODELS[id]?.candidates.some((c) => c.repo === r?.repo)) resolved[id] = r;
   }
   s.resolved = resolved;
   delete s.enabled;
-  // scheda video che ha dato errore, per modello (prima era un sì/no unico: si riparte da zero)
+  // graphics card that gave an error, per model (it used to be a single yes/no: starting over)
   if (!s.gpuFailed || typeof s.gpuFailed !== 'object') s.gpuFailed = {};
   return s;
 }
 export function saveSettings(s) {
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch { /* storage non disponibile */ }
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch { /* storage not available */ }
 }
 
-/** Info sul browser utili per capire la velocità. */
+/** Browser info useful for understanding the speed. */
 export function environment() {
   return {
     isolated: Boolean(globalThis.crossOriginIsolated),
@@ -93,7 +93,7 @@ export function environment() {
   };
 }
 
-/** Batteria del portatile: {charging, level} oppure null se il browser non lo dice. */
+/** Laptop battery: {charging, level} or null if the browser does not say. */
 export async function batteryInfo() {
   try {
     const b = await navigator.getBattery?.();
@@ -103,7 +103,7 @@ export async function batteryInfo() {
   }
 }
 
-/** Trova il file GGUF su Hugging Face: {url, size, repo, file}. */
+/** Finds the GGUF file on Hugging Face: {url, size, repo, file}. */
 async function resolveModel(model, signal) {
   const errors = [];
   for (const c of model.candidates) {
@@ -113,17 +113,17 @@ async function resolveModel(model, signal) {
       const files = await r.json();
       const ggufs = files.filter((f) => f.type === 'file' && /\.gguf$/i.test(f.path) && !/mmproj/i.test(f.path));
       const hit = ggufs.find((f) => f.path.toUpperCase().includes(c.quant));
-      if (!hit) { errors.push(`${c.repo}: manca ${c.quant}`); continue; }
+      if (!hit) { errors.push(`${c.repo}: missing ${c.quant}`); continue; }
       return { url: `https://huggingface.co/${c.repo}/resolve/main/${hit.path}`, size: hit.lfs?.size || hit.size || 0, repo: c.repo, file: hit.path };
     } catch (e) {
       if (signal?.aborted) throw e;
       errors.push(`${c.repo}: ${e.message}`);
     }
   }
-  throw new Error(`Non trovo il modello su Hugging Face (${errors.join('; ')}). Serve internet per il primo download.`);
+  throw new Error(`Cannot find the model on Hugging Face (${errors.join('; ')}). Internet is needed for the first download.`);
 }
 
-const quietLogger = { debug() {}, log() {}, info() {}, warn: (...a) => console.warn('[IA]', ...a), error: (...a) => console.error('[IA]', ...a) };
+const quietLogger = { debug() {}, log() {}, info() {}, warn: (...a) => console.warn('[AI]', ...a), error: (...a) => console.error('[AI]', ...a) };
 
 /**
  * Stato dell'IA, osservabile: subscribe(fn) riceve {status, progress, info, error}.
@@ -135,7 +135,7 @@ class LocalAI {
     this.state = { status: 'idle', progress: null, info: null, error: null };
     this.listeners = new Set();
     this.wllama = null;
-    this.loaded = null; // id del modello caricato in memoria
+    this.loaded = null; // id of the model loaded in memory
     this.queue = Promise.resolve();
     this.downloadCtl = null;
   }
@@ -163,7 +163,7 @@ class LocalAI {
   markGpuFailed(id = this.modelId) {
     this.updateSettings({ gpuFailed: { ...this.settings.gpuFailed, [id]: true } });
   }
-  /** Scheda video: 'on'/'off' scelti dall'utente, altrimenti dipende dal modello (vedi MODELS). */
+  /** Graphics card: 'on'/'off' chosen by the user, otherwise depends on the model (see MODELS). */
   gpuWanted(id = this.modelId) {
     if (this.settings.gpuFailed?.[id]) return false;
     if (this.settings.gpu === 'on') return true;
@@ -171,7 +171,7 @@ class LocalAI {
     return Boolean(MODELS[id]?.gpu);
   }
 
-  /** Il modello scelto è già sul disco (cache del browser)? */
+  /** Is the chosen model already on disk (browser cache)? */
   async isDownloaded(id = this.modelId) {
     const url = this.settings.resolved?.[id]?.url;
     if (!url) return false;
@@ -183,25 +183,25 @@ class LocalAI {
     }
   }
 
-  /** Controlla lo stato all'avvio, ed eventualmente fa partire il download automatico. */
+  /** Checks the state at start-up, and possibly starts the automatic download. */
   async init({ autoStart = true } = {}) {
     if (['downloading', 'loading', 'ready', 'busy'].includes(this.state.status)) return;
     const done = await this.isDownloaded();
     this.set({ status: done ? 'downloaded' : 'idle' });
-    // il download automatico parte solo se si usa la modalità Completa
+    // the automatic download starts only if Complete mode is in use
     if (!done && autoStart && this.settings.mode === 'full' && this.settings.autoDownload && !environment().saveData) this.download().catch(() => {});
   }
 
-  /** Scarica il modello (senza caricarlo in memoria). Una sola scheda alla volta scarica (Web Locks). */
+  /** Downloads the model (without loading it into memory). Only one tab at a time downloads (Web Locks). */
   download() {
-    if (this.downloadPromise) return this.downloadPromise; // già in corso in questa scheda
+    if (this.downloadPromise) return this.downloadPromise; // already running in this tab
     if (['downloading', 'loading', 'ready', 'busy'].includes(this.state.status)) return Promise.resolve();
     const run = () => this.downloadNow();
     const locks = navigator.locks;
     this.downloadPromise = locks
       ? locks.request('dollaroni-ai-download', { ifAvailable: true }, (lock) => {
         if (!lock) {
-          this.set({ status: 'error', error: "Il modello si sta già scaricando in un'altra scheda di Dollaroni: lascialo finire lì oppure chiudi quella scheda e riprova." });
+          this.set({ status: 'error', error: "The model is already being downloaded in another Dollaroni tab: let it finish there or close that tab and try again." });
           return undefined;
         }
         return run();
@@ -230,7 +230,7 @@ class LocalAI {
         try {
           await mm.downloadModel(res.url, options);
         } catch (e) {
-          // un pezzo di download precedente ancora aperto blocca il file: si aspetta un attimo e si riprova una volta
+          // a piece of an earlier download still open locks the file: wait a moment and try again once
           if (!isLocked(e) || signal.aborted) throw e;
           await new Promise((r) => setTimeout(r, 2500));
           await mm.downloadModel(res.url, options);
@@ -246,13 +246,13 @@ class LocalAI {
     }
   }
 
-  /** Ferma il download in corso; la promessa finisce quando il download si è davvero fermato. */
+  /** Stops the current download; the promise ends when the download has really stopped. */
   cancelDownload() {
     this.downloadCtl?.abort();
     return (this.downloadPromise || Promise.resolve()).catch(() => {});
   }
 
-  /** Scarica (se serve) e carica il modello in memoria. */
+  /** Downloads (if needed) and loads the model into memory. */
   async ensureReady() {
     if (this.wllama && this.loaded === this.modelId) return;
     if (this.state.status === 'downloading') await this.waitFor(['downloaded', 'error', 'idle']);
@@ -276,7 +276,7 @@ class LocalAI {
     const tryLoad = async (gpu) => {
       const w = new Wllama({ default: WASM_URL }, { allowOffline: true, logger: quietLogger, suppressNativeLog: true });
       const params = { n_ctx: 4096, n_parallel: 1, useCache: true };
-      if (this.settings.threads) params.n_threads = this.settings.threads; // di solito si lascia decidere a wllama (metà dei core logici)
+      if (this.settings.threads) params.n_threads = this.settings.threads; // usually left to wllama to decide (half of the logical cores)
       if (!gpu) params.n_gpu_layers = 0;
       await w.loadModelFromUrl(res.url, params);
       return w;
@@ -289,7 +289,7 @@ class LocalAI {
         this.wllama = await tryLoad(gpu);
       } catch (e) {
         if (!gpu) throw e;
-        console.warn('[IA] WebGPU non va, passo alla CPU:', e);
+        console.warn('[AI] WebGPU does not work, switching to the CPU:', e);
         this.markGpuFailed();
         gpu = false;
         this.wllama = await tryLoad(false);
@@ -312,10 +312,10 @@ class LocalAI {
     this.wllama = null;
     this.loaded = null;
     this.warmed = null;
-    if (w) { try { await w.exit(); } catch { /* già chiuso */ } }
+    if (w) { try { await w.exit(); } catch { /* already closed */ } }
   }
 
-  /** Cancella il modello scelto dal disco. */
+  /** Deletes the chosen model from disk. */
   async remove(id = this.modelId) {
     if (this.loaded === id) await this.unload();
     const url = this.settings.resolved?.[id]?.url;
@@ -327,9 +327,9 @@ class LocalAI {
   }
 
   /**
-   * Prepara Brumoth per la modalità Completa: scarica (se serve), carica il modello e legge una volta
-   * le istruzioni (systemPrompt). Il motore tiene in memoria quel pezzo già letto, così a ogni domanda
-   * legge solo i dati e la domanda.
+   * Prepares Brumoth for Complete mode: downloads (if needed), loads the model and reads the
+   * instructions once (systemPrompt). The engine keeps that already-read part in memory, so for each question
+   * it reads only the data and the question.
    */
   prepare(systemPrompt) {
     if (this.preparing) return this.preparing;
@@ -354,8 +354,8 @@ class LocalAI {
   }
 
   /**
-   * Risposta in streaming. onText(testoFinora) a ogni pezzo. Le richieste passano una alla volta.
-   * Ritorna {text, tokens, seconds}.
+   * Streaming answer. onText(textSoFar) for each piece. Requests go through one at a time.
+   * Returns {text, tokens, seconds}.
    */
   chat(messages, { onText, signal, maxTokens = 450 } = {}) {
     const attempt = async () => {
@@ -381,7 +381,7 @@ class LocalAI {
           onText?.(cleanReply(text));
         }
       } catch (e) {
-        if (signal?.aborted || e?.name === 'WllamaAbortError' || e?.name === 'AbortError') { /* fermata dall'utente */ } else throw e;
+        if (signal?.aborted || e?.name === 'WllamaAbortError' || e?.name === 'AbortError') { /* stopped by the user */ } else throw e;
       }
       const gen = first ? (performance.now() - first) / 1000 : 0;
       const tps = gen > 0.2 ? tokens / gen : null;
@@ -393,12 +393,12 @@ class LocalAI {
       try {
         return await attempt();
       } catch (e) {
-        // il motore si è bloccato (memoria, scheda video persa…): si ricarica, senza scheda video se la usava, e si riprova una volta
+        // the engine has hung (memory, lost graphics card…): reload, without the graphics card if it was using it, and try again once
         if (!isCrash(e) || signal?.aborted) {
           this.set({ status: this.wllama ? 'ready' : 'downloaded', error: friendlyError(e) });
           throw e;
         }
-        console.warn('[IA] il motore si è bloccato, lo riavvio:', e);
+        console.warn('[AI] the engine has hung, restarting it:', e);
         if (this.state.info?.gpu) this.markGpuFailed();
         await this.unload();
         this.set({ status: 'downloaded' });
@@ -416,7 +416,7 @@ class LocalAI {
     return p;
   }
 
-  /** Risposta breve non in streaming (es. scegliere l'argomento di una domanda con una parola). */
+  /** Short non-streaming answer (e.g. choosing the topic of a question with one word). */
   complete(messages, { signal, maxTokens = 12 } = {}) {
     const run = async () => {
       await this.ensureReady();
@@ -441,23 +441,23 @@ class LocalAI {
 /** "Qwen3.5-0.8B-Q4_K_M.gguf" -> "Qwen3.5-0.8B". */
 const modelLabel = (file) => String(file || '').split('/').pop().replace(/\.gguf$/i, '').replace(/^[A-Za-z]+_(?=[A-Z])/, '').replace(/[-_.](Q\d|IQ\d|F16|BF16).*$/i, '');
 
-/** Toglie eventuali ragionamenti <think>…</think> e spazi in eccesso. */
+/** Removes any <think>…</think> reasoning and excess spaces. */
 export function cleanReply(text) {
   return String(text || '').replace(/<think>[\s\S]*?(<\/think>|$)/g, '').replace(/^\s+/, '');
 }
 
-/** Il motore WebAssembly si è fermato e va ricaricato. */
+/** The WebAssembly engine has stopped and must be reloaded. */
 const isCrash = (e) => e?.name === 'WllamaRuntimeError' || /crashed|reload the module|RuntimeError|unreachable|out of bounds|device (was )?lost|gpu|webgpu|out of memory/i.test(String(e?.message || e));
 
 const isLocked = (e) => e?.name === 'NoModificationAllowedError' || /modifications are not allowed|NoModificationAllowed/i.test(String(e?.message));
 
 function friendlyError(e) {
   const m = String(e?.message || e);
-  if (isLocked(e)) return "Il file del modello è bloccato da un download rimasto a metà o da un'altra scheda di Dollaroni. Chiudi le altre schede di Dollaroni, ricarica questa pagina (F5) e premi di nuovo «Scarica ora».";
-  if (/quota|QuotaExceeded/i.test(m)) return 'Spazio su disco del browser insufficiente per il modello.';
-  if (/Failed to fetch|NetworkError|network/i.test(m)) return 'Download non riuscito: controlla la connessione e riprova.';
-  if (/memory|OOM|allocate/i.test(m)) return 'Memoria insufficiente: nelle impostazioni prova il modello Leggero.';
-  if (/crashed|reload the module/i.test(m)) return "Il motore dell'IA si è bloccato anche dopo il riavvio: ricarica la pagina (F5); se succede ancora, nelle impostazioni prova il modello Leggero o usa la modalità Istantanea.";
+  if (isLocked(e)) return "The model file is locked by a half-finished download or by another Dollaroni tab. Close the other Dollaroni tabs, reload this page (F5) and press «Download now» again.";
+  if (/quota|QuotaExceeded/i.test(m)) return 'Not enough browser disk space for the model.';
+  if (/Failed to fetch|NetworkError|network/i.test(m)) return 'Download failed: check the connection and try again.';
+  if (/memory|OOM|allocate/i.test(m)) return 'Not enough memory: in the settings try the Light model.';
+  if (/crashed|reload the module/i.test(m)) return "The AI engine hung even after restarting: reload the page (F5); if it happens again, in the settings try the Light model or use Instant mode.";
   return m.length > 220 ? `${m.slice(0, 220)}…` : m;
 }
 

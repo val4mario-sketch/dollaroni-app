@@ -72,7 +72,7 @@ main > * { max-width: 1320px; }
 .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
 .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
 
-/* ------------------------------------------------------------ card, metriche */
+/* ------------------------------------------------------------ cards, metrics */
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; box-shadow: var(--shadow); }
 .card-tight { padding: 14px 16px; }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -289,7 +289,7 @@ td.r .proc-cell { justify-content: flex-end; }
   .grid-2 { grid-template-columns: 1fr; }
 }
 
-/* ------------------------------------------------------------ app installabile: avviso di aggiornamento */
+/* ------------------------------------------------------------ installable app: update notice */
 .update-banner { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 50; display: flex; gap: 16px; align-items: center; max-width: min(760px, calc(100vw - 32px)); padding: 12px 14px 12px 18px; background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; box-shadow: 0 8px 28px rgba(16, 35, 59, .22); font-size: 13px; }
 .update-actions { display: flex; gap: 6px; flex: none; }
 .update-text { display: grid; gap: 4px; min-width: 0; }
@@ -299,7 +299,7 @@ td.r .proc-cell { justify-content: flex-end; }
 .update-text .link { justify-self: start; padding: 0; }
 @media (max-width: 640px) { .update-banner { flex-direction: column; align-items: stretch; } }
 
-/* finestra "Novità" */
+/* "What's new" window */
 .news-modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(16, 35, 59, .35); }
 .news-box { width: min(520px, 100%); max-height: 80vh; overflow: auto; padding: 20px 22px; background: var(--panel); border-radius: 14px; box-shadow: 0 16px 48px rgba(16, 35, 59, .3); }
 .news-box ul { padding-left: 20px; margin: 10px 0 16px; line-height: 1.5; }
@@ -307,7 +307,7 @@ td.r .proc-cell { justify-content: flex-end; }
 .version-foot .link { font-size: 12px; padding: 0; }
 .version-foot .new { color: var(--ok); font-weight: 600; }
 
-/* ------------------------------------------------------------ assistente (pallino + chat) */
+/* ------------------------------------------------------------ assistant (dot + chat) */
 .ai-fab { position: fixed; right: 20px; bottom: 20px; z-index: 45; width: 58px; height: 58px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
   color: #fff; background: radial-gradient(circle at 30% 25%, #2c6fc2, var(--navy) 70%); box-shadow: 0 6px 18px rgba(16, 35, 59, .35); transition: transform .15s ease; }
 .ai-fab:hover { transform: scale(1.06); }
@@ -318,7 +318,7 @@ td.r .proc-cell { justify-content: flex-end; }
 @keyframes boat-bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-1.5px) rotate(-4deg); } }
 .ai-head-boat { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .12); }
 
-/* fumetto "Chiedi a Brumoth!" sopra la barchetta: sparisce appena si scorre o si tocca altrove */
+/* "Ask Brumoth!" bubble above the boat: goes away as soon as you scroll or touch elsewhere */
 .ai-hint { position: fixed; right: 16px; bottom: 92px; z-index: 45; padding: 9px 15px; border: 1px solid var(--border-strong); border-radius: 16px;
   background: var(--panel); color: var(--navy); font: inherit; font-size: 14px; font-weight: 650; white-space: nowrap; cursor: pointer;
   box-shadow: 0 8px 24px rgba(16, 35, 59, .22); animation: ai-hint-in .4s cubic-bezier(.2, 1.4, .4, 1) both; }
@@ -389,7 +389,7 @@ td.r .proc-cell { justify-content: flex-end; }
 .ai-input-bar .ai-send { margin-left: auto; }
 .ai-battery { font-size: 11.5px; color: var(--warn); background: var(--warn-bg); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
 
-/* menu a tendina della modalità (Istantaneo / Completo) */
+/* mode drop-down menu (Instant / Complete) */
 .ai-mode { position: relative; }
 .ai-mode-btn { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 9px; border: 1px solid var(--border); border-radius: 8px;
   background: var(--panel-2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }

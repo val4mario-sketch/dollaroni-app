@@ -1,25 +1,25 @@
-// Service worker di Dollaroni: l'app funziona anche offline e si aggiorna da sola.
+// Dollaroni service worker: the app also works offline and updates itself.
 //
-// VERSION e PRECACHE vengono riscritti da tools/build_pwa.py quando si pubblica (GitHub Pages):
-// ogni modifica ai file cambia VERSION, quindi il browser installa il service worker nuovo,
-// scarica i file nuovi e l'app mostra "È disponibile Dollaroni x.y.z" (src/app/pwa.js e updates.js).
-// In locale (python tools/devserver.py) il service worker non viene registrato.
+// VERSION and PRECACHE are rewritten by tools/build_pwa.py when publishing (GitHub Pages):
+// each file change alters VERSION, so the browser installs the new service worker,
+// downloads the new files and the app shows "Dollaroni x.y.z is available" (src/app/pwa.js and updates.js).
+// Locally (python tools/devserver.py) the service worker is not registered.
 
 const VERSION = 'dev';
 const PRECACHE = [];
 const CACHE = `dollaroni-${VERSION}`;
 
-// Librerie pesanti con la versione nel nome della cartella (il motore dell'IA, ~9 MB): si scaricano
-// alla prima richiesta e restano tra un aggiornamento e l'altro. Se si cambia versione di wllama,
-// aggiornare qui il nome della cartella.
+// Heavy libraries with the version in the folder name (the AI engine, ~9 MB): downloaded
+// on first request and kept between updates. If you change the wllama version,
+// update the folder name here.
 const STATIC = 'dollaroni-static';
 const STATIC_DIRS = ['vendor/wllama-3.8.1/'];
 
-// Sempre dalla rete (se c'è): servono a sapere se esiste una versione nuova.
+// Always from the network (if available): used to find out whether a new version exists.
 const NETWORK_FIRST = ['version.json', 'dollaroni.config.json'];
 
-// "Cross-origin isolation": su GitHub Pages non si possono impostare gli header del server, quindi li
-// aggiunge il service worker. Servono all'IA locale per usare tutti i core (SharedArrayBuffer).
+// "Cross-origin isolation": on GitHub Pages server headers cannot be set, so the
+// service worker adds them. The local AI needs them to use all the cores (SharedArrayBuffer).
 function isolate(res) {
   if (!res || res.status === 0 || res.type === 'opaque') return res;
   const headers = new Headers(res.headers);
@@ -29,7 +29,7 @@ function isolate(res) {
 }
 
 self.addEventListener('install', (event) => {
-  // non si attiva da solo se c'è già una versione aperta: aspetta il clic su "Aggiorna"
+  // does not activate by itself if a version is already open: waits for the click on "Update"
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)));
 });
 
@@ -38,7 +38,7 @@ self.addEventListener('activate', (event) => {
     for (const key of await caches.keys()) {
       if (key.startsWith('dollaroni-') && key !== CACHE && key !== STATIC) await caches.delete(key);
     }
-    // nella cache delle librerie restano solo le versioni in uso
+    // only the versions in use stay in the library cache
     const st = await caches.open(STATIC);
     for (const req of await st.keys()) {
       if (!STATIC_DIRS.some((d) => req.url.includes(`/${d}`))) await st.delete(req);
@@ -82,7 +82,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Prima la copia salvata (veloce e offline), altrimenti la rete. I file nuovi arrivano con la versione nuova.
+  // The saved copy first (fast and offline), otherwise the network. New files arrive with the new version.
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const key = req.mode === 'navigate' ? new URL('./', self.registration.scope).href : req;
@@ -90,7 +90,7 @@ self.addEventListener('fetch', (event) => {
     if (hit) return isolate(hit);
     try {
       const res = await fetch(req);
-      // tiene anche i file non in elenco (es. pagine dei test) per l'uso offline
+      // also keeps files not on the list (e.g. test pages) for offline use
       if (res.ok && res.type === 'basic') cache.put(req, res.clone());
       return isolate(res);
     } catch (e) {

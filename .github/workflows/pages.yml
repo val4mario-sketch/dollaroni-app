@@ -1,6 +1,6 @@
-# Pubblica Dollaroni su GitHub Pages a ogni push sul branch main.
-# Il sito è preparato da tools/build_pwa.py: la versione nuova arriva da sola a chi usa l'app.
-name: Pubblica su GitHub Pages
+# Publishes Dollaroni to GitHub Pages on every push to the main branch.
+# The site is prepared by tools/build_pwa.py: the new version reaches app users by itself.
+name: Publish to GitHub Pages
 
 on:
   push:
@@ -27,9 +27,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Test nel browser (Chrome headless)
+      - name: Browser tests (headless Chrome)
         run: python tools/run_tests_headless.py
-      - name: Prepara il sito
+      - name: Prepare the site
         run: python tools/build_pwa.py _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

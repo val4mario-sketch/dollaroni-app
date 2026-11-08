@@ -1,12 +1,12 @@
-// Valutazione di un progetto Dollaroni: dai dati inseriti (parti laminate + voci)
-// a costi SM$, totali per componente, limiti carbonio, masse e handicap.
+// Evaluation of a Dollaroni project: from the entered data (laminated parts + items)
+// to SM$ costs, totals by component, carbon limits, masses and handicap.
 //
-// Struttura dati (file .json del progetto): vedi README.md, sezione "Formato del progetto".
+// Data structure (project .json file): see README.md, section "Project format".
 
 import { computePart, partMaterialMasses } from './layup.js';
 import { performanceRating } from './performance.js';
 
-/** Catalogo = voci del listino ufficiale + voci del team (hardware MSRP, prezzi dati su Discord…). */
+/** Catalogue = official price-list items + team items (MSRP hardware, prices given on Discord…). */
 export function makeCatalog(entries, extras = []) {
   const map = new Map();
   for (const e of entries) map.set(e.id, e);
@@ -52,9 +52,9 @@ function coreOf(part) {
 }
 
 /**
- * Righe generate in automatico da una parte (per i progetti nuovi): fibra, resina, anima.
- * part.waste = {<id listino>: kg} è il materiale consumato in più e buttato (S2, §9.2.2 2027):
- * si somma alla quantità (e quindi al costo) delle righe con quel materiale, in proporzione alla massa.
+ * Rows generated automatically from a part (for new projects): fibre, resin, core.
+ * part.waste = {<price-list id>: kg} is the material consumed in excess and thrown away (S2, §9.2.2 2027):
+ * it adds to the quantity (and so the cost) of the rows with that material, in proportion to the mass.
  */
 function autoLinesFor(part, pr, catalog) {
   const lines = [];
@@ -95,21 +95,21 @@ function autoLinesFor(part, pr, catalog) {
 
 function computeLine(line, ctx) {
   const { catalog, rules, partResults } = ctx;
-  // status: 'estimated' (stima, tipico di S1) | 'measured' (valore reale as-built, S2)
+  // status: 'estimated' (estimate, typical of S1) | 'measured' (real as-built value, S2)
   const out = { line, id: line.id, component: line.component, name: line.name, status: line.status || 'estimated', errors: [], warnings: [], material: null, process: null, usedPart: null };
 
   if (line.material) {
     const m = line.material;
     const entry = m.ref ? catalog.get(m.ref) : null;
-    if (m.ref && !entry) out.errors.push(`Voce di listino "${m.ref}" inesistente`);
+    if (m.ref && !entry) out.errors.push(`Price-list item "${m.ref}" does not exist`);
     const source = m.source || 'new';
     const src = rules.sources[source];
-    if (!src) out.errors.push(`Provenienza "${source}" sconosciuta`);
+    if (!src) out.errors.push(`Origin "${source}" unknown`);
     const basePrice = m.price ?? entry?.price ?? null;
-    if (basePrice === null && (src?.factor ?? 1) !== 0) out.errors.push(`Prezzo mancante per "${m.label || entry?.name || m.name || line.name}"`);
+    if (basePrice === null && (src?.factor ?? 1) !== 0) out.errors.push(`Price missing for "${m.label || entry?.name || m.name || line.name}"`);
     const derived = m.fromLayup ? layupKg(partResults, m.fromLayup) : m.check ? layupKg(partResults, m.check) : null;
     const qty = m.qty ?? (m.fromLayup ? derived : null);
-    if (qty === null || qty === undefined) out.errors.push('Quantità mancante');
+    if (qty === null || qty === undefined) out.errors.push('Quantity missing');
     const factor = src ? src.factor : 1;
     const unitPrice = basePrice === null ? 0 : basePrice * factor;
     const label = m.label || entry?.name || m.name || '';
@@ -118,7 +118,7 @@ function computeLine(line, ctx) {
       qty: qty ?? 0, basePrice, factor, unitPrice, source,
       cost: (qty ?? 0) * unitPrice,
       layupKg: derived, manualPrice: m.price !== undefined, priceSource: m.priceSource || null,
-      // di cui scarto (stessa unità della quantità), tracciato in S2 (§9.2.2 2027)
+      // of which waste (same unit as the quantity), tracked in S2 (§9.2.2 2027)
       waste: typeof m.waste === 'number' && m.waste > 0 ? m.waste : 0,
     };
   }
@@ -126,7 +126,7 @@ function computeLine(line, ctx) {
   if (line.process) {
     const p = line.process;
     const entry = catalog.get(p.ref);
-    if (!entry) out.errors.push(`Lavorazione "${p.ref}" inesistente nel listino`);
+    if (!entry) out.errors.push(`Process "${p.ref}" does not exist in the price list`);
     const rate = p.rate ?? entry?.price ?? 0;
     out.process = { entry, label: p.label || entry?.name || p.ref, hours: p.hours ?? 0, rate, cost: (p.hours ?? 0) * rate };
   }
@@ -134,11 +134,11 @@ function computeLine(line, ctx) {
   if (line.usedPart) {
     const u = line.usedPart;
     const def = rules.usedParts?.[u.element];
-    if (!def) out.errors.push(`Elemento "${u.element}" non previsto dal regolamento ${rules.id}`);
+    if (!def) out.errors.push(`Element "${u.element}" not provided for by the rulebook ${rules.id}`);
     else if (def.cost === null) {
-      // 2027: niente costo fisso né handicap per anno; la parte si paga al prezzo della voce (material)
+      // 2027: no fixed cost or handicap by year; the part is paid at the item price (material)
       out.usedPart = { def, year: u.year ?? null, fixed: false, cost: 0, handicap: 0, doubled: false };
-      if (!line.material) out.errors.push('Prezzo mancante: nel 2027 le parti usate non hanno più un costo fisso');
+      if (!line.material) out.errors.push('Price missing: in 2027 used parts no longer have a fixed cost');
     } else {
       const col = rules.usedPartYearIndex(u.year);
       const doubling = def.kind === 'foil' && (u.participationYear || 1) > 1 ? 2 : 1;
@@ -151,8 +151,8 @@ function computeLine(line, ctx) {
 }
 
 /**
- * Valuta il progetto.
- * ctx: {spec (Layup Calculator), catalogEntries (listino ufficiale), rules}
+ * Evaluates the project.
+ * ctx: {spec (Layup Calculator), catalogEntries (official price list), rules}
  */
 export function evaluate(project, { spec, catalogEntries, rules }) {
   const catalog = makeCatalog(catalogEntries, project.catalogExtras || []);
@@ -163,7 +163,7 @@ export function evaluate(project, { spec, catalogEntries, rules }) {
     const pr = computePart(spec, catalog, part);
     pr.core = coreOf(part);
     pr.status = part.status || 'estimated';
-    // massa calcolata (laminato + anima + resina assorbita) e massa pesata as-built, se inserita
+    // calculated mass (laminate + core + absorbed resin) and as-built weighed mass, if entered
     pr.computedMass = pr.totals.composite / G_PER_KG + (pr.core?.mass || 0) + (pr.core?.uptake || 0);
     pr.measuredMass = typeof part.measuredMass === 'number' ? part.measuredMass : null;
     partResults.set(part.id, pr);
@@ -182,7 +182,7 @@ export function evaluate(project, { spec, catalogEntries, rules }) {
   const unknownComponent = lines.filter((l) => !rules.components.some((c) => c.id === l.component));
   const total = lines.reduce((a, l) => a + l.total, 0);
 
-  // Limiti di carbonio (Tab. 2): somma per gruppo e fonte, confronto con i limiti.
+  // Carbon limits (Table 2): sum by group and source, comparison with the limits.
   const carbon = rules.carbonGroups.map((g, i) => {
     const sums = { virgin: { cf: 0, cfrp: 0 }, recycled: { cf: 0, cfrp: 0 }, upcycled: { cf: 0, cfrp: 0 } };
     for (const pr of partResults.values()) {
@@ -194,16 +194,16 @@ export function evaluate(project, { spec, catalogEntries, rules }) {
     }
     const L = rules.carbonLimits;
     const checks = [
-      { key: 'cf', label: 'CF secco', value: sums.virgin.cf, limit: L.cf[i] },
+      { key: 'cf', label: 'Dry CF', value: sums.virgin.cf, limit: L.cf[i] },
       { key: 'cfrp', label: 'CFRP', value: sums.virgin.cfrp, limit: L.cfrp[i] },
-      { key: 'recycled_cf', label: 'CF riciclato', value: sums.recycled.cf, limit: L.recycled_cf[i] },
-      { key: 'recycled_cfrp', label: 'CFRP riciclato', value: sums.recycled.cfrp, limit: L.recycled_cfrp[i] },
+      { key: 'recycled_cf', label: 'Recycled CF', value: sums.recycled.cf, limit: L.recycled_cf[i] },
+      { key: 'recycled_cfrp', label: 'Recycled CFRP', value: sums.recycled.cfrp, limit: L.recycled_cfrp[i] },
       { key: 'upcycled_cfrp', label: 'CFRP upcycled', value: sums.upcycled.cfrp, limit: L.upcycled_cfrp[i] },
     ].map((c) => ({ ...c, ratio: c.limit ? c.value / c.limit : 0 }));
     return { ...g, checks, hasCarbon: checks.some((c) => c.value > 0) };
   });
 
-  // Mass breakdown (§2.5): fibra, resina, anima (+ assorbimento resina), altro.
+  // Mass breakdown (§2.5): fibre, resin, core (+ resin absorption), other.
   const mass = rules.massGroups.map((g) => ({ ...g, fibre: 0, resin: 0, core: 0, uptake: 0, other: 0 }));
   const massRow = (id) => mass.find((m) => m.id === id) || mass.find((m) => m.id === 'other');
   for (const pr of partResults.values()) {
@@ -219,7 +219,7 @@ export function evaluate(project, { spec, catalogEntries, rules }) {
 
   const handicap = lines.filter((l) => l.usedPart).reduce((a, l) => a + l.usedPart.handicap, 0);
 
-  // Scarti registrati (S2): voci con "di cui scarto".
+  // Recorded waste (S2): items with "of which waste".
   const wasteRows = lines.filter((l) => l.material?.waste > 0).map((l) => ({
     id: l.id, name: l.name, component: l.component, label: l.material.label, unit: l.material.unit,
     used: l.material.qty, waste: l.material.waste, share: l.material.qty > 0 ? l.material.waste / l.material.qty : null,

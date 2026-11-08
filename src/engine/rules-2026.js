@@ -1,55 +1,55 @@
-// Regole del 2026 SuMoth Challenge Competition Handbook (versione 15 ottobre 2025).
-// Quando esce il regolamento nuovo si crea rules-20xx.js con la stessa forma.
+// Rules of the 2026 SuMoth Challenge Competition Handbook (version of 15 October 2025).
+// When the new rulebook comes out, create rules-20xx.js with the same shape.
 
 export const RULES_2026 = {
   id: '2026',
-  title: 'Competition Handbook 2026 (15 ottobre 2025)',
-  // file ufficiali da cui si leggono listino e Layup Calculator
+  title: 'Competition Handbook 2026 (15 October 2025)',
+  // official files from which the price list and Layup Calculator are read
   official: {
     costs: 'data/official/2026_SMC_Standardized_Costs.xlsx',
     layup: 'data/official/2026_SMC_Composite_Layup_Calculator.xlsx',
     provisional: false,
   },
   budget: 10000, // §2.2
-  budgetStrict: false, // "capped at 10,000 SM$": il limite è compreso
+  budgetStrict: false, // "capped at 10,000 SM$": the limit is included
   budgetPenalty: null,
-  // riferimenti al regolamento usati nei messaggi
+  // references to the rulebook used in the messages
   refs: { budget: '§2.2', sources: '§3.3.B', upcycled: '§3.3.A', mass: '§2.5', usedParts: 'Tab. 3' },
   help: {
-    notInCalculator: 'chiedere su Discord o documentare il calcolo a parte',
-    priceSource: 'MSRP del fornitore o prezzo dato su Discord',
-    catalogExtras: 'Hardware a prezzo MSRP (§3.2: SM$ = prezzo di listino in USD senza tasse e spedizione) e materiali che non sono nel listino: il prezzo va chiesto sul Discord SuMoth (§3.1). Indica sempre la fonte.',
+    notInCalculator: 'ask on Discord or document the calculation separately',
+    priceSource: 'supplier MSRP or price given on Discord',
+    catalogExtras: 'Hardware at MSRP (§3.2: SM$ = list price in USD without taxes and shipping) and materials not in the price list: the price must be requested on the SuMoth Discord (§3.1). Always state the source.',
   },
   massBreakdownRequired: true, // §2.5
   sourcesToConfirm: false,
   wasteTracking: false,
-  reportNumbering: true, // numerazione delle sezioni del template S2 2026 (2.1–2.4)
-  performance: null, // la Tab. 4 (handicap A–F) del 2026 non è implementata
+  reportNumbering: true, // section numbering of the 2026 S2 template (2.1–2.4)
+  performance: null, // the 2026 Table 4 (handicap A–F) is not implemented
   labels: {
     s2DocTitle: '2. FINAL COST ANALYSIS – tables',
     costBasis: 'unit costs from the official Standardized Costs.',
   },
 
-  // Categorie della sezione 2.2 del template S2 (una tabella per categoria).
+  // Categories of section 2.2 of the S2 template (one table per category).
   components: [
-    { id: 'hull', en: 'Hull', it: 'Scafo' },
+    { id: 'hull', en: 'Hull', it: 'Hull' },
     { id: 'foils', en: 'Foils', it: 'Foil' },
-    { id: 'mechanical_control', en: 'Mechanical Control System', it: 'Controllo meccanico' },
+    { id: 'mechanical_control', en: 'Mechanical Control System', it: 'Mechanical control' },
     { id: 'gantry', en: 'Gantry', it: 'Gantry' },
-    { id: 'wingbars', en: 'Wingbars', it: 'Terrazze' },
+    { id: 'wingbars', en: 'Wingbars', it: 'Wings' },
     { id: 'rig', en: 'Rig', it: 'Rig' },
-    { id: 'electronics', en: 'Electronics', it: 'Elettronica' },
+    { id: 'electronics', en: 'Electronics', it: 'Electronics' },
   ],
 
-  // §3.3.B e §3.3.A: provenienza del materiale -> moltiplicatore sul prezzo.
+  // §3.3.B and §3.3.A: origin of the material -> multiplier on the price.
   sources: {
-    new: { factor: 1, it: 'Nuovo', en: null },
+    new: { factor: 1, it: 'New', en: null },
     industrial_excess: {
-      factor: 0.75, it: 'Eccedenza industriale −25%', en: 'Industrial Excess',
+      factor: 0.75, it: 'Industrial surplus −25%', en: 'Industrial Excess',
       footnote: 'Material sourced from industrial excess: 25% reduction under Section 3.3.B of the Rules',
     },
     out_of_shelf_life: {
-      factor: 0.5, it: 'Fuori shelf-life −50%', en: 'OOSL',
+      factor: 0.5, it: 'Out of shelf life −50%', en: 'OOSL',
       footnote: 'Out-of-shelf-life material: 50% reduction under Section 3.3.B of the Rules',
     },
     upcycled: {
@@ -58,7 +58,7 @@ export const RULES_2026 = {
     },
   },
 
-  // Tab. 2 – limiti di carbonio in kg per componente.
+  // Table 2 – carbon limits in kg per component.
   carbonGroups: [
     { id: 'hull', en: 'Hull' }, { id: 'wingbars', en: 'Wingbars' },
     { id: 'main_vertical', en: 'Main Vertical' }, { id: 'main_horizontal', en: 'Main Horizontal' },
@@ -74,8 +74,8 @@ export const RULES_2026 = {
     upcycled_cfrp:   [25.0, 5.00, 3.00,  1.00, 2.50, 1.00, 2.00, 1.00, 1.00],
   },
 
-  // Tab. 3 – parti usate (non UFLP): costo SM$ fisso e punti di handicap per anno di produzione.
-  // Punti negativi = riduzione. Per i foil, dagli anni di partecipazione successivi la riduzione raddoppia (§3.4.A).
+  // Table 3 – used parts (not UFLP): fixed SM$ cost and handicap points by year of production.
+  // Negative points = reduction. For foils, the reduction doubles from the following years of participation (§3.4.A).
   usedParts: {
     main_vertical:     { en: 'Main Vertical',     kind: 'foil', cost: 1500, handicap: [-200, -220, -240, -260, -500] },
     main_horizontal:   { en: 'Main Horizontal',   kind: 'foil', cost: 500,  handicap: [-150, -170, -190, -210, -300] },
@@ -86,14 +86,14 @@ export const RULES_2026 = {
     boom:              { en: 'Boom',     kind: 'rig', cost: 0, handicap: [0, -50, -100, -150, -200] },
     spreader:          { en: 'Spreader', kind: 'rig', cost: 0, handicap: [0, -50, -100, -150, -200] },
   },
-  /** Colonna della Tab. 3 per un anno di produzione: Pre 2015, 2015, 2016, 2017, Post 2017. */
+  /** Table 3 column for a year of production: Pre 2015, 2015, 2016, 2017, Post 2017. */
   usedPartYearIndex(year) {
     if (year < 2015) return 0;
     if (year > 2017) return 4;
     return year - 2014;
   },
 
-  // Gruppi del mass breakdown as-built richiesto al §2.5.
+  // Groups of the as-built mass breakdown required by §2.5.
   massGroups: [
     { id: 'hull', en: 'Hull' }, { id: 'wings', en: 'Wings' },
     { id: 'horizontal_foils', en: 'Horizontal foils' }, { id: 'vertical_foils', en: 'Vertical foils' },
@@ -101,8 +101,8 @@ export const RULES_2026 = {
   ],
 };
 
-// Densità (g/cm³) dei materiali che il Layup Calculator ufficiale NON prevede.
-// Servono solo per le stime interne: nel file ufficiale questi materiali non si possono inserire.
+// Densities (g/cm³) of materials the official Layup Calculator does NOT include.
+// Used only for internal estimates: these materials cannot be entered in the official file.
 export const EXTRA_DENSITIES = {
   aramid: 1.44,
   innegra: 0.84,
@@ -112,11 +112,11 @@ export const EXTRA_DENSITIES = {
 };
 
 /**
- * Collega una voce del listino al materiale del Layup Calculator.
- * Ritorna {calc: nome nel calcolatore | null, density?, carbon: bool}.
+ * Links a price-list item to the Layup Calculator material.
+ * Returns {calc: name in the calculator | null, density?, carbon: bool}.
  */
 export function layupMaterialFor(entry) {
-  // group/type per le voci del listino ufficiale, name per quelle aggiunte dal team
+  // group/type for the items of the official price list, name for those added by the team
   const txt = `${entry.group ?? ''} ${entry.type ?? ''} ${entry.extra ? entry.name ?? '' : ''}`.toLowerCase();
   if (entry.density && entry.kind === 'reinforcement') return { calc: null, density: entry.density, carbon: /carbon|\bcf\b/.test(txt) };
   if (entry.kind === 'reinforcement') {

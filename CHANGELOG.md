@@ -3,6 +3,10 @@
 Versions follow `MAJOR.MINOR.PATCH`. The current version and its notes are in `version.json`:
 to publish a new one use `python tools/release.py <version> "note" "note"` (it updates both files).
 
+## 0.6.0 – 08/11/2026
+- The interface, messages and documentation are now in English.
+- Brumoth understands questions in English as well as Italian.
+
 ## 0.5.1 – 01/11/2026
 - Unsaved work is protected: before replacing a project the app asks for confirmation and keeps a copy that can be recovered from the start screen. It also warns you when you close the page.
 - When saving to a file, the app warns you if someone else has changed the file in the meantime.

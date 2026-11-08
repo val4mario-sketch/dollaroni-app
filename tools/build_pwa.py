@@ -1,12 +1,12 @@
-"""Prepara il sito da pubblicare (GitHub Pages) in una cartella: python tools/build_pwa.py _site
+"""Prepares the site to publish (GitHub Pages) in a folder: python tools/build_pwa.py _site
 
-- copia solo i file che servono all'app (niente out/, note interne, strumenti);
-- version.json (versione e note) viaggia con il sito: è quello che l'app confronta per gli aggiornamenti;
-- scrive in sw.js la versione (impronta dei file) e l'elenco dei file da tenere offline.
+- copies only the files the app needs (no out/, internal notes, tools);
+- version.json (version and notes) travels with the site: it is what the app compares for updates;
+- writes into sw.js the version (a fingerprint of the files) and the list of files to keep offline.
 
-Ogni modifica a un file cambia la versione: chi ha l'app aperta o installata vede
-"È disponibile una nuova versione" e aggiorna con un clic. Lo usa il workflow
-.github/workflows/pages.yml a ogni push; in locale serve per provare l'app installabile:
+Each file change alters the version: anyone with the app open or installed sees
+"A new version is available" and updates with one click. Used by the
+.github/workflows/pages.yml workflow on each push; locally it is for trying the installable app:
     python tools/build_pwa.py out/site
     python tools/devserver.py 8766 --root=out/site   ->  http://127.0.0.1:8766/?pwa
 """
@@ -20,8 +20,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 INCLUDE = ["index.html", "manifest.webmanifest", "sw.js", "version.json", "dollaroni.config.json", "styles", "src", "vendor", "data", "icons", "tests"]
-NOT_OFFLINE = ("tests/", "vendor/wllama-")  # pubblicati ma non scaricati in anticipo (il motore IA si scarica al primo uso)
-SKIP_SUFFIX = (".dollaroni.json",)  # file progetto del team: mai nel sito
+NOT_OFFLINE = ("tests/", "vendor/wllama-")  # published but not downloaded in advance (the AI engine downloads on first use)
+SKIP_SUFFIX = (".dollaroni.json",)  # team project files: never on the site
 
 
 def files():
@@ -61,9 +61,9 @@ def main(out_dir):
     items = ",\n  ".join(f"'{p}'" for p in precache)
     text, n2 = re.subn(r"const PRECACHE = \[\];", f"const PRECACHE = [\n  {items},\n];", text, count=1)
     if n1 != 1 or n2 != 1:
-        sys.exit("sw.js: non trovo VERSION o PRECACHE da riscrivere")
+        sys.exit("sw.js: cannot find VERSION or PRECACHE to rewrite")
     sw.write_text(text, encoding="utf-8")
-    print(f"Sito pronto in {out} - versione {version} - {len(precache)} file offline")
+    print(f"Site ready in {out} - version {version} - {len(precache)} file offline")
 
 
 if __name__ == "__main__":

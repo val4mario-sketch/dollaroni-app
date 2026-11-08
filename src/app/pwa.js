@@ -1,7 +1,7 @@
-// App installabile: registra il service worker (sw.js) e avvisa quando c'è una versione nuova.
-// In locale (localhost / 127.0.0.1) non si registra, così durante lo sviluppo si vedono sempre i file
-// appena modificati: lì gli aggiornamenti li gestisce il server locale (src/app/updates.js).
-// Per provarlo in locale: tools/build_pwa.py + devserver con --root (vedi README).
+// Installable app: registers the service worker (sw.js) and warns when there is a new version.
+// Locally (localhost / 127.0.0.1) it does not register, so during development the files
+// just changed are always visible: there updates are handled by the local server (src/app/updates.js).
+// To try it locally: tools/build_pwa.py + devserver with --root (see README).
 
 import { offerUpdate } from './updates.js';
 
@@ -12,7 +12,7 @@ export function setupPwa() {
   if (!('serviceWorker' in navigator)) return;
   if (LOCAL && !new URLSearchParams(location.search).has('pwa')) return;
 
-  // al primo avvio il service worker prende il controllo senza bisogno di ricaricare la pagina
+  // on first start the service worker takes control without reloading the page
   const hadController = Boolean(navigator.serviceWorker.controller);
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -26,19 +26,19 @@ export function setupPwa() {
     try {
       reg = await navigator.serviceWorker.register('sw.js');
     } catch (e) {
-      console.warn('Service worker non registrato:', e);
+      console.warn('Service worker not registered:', e);
       return;
     }
     const offer = async (worker) => {
-      // solo se c'è già una versione in uso: al primo avvio non c'è niente da aggiornare
+      // only if a version is already in use: on first start there is nothing to update
       if (!worker || !navigator.serviceWorker.controller) return;
-      // version.json passa sempre dalla rete (vedi sw.js): sono le note della versione nuova
+      // version.json always comes from the network (see sw.js): these are the notes of the new version
       const latest = await fetch('version.json', { cache: 'no-store' }).then((r) => r.json()).catch(() => null);
       offerUpdate({
         latest,
         apply: async (setMessage) => {
-          setMessage('Attivo la nuova versione…');
-          worker.postMessage('skipWaiting'); // poi "controllerchange" ricarica la pagina
+          setMessage('Activating the new version…');
+          worker.postMessage('skipWaiting'); // then "controllerchange" reloads the page
         },
       });
     };
@@ -47,7 +47,7 @@ export function setupPwa() {
       const w = reg.installing;
       w?.addEventListener('statechange', () => { if (w.state === 'installed') offer(w); });
     });
-    // controlla ogni tanto e quando si torna sulla finestra
+    // checks now and then and when you return to the window
     const check = () => reg.update().catch(() => {});
     setInterval(check, CHECK_EVERY_MS);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });

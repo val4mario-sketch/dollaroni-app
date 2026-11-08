@@ -1,9 +1,9 @@
 import { html, Card, Button, Badge, Empty } from '../ui.js';
 
 const LEVELS = [
-  { id: 'error', title: 'Errori da sistemare', tone: 'err', hint: 'Prima di consegnare vanno risolti.' },
-  { id: 'warning', title: 'Da verificare', tone: 'warn', hint: 'Potrebbero essere giusti, ma conviene ricontrollarli.' },
-  { id: 'info', title: 'Informazioni', tone: 'info', hint: 'Promemoria utili, niente di bloccante.' },
+  { id: 'error', title: 'Errors to fix', tone: 'err', hint: 'They must be resolved before submitting.' },
+  { id: 'warning', title: 'To check', tone: 'warn', hint: 'They may be right, but it is worth checking them again.' },
+  { id: 'info', title: 'Information', tone: 'info', hint: 'Useful reminders, nothing blocking.' },
 ];
 
 export function Checks({ checks, project, go }) {
@@ -13,15 +13,15 @@ export function Checks({ checks, project, go }) {
     if (project.lines.some((l) => l.id === c.target)) return () => go('lines', { line: c.target });
     const autoPart = project.parts.find((p) => String(c.target).startsWith(p.id + ':'));
     if (autoPart) return () => go('parts', { part: autoPart.id });
-    const inGroup = project.parts.find((p) => (p.limitGroup || 'other') === c.target); // limiti di carbonio
+    const inGroup = project.parts.find((p) => (p.limitGroup || 'other') === c.target); // carbon limits
     if (inGroup) return () => go('parts', { part: inGroup.id });
     return () => go('overview');
   };
 
   return html`
-    <div class="page-head"><div><h1>Controlli</h1><p class="muted">Verifiche automatiche su budget, limiti di carbonio (Tab. 2), coerenza con il Layup Calculator, prezzi e provenienze.</p></div></div>
+    <div class="page-head"><div><h1>Checks</h1><p class="muted">Automatic checks on budget, carbon limits (Table 2), consistency with the Layup Calculator, prices and origins.</p></div></div>
     ${checks.length === 0
-      ? html`<${Empty} title="Tutto a posto">Nessun problema trovato nel progetto.</${Empty}>`
+      ? html`<${Empty} title="All good">No problems found in the project.</${Empty}>`
       : LEVELS.map((lv) => {
           const list = checks.filter((c) => c.level === lv.id);
           if (!list.length) return null;
@@ -31,7 +31,7 @@ export function Checks({ checks, project, go }) {
               const action = open(c);
               return html`<li class=${`check-item tone-border-${lv.tone}`}>
                 <span>${c.message}</span>
-                ${action && html`<${Button} small onClick=${action}>Vai</${Button}>`}
+                ${action && html`<${Button} small onClick=${action}>Go</${Button}>`}
               </li>`;
             })}</ul>
           </${Card}>`;

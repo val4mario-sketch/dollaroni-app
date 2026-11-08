@@ -1,10 +1,8 @@
 {
-  "version": "0.5.1",
-  "date": "2026-11-01",
+  "version": "0.6.0",
+  "date": "2026-11-08",
   "notes": [
-    "Il lavoro non salvato è protetto: prima di sostituire un progetto l'app chiede conferma e ne tiene una copia, recuperabile dalla schermata iniziale. Avvisa anche se chiudi la pagina.",
-    "Salvando su file, l'app avvisa se nel frattempo il file è stato cambiato da qualcun altro.",
-    "Nuovi controlli sui conti: valori negativi, id duplicati, voci a costo zero dimenticate, carbonio su voci a mano fuori dalla Tab. 2, foil senza gruppo.",
-    "L'avviso sugli sconti 2027 mostra anche totale e margine senza sconti. I file progetto danneggiati vengono rifiutati con un messaggio chiaro."
+    "The interface, messages and documentation are now in English.",
+    "Brumoth understands questions in English as well as Italian."
   ]
 }

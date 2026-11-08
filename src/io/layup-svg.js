@@ -1,6 +1,6 @@
-// Disegna la tabella di un pezzo nello stile del Layup Calculator ufficiale (come gli screenshot
-// dell'Appendice G del report S1). Serve per l'anteprima nell'app e per le immagini PNG dell'appendice.
-// Solo elementi SVG semplici (niente foreignObject), così la conversione in PNG funziona ovunque.
+// Draws the table of a part in the style of the official Layup Calculator (like the screenshots
+// in Appendix G of the S1 report). Used for the preview in the app and for the appendix PNG images.
+// Simple SVG elements only (no foreignObject), so the PNG conversion works everywhere.
 
 const COLS = [
   { key: 'sub', w: 72, title: ['Substacks'] },
@@ -27,8 +27,8 @@ const pct = (x, d = 0) => `${(x * 100).toFixed(d)}%`;
 const plain = (x) => String(Number(Number(x).toPrecision(12)));
 
 /**
- * result: output di computePart per il blocco (max 5 substack); title: nome del pezzo.
- * Ritorna {svg, width, height}.
+ * result: output of computePart for the block (max 5 substacks); title: part name.
+ * Returns {svg, width, height}.
  */
 export function layupTableSvg(result, title) {
   const width = COLS.reduce((a, c) => a + c.w, 0);
@@ -40,7 +40,7 @@ export function layupTableSvg(result, title) {
     parts.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="0.6"/>`);
   const text = (x, y, s, { size = 11, weight = 400, anchor = 'middle', fill = C.text } = {}) =>
     parts.push(`<text x="${x}" y="${y}" font-family="Arial, Helvetica, sans-serif" font-size="${size}" font-weight="${weight}" text-anchor="${anchor}" fill="${fill}">${esc(s)}</text>`);
-  // opts.fill è lo sfondo della cella; il testo resta nero (opts.color per cambiarlo)
+  // opts.fill is the cell background; the text stays black (opts.color to change it)
   const cell = (key, y, h, s, { fill = C.white, color, ...opts } = {}) => {
     const i = col(key);
     rect(x0[i], y, COLS[i].w, h, fill);
@@ -48,7 +48,7 @@ export function layupTableSvg(result, title) {
   };
 
   let y = 0;
-  // Barra del titolo come nel foglio: "PART NAME:" + nome
+  // Title bar as in the sheet: "PART NAME:" + name
   const labelW = x0[col('den')];
   rect(0, y, width, 10, C.text, C.text);
   y += 10;
@@ -98,8 +98,8 @@ export function layupTableSvg(result, title) {
     y += SEP;
   });
 
-  // Blocco totali
-  const labelX = x0[col('vf')]; // etichette su due colonne, altrimenti "Total Composite (g)" non ci sta
+  // Totals block
+  const labelX = x0[col('vf')]; // labels on two columns, otherwise "Total Composite (g)" does not fit
   const labelWidth = COLS[col('vf')].w + COLS[col('wf')].w;
   const t = result.totals;
   const totals = [
@@ -126,7 +126,7 @@ export function layupTableSvg(result, title) {
   return { svg, width, height };
 }
 
-/** Converte un SVG in PNG (Uint8Array) a `scale` volte la risoluzione. */
+/** Converts an SVG to PNG (Uint8Array) at `scale` times the resolution. */
 export async function svgToPng({ svg, width, height }, scale = 2) {
   const img = new Image();
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);

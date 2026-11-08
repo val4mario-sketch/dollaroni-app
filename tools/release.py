@@ -1,8 +1,8 @@
-"""Prepara una nuova versione: python tools/release.py 0.6.0 "Prima novità" "Seconda novità"
+"""Prepares a new version: python tools/release.py 0.6.0 "First change" "Second change"
 
-Aggiorna version.json (versione, data, note) e aggiunge la sezione in cima a CHANGELOG.md.
-Poi basta fare commit e push su main: GitHub Pages pubblica e chi usa l'app vede
-"È disponibile la versione 0.6.0" con queste note.
+Updates version.json (version, date, notes) and adds the section at the top of CHANGELOG.md.
+Then just commit and push to main: GitHub Pages publishes and app users see
+"Version 0.6.0 is available" with these notes.
 """
 import datetime
 import json
@@ -19,13 +19,13 @@ def parse(v):
 
 def main(version, notes):
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
-        sys.exit("La versione deve essere tipo 0.6.0")
+        sys.exit("The version must look like 0.6.0")
     if not notes:
-        sys.exit('Scrivi almeno una nota, es.: python tools/release.py 0.6.0 "Nuovo export S3"')
+        sys.exit('Write at least one note, e.g.: python tools/release.py 0.6.0 "New S3 export"')
     vfile = ROOT / "version.json"
     old = json.loads(vfile.read_text(encoding="utf-8"))
     if parse(version) <= parse(old["version"]):
-        sys.exit(f"La versione nuova deve essere maggiore di {old['version']}")
+        sys.exit(f"The new version must be greater than {old['version']}")
     today = datetime.date.today()
     vfile.write_text(json.dumps({"version": version, "date": today.isoformat(), "notes": notes}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     cl = ROOT / "CHANGELOG.md"
@@ -34,7 +34,7 @@ def main(version, notes):
     i = text.find("\n## ")
     text = text[: i + 1] + section + text[i + 1:] if i >= 0 else text + "\n" + section
     cl.write_text(text, encoding="utf-8")
-    print(f"Versione {version} pronta: ora commit e push su main.")
+    print(f"Version {version} ready: now commit and push to main.")
 
 
 if __name__ == "__main__":

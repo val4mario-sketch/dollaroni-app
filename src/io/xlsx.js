@@ -1,27 +1,27 @@
-// Lettura minimale di file .xlsx (Office Open XML) nel browser.
-// Serve per importare i file ufficiali SuMoth (listino costi, Layup Calculator)
-// senza dipendere da librerie pesanti: JSZip per lo zip, DOMParser per l'XML.
+// Minimal reading of .xlsx (Office Open XML) files in the browser.
+// Used to import the official SuMoth files (cost price list, Layup Calculator)
+// without depending on heavy libraries: JSZip for the zip, DOMParser for the XML.
 
 export const NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
 const NS_REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 
 function jszip(lib) {
   const z = lib || globalThis.JSZip;
-  if (!z) throw new Error('JSZip non caricato (vendor/jszip.min.js)');
+  if (!z) throw new Error('JSZip not loaded (vendor/jszip.min.js)');
   return z;
 }
 
 export function parseXml(text) {
   const doc = new DOMParser().parseFromString(text, 'application/xml');
   const err = doc.getElementsByTagName('parsererror')[0];
-  if (err) throw new Error('XML non valido: ' + err.textContent.slice(0, 200));
+  if (err) throw new Error('Invalid XML: ' + err.textContent.slice(0, 200));
   return doc;
 }
 
-/** Converte "B12" in {col: 2, row: 12}. */
+/** Converts "B12" to {col: 2, row: 12}. */
 export function splitRef(ref) {
   const m = /^([A-Z]+)(\d+)$/.exec(ref);
-  if (!m) throw new Error('Riferimento cella non valido: ' + ref);
+  if (!m) throw new Error('Invalid cell reference: ' + ref);
   let col = 0;
   for (const ch of m[1]) col = col * 26 + (ch.charCodeAt(0) - 64);
   return { col, row: Number(m[2]) };
@@ -38,14 +38,14 @@ export function colLetter(col) {
 }
 
 /**
- * Apre un xlsx. Ritorna l'oggetto zip (per eventuali modifiche), l'elenco fogli
- * e una funzione per leggere le celle di un foglio.
+ * Opens an xlsx. Returns the zip object (for any changes), the sheet list
+ * and a function to read the cells of a sheet.
  */
 export async function openXlsx(data, JSZipLib) {
   const zip = await jszip(JSZipLib).loadAsync(data);
   const read = async (path) => {
     const f = zip.file(path);
-    if (!f) throw new Error('Parte mancante nel file xlsx: ' + path);
+    if (!f) throw new Error('Part missing in the xlsx file: ' + path);
     return parseXml(await f.async('string'));
   };
 
@@ -69,10 +69,10 @@ export async function openXlsx(data, JSZipLib) {
     );
   }
 
-  /** Celle del foglio come Map "A1" -> {value, formula}. */
+  /** Cells of the sheet as a Map "A1" -> {value, formula}. */
   async function cells(sheetName) {
     const sheet = sheets.find((s) => s.name === sheetName);
-    if (!sheet) throw new Error(`Foglio "${sheetName}" non trovato`);
+    if (!sheet) throw new Error(`Sheet "${sheetName}" not found`);
     const doc = await read(sheet.path);
     const out = new Map();
     for (const c of doc.getElementsByTagNameNS(NS, 'c')) {
@@ -96,7 +96,7 @@ export async function openXlsx(data, JSZipLib) {
   return { zip, sheets, shared, cells, read };
 }
 
-/** Righe di un foglio come array di array (colonne da 1), comodo per le tabelle. */
+/** Rows of a sheet as an array of arrays (columns from 1), handy for tables. */
 export function toRows(cellMap) {
   const rows = [];
   for (const [ref, cell] of cellMap) {

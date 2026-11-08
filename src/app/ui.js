@@ -1,11 +1,11 @@
-// Componenti di interfaccia riusati in tutte le viste (Preact + htm, niente build).
+// Interface components reused in all views (Preact + htm, no build).
 
 import { html, useState, useEffect, useRef, useMemo } from '../../vendor/preact-htm.js';
 import { parseNum, num } from './format.js';
 
 export { html, useState, useEffect, useRef, useMemo };
 
-// ---------------------------------------------------------------- icone (SVG in linea)
+// ---------------------------------------------------------------- icons (inline SVG)
 const PATHS = {
   plus: 'M12 5v14M5 12h14',
   trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
@@ -54,7 +54,7 @@ export function Button({ icon, children, onClick, kind = 'secondary', title, dis
 }
 
 // ---------------------------------------------------------------- campi
-/** Campo numerico: accetta la virgola, non "salta" mentre scrivi. */
+/** Numeric field: accepts the comma, does not "jump" while you type. */
 export function NumInput({ value, onChange, width = 80, placeholder, title, min, className = '' }) {
   const [text, setText] = useState(value === null || value === undefined ? '' : String(value).replace('.', ','));
   const focused = useRef(false);
@@ -93,18 +93,18 @@ export function Select({ value, onChange, options, width, title, className = '',
   return html`<select class=${`inp ${className}`} style=${width ? { width: typeof width === 'number' ? width + 'px' : width } : null} title=${title}
     onChange=${(e) => onChange(e.target.value)}>
     ${placeholder !== undefined && html`<option value="" selected=${!value}>${placeholder}</option>`}
-    ${!known && value && html`<option value=${value} selected>${value} (non trovato)</option>`}
+    ${!known && value && html`<option value=${value} selected>${value} (not found)</option>`}
     ${groups.map((g) => (g.name ? html`<optgroup label=${g.name}>${g.items.map(opt)}</optgroup>` : g.items.map(opt)))}
   </select>`;
 }
 
 const KIND_LABEL = {
-  reinforcement: 'Rinforzi', prepreg: 'Prepreg', matrix: 'Matrici e resine', core: 'Anime',
-  process: 'Lavorazioni', consumable: 'Consumabili', other: 'Stampi, metalli, stampa 3D', hardware: 'Voci del team (MSRP, Discord)',
+  reinforcement: 'Reinforcements', prepreg: 'Prepreg', matrix: 'Matrices and resins', core: 'Cores',
+  process: 'Processes', consumable: 'Consumables', other: 'Moulds, metals, 3D printing', hardware: 'Team items (MSRP, Discord)',
 };
 export const kindLabel = (k) => KIND_LABEL[k] || k;
 
-/** Nome breve di una voce di listino ("Dry fabric Basalt Fibers" -> "Basalt Fibers"). */
+/** Short name of a price-list item ("Dry fabric Basalt Fibers" -> "Basalt Fibers"). */
 export function shortName(e) {
   if (!e) return '';
   const n = (e.name || e.id).replace(/^Dry fabric\s+/i, '');
@@ -115,7 +115,7 @@ export function catalogOptions(catalog, kinds) {
   const out = [];
   for (const e of catalog.values()) {
     if (kinds && !kinds.includes(e.kind)) continue;
-    const price = e.price === null || e.price === undefined ? 'prezzo da chiedere' : `${num(e.price, 2)} SM$/${e.unit}`;
+    const price = e.price === null || e.price === undefined ? 'price to request' : `${num(e.price, 2)} SM$/${e.unit}`;
     out.push({ value: e.id, label: `${shortName(e)} · ${price}`, group: kindLabel(e.kind) });
   }
   return out;
@@ -126,13 +126,13 @@ export function CatalogSelect({ catalog, kinds, value, onChange, width, placehol
 }
 
 export const SOURCE_OPTIONS = [
-  { value: 'new', label: 'Nuovo' },
-  { value: 'industrial_excess', label: 'Eccedenza −25%' },
-  { value: 'out_of_shelf_life', label: 'Scaduto −50%' },
+  { value: 'new', label: 'New' },
+  { value: 'industrial_excess', label: 'Surplus −25%' },
+  { value: 'out_of_shelf_life', label: 'Expired −50%' },
   { value: 'upcycled', label: 'Upcycled −100%' },
 ];
 
-// ---------------------------------------------------------------- piccoli elementi grafici
+// ---------------------------------------------------------------- small graphic elements
 export function Bar({ ratio, tone = 'accent', height = 8 }) {
   const r = Math.max(0, Math.min(1, ratio || 0));
   return html`<div class="bar" style=${{ height: height + 'px' }}><div class=${`bar-fill tone-${tone}`} style=${{ width: r * 100 + '%' }}></div></div>`;
@@ -155,11 +155,11 @@ export function Empty({ title, children, action }) {
 
 export const toneForRatio = (r) => (r > 1 + 1e-9 ? 'err' : r >= 0.95 ? 'warn' : 'ok');
 
-/** Stato di una voce in S2: stimata (da aggiornare) o misurata (valore reale as-built). */
+/** State of an item in S2: estimated (to update) or measured (real as-built value). */
 export function StatusPill({ status, onToggle, title }) {
   const measured = status === 'measured';
   return html`<button type="button" class=${`status-pill ${measured ? 'measured' : 'estimated'}`} onClick=${onToggle} disabled=${!onToggle}
-    title=${title || (onToggle ? (measured ? 'Valore reale as-built. Clic per rimetterla stimata' : 'Ancora una stima. Clic quando è aggiornata al valore reale') : '')}>
-    ${measured ? '✓ misurata' : 'stimata'}
+    title=${title || (onToggle ? (measured ? 'Real as-built value. Click to mark it estimated again' : 'Still an estimate. Click when updated to the real value') : '')}>
+    ${measured ? '✓ measured' : 'stimata'}
   </button>`;
 }

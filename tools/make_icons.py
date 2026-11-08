@@ -1,4 +1,4 @@
-"""Genera le icone dell'app installabile (icons/*.png). Uso: python tools/make_icons.py"""
+"""Generates the icons of the installable app (icons/*.png). Usage: python tools/make_icons.py"""
 import math
 import pathlib
 
@@ -12,12 +12,12 @@ FONT = "C:/Windows/Fonts/segoeuib.ttf"
 
 
 def draw(size, maskable=False):
-    s = size * 4  # disegno grande e poi riduco: bordi più puliti
+    s = size * 4  # drawing large and then shrinking: cleaner edges
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     if maskable:
-        d.rectangle([0, 0, s, s], fill=NAVY)  # a tutta pagina: il sistema taglia la forma
-        scale = 0.72  # contenuto dentro la zona sicura
+        d.rectangle([0, 0, s, s], fill=NAVY)  # full page: the system crops the shape
+        scale = 0.72  # content inside the safe zone
     else:
         d.rounded_rectangle([0, 0, s - 1, s - 1], radius=int(s * 0.22), fill=NAVY)
         scale = 0.9
@@ -28,7 +28,7 @@ def draw(size, maskable=False):
     x = (s - w) / 2 - box[0]
     y = s * 0.44 - h / 2 - box[1]
     d.text((x, y), text, font=font, fill="white")
-    # onda sotto la scritta
+    # wave under the lettering
     wy = s * 0.70
     ww = s * 0.46 * scale
     n = 120
@@ -44,4 +44,4 @@ if __name__ == "__main__":
     draw(512, maskable=True).save(OUT / "icon-maskable-512.png")
     draw(180).save(OUT / "apple-touch-icon.png")
     draw(32).save(OUT / "favicon-32.png")
-    print("icone scritte in", OUT)
+    print("icons written to", OUT)

@@ -1,11 +1,11 @@
-"""Esegue i test del browser senza aprire finestre: python tools/run_tests_headless.py
+"""Runs the browser tests without opening windows: python tools/run_tests_headless.py
 
-Avvia il server locale su una porta libera, apre tests/ con Chrome o Edge "headless" (senza finestra)
-e legge il risultato che la pagina dei test salva in out/test-results.json.
-Esce con codice 1 se qualche test fallisce: lo usa anche GitHub (.github/workflows/pages.yml) prima di pubblicare,
-così una versione rotta non arriva al team.
+Starts the local server on a free port, opens tests/ with headless Chrome or Edge (no window)
+and reads the result the test page saves in out/test-results.json.
+Exits with code 1 if a test fails: GitHub also uses it (.github/workflows/pages.yml) before publishing,
+so a broken version does not reach the team.
 
-Si può indicare il browser con la variabile CHROME (percorso dell'eseguibile).
+The browser can be set with the CHROME variable (path of the executable).
 """
 import json
 import os
@@ -39,7 +39,7 @@ def find_browser():
         p = shutil.which(c) or (c if os.path.exists(c) else None)
         if p:
             return p
-    sys.exit("Non trovo Chrome o Edge: indica il percorso con la variabile CHROME")
+    sys.exit("Cannot find Chrome or Edge: set the path with the CHROME variable")
 
 
 def free_port():
@@ -49,13 +49,13 @@ def free_port():
 
 
 def wait_results(result_file, chrome, limit=180):
-    """Aspetta out/test-results.json; False se Chrome si chiude prima di aver aperto la pagina."""
-    print("Test in corso (di solito meno di un minuto, al massimo 3)", end="", flush=True)
+    """Waits for out/test-results.json; False if Chrome closes before opening the page."""
+    print("Tests running (usually under a minute, at most 3)", end="", flush=True)
     start = time.time()
     while time.time() - start < limit and not result_file.exists():
         time.sleep(0.5)
         if chrome is not None and chrome.poll() is not None and not result_file.exists():
-            print(f" Chrome si è chiuso da solo (codice {chrome.returncode})", flush=True)
+            print(f" Chrome closed by itself (code {chrome.returncode})", flush=True)
             return False
         if int((time.time() - start) * 2) % 10 == 0:
             print(".", end="", flush=True)
@@ -77,7 +77,7 @@ def main():
     browser = find_browser()
     port = free_port()
     print(f"Browser: {browser}", flush=True)
-    print(f"Avvio il server di prova sulla porta {port}…", flush=True)
+    print(f"Starting the test server on port {port}…", flush=True)
     result_file = ROOT / "out" / "test-results.json"
     result_file.unlink(missing_ok=True)
     (ROOT / "out").mkdir(exist_ok=True)
@@ -96,10 +96,10 @@ def main():
             except OSError:
                 time.sleep(0.1)
         if not up:
-            sys.exit("Il server di prova non risponde: vedi out/test-server.log")
-        print("Server pronto.", flush=True)
+            sys.exit("The test server does not respond: see out/test-server.log")
+        print("Server ready.", flush=True)
         url = f"http://127.0.0.1:{port}/tests/"
-        # 1) Chrome senza finestra (due modi di avviarlo); 2) se su questo PC non parte, una scheda del browser normale
+        # 1) Chrome without a window (two ways of starting it); 2) if it does not start on this PC, a normal browser tab
         attempts = [["--headless=new"], ["--headless=new", "--remote-debugging-port=0", "--disable-extensions"]]
         for extra in attempts:
             with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile:
@@ -116,7 +116,7 @@ def main():
             if ok or result_file.exists():
                 break
         if not result_file.exists():
-            print("Chrome senza finestra non parte su questo PC: apro i test in una scheda del browser.", flush=True)
+            print("Chrome without a window does not start on this PC: opening the tests in a browser tab.", flush=True)
             webbrowser.open(url)
             wait_results(result_file, None)
     finally:
@@ -126,9 +126,9 @@ def main():
         server_log.close()
         chrome_log.close()
     if not result_file.exists():
-        sys.exit("I test non hanno risposto entro 3 minuti. Dettagli in out/test-chrome.log e out/test-server.log.")
+        sys.exit("The tests did not respond within 3 minutes. Details in out/test-chrome.log and out/test-server.log.")
     res = json.loads(result_file.read_text(encoding="utf-8"))
-    print(f"{res['passed']}/{res['total']} test superati")
+    print(f"{res['passed']}/{res['total']} tests passed")
     for f in res["failed"]:
         print(f"  ✗ {f['suite']} – {f['name']}\n      {f['error']}")
     if res["passed"] != res["total"]:

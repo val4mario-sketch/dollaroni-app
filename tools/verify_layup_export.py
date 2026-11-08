@@ -1,15 +1,15 @@
-"""Verifica che gli xlsx esportati diano gli stessi numeri con le formule UFFICIALI del template.
+"""Checks that the exported xlsx files give the same numbers with the OFFICIAL template formulas.
 
-Per ogni file: sostituisce tutti i valori in cache delle formule con 12345, lo fa ricalcolare
-a LibreOffice e confronta il risultato con i valori scritti dall'app. Se il motore dell'app
-e le formule del Layup Calculator coincidono, lo scarto è ~1e-15.
+For each file: replaces all the cached formula values with 12345, has LibreOffice
+recalculate it and compares the result with the values written by the app. If the app engine
+and the Layup Calculator formulas match, the difference is ~1e-15.
 
-Uso:  python tools/verify_layup_export.py out/layup-s1
+Usage:  python tools/verify_layup_export.py out/layup-s1
 
-Note (scoperte a fatica):
-- LibreOffice di default NON ricalcola gli xlsx al caricamento: serve un profilo dedicato
-  con OOXMLRecalcMode = 0 ("ricalcola sempre"). Lo creiamo in %TEMP%, senza toccare quello dell'utente.
-- Con un percorso del profilo troppo lungo soffice si chiude con errore -1073740791: usiamo una cartella corta.
+Notes (learned the hard way):
+- By default LibreOffice does NOT recalculate xlsx files on load: a dedicated profile
+  with OOXMLRecalcMode = 0 ("always recalculate") is needed. We create it in %TEMP%, without touching the user's.
+- With a profile path that is too long soffice closes with error -1073740791: we use a short folder.
 """
 import os
 import pathlib
@@ -35,7 +35,7 @@ def soffice(*args):
     profile = "file:///" + str(WORK / "profile").replace("\\", "/")
     res = subprocess.run([str(SOFFICE), f"-env:UserInstallation={profile}", "--headless", *args], capture_output=True, text=True)
     if res.returncode != 0:
-        sys.exit(f"soffice ha restituito {res.returncode}: {res.stderr or res.stdout}")
+        sys.exit(f"soffice returned {res.returncode}: {res.stderr or res.stdout}")
 
 
 def ensure_profile(sample):
@@ -59,7 +59,7 @@ def poison_copy(src, dst):
 def main(folder):
     files = sorted(pathlib.Path(folder).glob("*.xlsx"))
     if not files:
-        sys.exit(f"Nessun .xlsx in {folder}")
+        sys.exit(f"No .xlsx in {folder}")
     for d in ("in", "out"):
         shutil.rmtree(WORK / d, ignore_errors=True)
         (WORK / d).mkdir(parents=True)
@@ -77,12 +77,12 @@ def main(folder):
                 a, b = c.value, lo[c.coordinate].value
                 if b == POISON:
                     failures += 1
-                    print(f"  {f.name} {c.coordinate}: non ricalcolata")
+                    print(f"  {f.name} {c.coordinate}: not recalculated")
                 elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
                     worst = max(worst, abs(a - b) / max(1.0, abs(a)))
-        print(f"{f.stem:45s} composito {lo['K27'].value:9.1f} g   fibre {lo['K28'].value:8.1f} g   resina {lo['K30'].value:8.1f} g")
+        print(f"{f.stem:45s} composite {lo['K27'].value:9.1f} g   fibre {lo['K28'].value:8.1f} g   resin {lo['K30'].value:8.1f} g")
     ok = failures == 0 and worst < 1e-9
-    print(f"\nScarto massimo app vs formule ufficiali: {worst:.2e}  ->  {'OK' if ok else 'DIFFERENZE'}")
+    print(f"\nMaximum difference app vs official formulas: {worst:.2e}  ->  {'OK' if ok else 'DIFFERENCES'}")
     sys.exit(0 if ok else 1)
 
 

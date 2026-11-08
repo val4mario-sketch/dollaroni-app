@@ -11,28 +11,28 @@ export function Welcome({ autosave, recovery, onRecover, onResume, onNew, onTemp
     <div class="welcome-box">
       <div class="welcome-head">
         <div class="brand-big">Dollaroni</div>
-        <p class="muted">SuMoth Dollars del Sapienza Foiling Team: si inseriscono i pezzi e le voci di costo, l'app calcola masse, SM$ e limiti, e prepara i file per i report.</p>
+        <p class="muted">SuMoth Dollars of the Sapienza Foiling Team: enter the parts and cost items, the app calculates masses, SM$ and limits, and prepares the files for the reports.</p>
       </div>
       ${autosave?.project && html`<div class="welcome-section">
-        ${opt('undo', `Riprendi “${autosave.project.name} ${autosave.project.season} ${autosave.project.stage}”`, `ultima modifica ${when}${autosave.fileName ? ` · file ${autosave.fileName}` : ' · non ancora salvato su file'}`, onResume, true)}
+        ${opt('undo', `Resume “${autosave.project.name} ${autosave.project.season} ${autosave.project.stage}”`, `last modified ${when}${autosave.fileName ? ` · file ${autosave.fileName}` : ' · not yet saved to a file'}`, onResume, true)}
       </div>`}
       ${recovery?.project && html`<div class="welcome-section">
-        ${opt('undo', `Recupera “${recovery.project.name} ${recovery.project.season} ${recovery.project.stage}”`, `copia con le modifiche non salvate, messa da parte il ${new Date(recovery.keptAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}`, onRecover)}
+        ${opt('undo', `Recover “${recovery.project.name} ${recovery.project.season} ${recovery.project.stage}”`, `copy with the unsaved changes, set aside on ${new Date(recovery.keptAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}`, onRecover)}
       </div>`}
       <div class="welcome-section">
         <h4>Inizia</h4>
-        ${opt('plus', 'Nuova barca 2027', 'Progetto vuoto con le regole 2027: aggiungi pezzi e voci da zero.', onNew)}
-        ${opt('layers', 'Nuova barca partendo da Meravijosa S1 2026', 'Stessi pezzi e voci della stima 2026, con le regole 2027: il modo più veloce.', onTemplate)}
-        ${opt('folder', 'Apri un file progetto…', 'Un file .dollaroni.json salvato da te o da qualcuno del team.', onOpen)}
+        ${opt('plus', 'New 2027 boat', 'Empty project with the 2027 rules: add parts and items from scratch.', onNew)}
+        ${opt('layers', 'New boat from Meravijosa S1 2026', 'Same parts and items as the 2026 estimate, with the 2027 rules: the fastest way.', onTemplate)}
+        ${opt('folder', 'Open a project file…', 'A .dollaroni.json file saved by you or by someone on the team.', onOpen)}
       </div>
       <div class="welcome-section">
-        <h4>Esempi (dati consegnati nel 2026)</h4>
+        <h4>Examples (data submitted in 2026)</h4>
         <div class="welcome-row">
-          ${opt('book', 'Meravijosa S1 2026', 'Stima di febbraio (regole 2026): Appendice G e Tabella 2.', () => onExample('meravijosa-2026-s1'))}
-          ${opt('book', 'Meravijosa S2 2026', 'As-built del report S2 (regole 2026).', () => onExample('meravijosa-2026-s2'))}
+          ${opt('book', 'Meravijosa S1 2026', 'February estimate (2026 rules): Appendix G and Table 2.', () => onExample('meravijosa-2026-s1'))}
+          ${opt('book', 'Meravijosa S2 2026', 'As-built of the S2 report (2026 rules).', () => onExample('meravijosa-2026-s2'))}
         </div>
       </div>
-      ${onClose && html`<div class="welcome-foot"><button class="link" onClick=${onClose}>Torna al progetto aperto</button></div>`}
+      ${onClose && html`<div class="welcome-foot"><button class="link" onClick=${onClose}>Back to the open project</button></div>`}
     </div>
   </div>`;
 }

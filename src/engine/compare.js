@@ -1,9 +1,9 @@
-// Confronto tra la stima S1 congelata e il progetto S2 (as-built), e dati per l'autovalutazione (S2 §2.4).
-// Le voci si abbinano per id: quando l'S2 nasce da "Congela S1 e crea S2" gli id restano gli stessi.
+// Comparison between the frozen S1 estimate and the S2 project (as-built), and data for the self-assessment (S2 §2.4).
+// Items are matched by id: when S2 comes from "Freeze S1 and create S2" the ids stay the same.
 
 const G_PER_KG = 1000;
 
-/** Voce per voce: [{id, name, component, kind: new|removed|changed|same, s1, s2, delta, qty1, qty2, unit}] ordinate per |Δ|. */
+/** Item by item: [{id, name, component, kind: new|removed|changed|same, s1, s2, delta, qty1, qty2, unit}] sorted by |Δ|. */
 export function compareItems(evS1, evS2) {
   const a = new Map(evS1.lines.map((l) => [l.id, l]));
   const b = new Map(evS2.lines.map((l) => [l.id, l]));
@@ -29,7 +29,7 @@ export function compareItems(evS1, evS2) {
   return rows.sort((p, q) => Math.abs(q.delta) - Math.abs(p.delta));
 }
 
-/** Pezzo per pezzo: massa calcolata in S1 e in S2. */
+/** Part by part: calculated mass in S1 and S2. */
 export function compareParts(evS1, evS2) {
   const a = new Map(evS1.parts.map((p) => [p.part.id, p]));
   const b = new Map(evS2.parts.map((p) => [p.part.id, p]));
@@ -45,7 +45,7 @@ export function compareParts(evS1, evS2) {
   });
 }
 
-/** Quanta parte del costo è già misurata (as-built) e quanta ancora stimata, per componente. */
+/** How much of the cost is already measured (as-built) and how much still estimated, by component. */
 export function costingBasis(ev) {
   const rows = ev.components.map((c) => {
     let measured = 0;
@@ -67,7 +67,7 @@ export function costingBasis(ev) {
   };
 }
 
-/** Pezzi con peso reale inserito: massa calcolata dal Layup Calculator contro massa pesata. */
+/** Parts with a real weight entered: mass calculated by the Layup Calculator against weighed mass. */
 export function weighedParts(ev) {
   return ev.parts
     .filter((p) => p.measuredMass !== null)
