@@ -1,28 +1,28 @@
-# Novità di Dollaroni
+# Dollaroni changelog
 
-Le versioni seguono `MAGGIORE.MINORE.CORREZIONE`. La versione in uso e le sue note stanno in `version.json`:
-per pubblicarne una nuova usa `python tools/release.py <versione> "nota" "nota"` (aggiorna entrambi i file).
+Versions follow `MAJOR.MINOR.PATCH`. The current version and its notes are in `version.json`:
+to publish a new one use `python tools/release.py <version> "note" "note"` (it updates both files).
 
 ## 0.5.1 – 01/11/2026
-- Il lavoro non salvato è protetto: prima di sostituire un progetto l'app chiede conferma e ne tiene una copia, recuperabile dalla schermata iniziale. Avvisa anche se chiudi la pagina.
-- Salvando su file, l'app avvisa se nel frattempo il file è stato cambiato da qualcun altro.
-- Nuovi controlli sui conti: valori negativi, id duplicati, voci a costo zero dimenticate, carbonio su voci a mano fuori dalla Tab. 2, foil senza gruppo.
-- L'avviso sugli sconti 2027 mostra anche totale e margine senza sconti. I file progetto danneggiati vengono rifiutati con un messaggio chiaro.
+- Unsaved work is protected: before replacing a project the app asks for confirmation and keeps a copy that can be recovered from the start screen. It also warns you when you close the page.
+- When saving to a file, the app warns you if someone else has changed the file in the meantime.
+- New checks on the accounts: negative values, duplicate ids, forgotten zero-cost items, carbon in manual items outside Table 2, foils without a group.
+- The 2027 discount warning also shows the total and margin without discounts. Damaged project files are rejected with a clear message.
 
 ## 0.5.0 – 26/10/2026
-- Brumoth, l'assistente di Dollaroni: la barchetta in basso a destra (con il fumetto "Chiedi a Brumoth!") apre una chat che risponde sul progetto aperto (budget, carbonio, classifiche, simulazioni, regolamento) usando i numeri calcolati dall'app.
-- Brumoth può modificare il progetto (aggiungere fibra a un pezzo, voci, pezzi nuovi, materiali nel listino, cambiare fibra, eliminare un pezzo), sempre mostrando prima cosa cambia e l'effetto su budget e limiti, con Applica / Annulla. Se la richiesta è troppo generica lo dice e chiede cosa manca. Spiega anche passo passo come fare le cose nell'app.
-- Brumoth ha due modalità, scelte dal menu sotto la chat: Istantaneo (risposte subito, dai dati) e Completo (l'IA locale riscrive la risposta a parole sue: ci mette di più, da mezzo minuto a qualche minuto). L'IA gira nel browser, si scarica una volta sola e poi funziona anche senza internet.
-- Aggiornamenti: avviso "Nuova versione disponibile" con le novità anche per chi usa Avvia Dollaroni.bat, e aggiornamento con un clic.
+- Brumoth, the Dollaroni assistant: the little boat at the bottom right (with the "Ask Brumoth!" bubble) opens a chat that answers about the open project (budget, carbon, rankings, simulations, rules) using the numbers calculated by the app.
+- Brumoth can change the project (add fibre to a part, items, new parts, catalogue materials, change fibre, delete a part), always showing first what changes and the effect on budget and limits, with Apply / Cancel. If a request is too generic it says so and asks what is missing. It also explains step by step how to do things in the app.
+- Brumoth has two modes, chosen from the menu under the chat: Instant (immediate answers from the data) and Complete (the local AI rewrites the answer in its own words, taking from half a minute to a few minutes). The AI runs in the browser, is downloaded once and then works offline.
+- Updates: a "New version available" notice with the release notes, also for people using Avvia Dollaroni.bat, and one-click updating.
 
 ## 0.4.0 – 28/09/2026
-- Regole 2027 (budget sotto i 10.000 SM$, Performance Rating, scarti in S2, parti usate a prezzo), app installabile da GitHub Pages.
+- 2027 rules (budget under 10,000 SM$, Performance Rating, S2 waste, used parts at a price), app installable from GitHub Pages.
 
 ## 0.3.0
-- Passaggio S1 → S2: congela S1, confronto, Esporta S2.
+- S1 → S2 transition: freeze S1, comparison, S2 export.
 
 ## 0.2.0
-- Interfaccia: panoramica, pezzi laminati, voci di costo, controlli, listino, Esporta S1.
+- Interface: overview, laminated parts, cost items, checks, catalogue, S1 export.
 
 ## 0.1.0
-- Motore di calcolo: listino e Layup Calculator ufficiali, costi, limiti di carbonio, masse.
+- Calculation engine: official catalogue and Layup Calculator, costs, carbon limits, masses.

@@ -1,268 +1,267 @@
-# Dollaroni – SuMoth Dollars per il Sapienza Foiling Team
+# Dollaroni – SuMoth Dollars for the Sapienza Foiling Team
 
-App per calcolare i SuMoth Dollars (SM$) della barca e produrre in automatico i file
-nel formato richiesto dalla SuMoth Challenge. Si lavora in una vista interna comoda; quando
-serve, un tasto riempie i template ufficiali.
+An app that calculates the boat's SuMoth Dollars (SM$) and automatically produces the files in the format required by the SuMoth
+Challenge. You work in a convenient internal view; when needed, one button fills in the official templates.
 
-**Versione 0.5.0 (fase 5).** Ci sono il motore di calcolo, i dati 2026, l'interfaccia, "Esporta S1", il passaggio S1→S2 con confronto ed "Esporta S2",
-le **regole 2027**, **Brumoth**, l'assistente con IA locale (la barchetta in basso a destra) e gli **avvisi di aggiornamento** per tutti i PC.
-Mancano ancora il listino 2027 (sta su SuMoth Agora) e il salvataggio su Google Drive.
+**Version 0.5.0 (phase 5).** It includes the calculation engine, the 2026 data, the interface, "Export S1", the S1→S2 transition with comparison and "Export S2",
+the **2027 rules**, **Brumoth**, the assistant with local AI (the little boat at the bottom right) and **update notices** for every PC.
+Still missing are the 2027 price list (it is on SuMoth Agora) and saving to Google Drive.
 
-## Come si usa
+The app's interface is in Italian, so the labels below are given as they appear on screen, with their meaning where useful.
 
-1. Doppio clic su **`Avvia Dollaroni.bat`**: si apre il browser su http://127.0.0.1:8765/. Serve Python; chiudi la finestra nera per spegnere.
-2. Nella schermata iniziale scegli una di queste strade:
-   - **Nuova barca 2027**: parti da zero.
-   - **Nuova barca partendo da Meravijosa S1 2026**: stessi pezzi e voci, da aggiornare.
-   - Apri un file `.dollaroni.json`, oppure guarda gli esempi 2026.
-3. Le sezioni a sinistra:
-   - **Panoramica**: dove vanno i dollari, limiti di carbonio della Tab. 2, masse del §2.5, cose da sistemare.
-   - **Pezzi laminati**: un pezzo corrisponde a un foglio del Layup Calculator.
-     - Per ogni substack scegli fibra, matrice, processo, area, numero di ply e grammatura, con la provenienza (scaduto −50%, eccedenza −25%, upcycled).
-     - Masse e costi si calcolano mentre scrivi.
-     - C'è l'anteprima di come uscirà il foglio ufficiale.
-   - **Voci di costo**: tutto il resto (stampi, consumabili, lavorazioni a ore, hardware MSRP, parti usate della Tab. 3, elementi upcycled), diviso nelle 7 categorie del template S2. Le righe grigie arrivano in automatico dai pezzi.
-   - **Controlli**: errori e cose da verificare, con il tasto "Vai" per arrivare al punto da correggere.
-   - **Listino**: il listino ufficiale 2026 e le voci aggiunte dal team (MSRP, prezzi dati su Discord, sempre con la fonte).
-   - **Esporta S1**: un clic produce tre cose, scaricabili una per una o tutte in uno zip:
-     - il Layup Calculator ufficiale compilato, un file per pezzo;
-     - le immagini delle tabelle per l'appendice;
-     - un documento Word/Google Docs con tutte le tabelle.
+## How to use it
 
-     Ogni tabella ha anche il tasto "Copia per Google Docs".
-4. **Salva** (Ctrl+S) scrive il file progetto. Nel frattempo una copia viene comunque salvata in automatico nel browser.
-5. Ctrl+Z / Ctrl+Y annullano e ripetono qualsiasi modifica.
+1. Double-click **`Avvia Dollaroni.bat`**: the browser opens at http://127.0.0.1:8765/. Python is required; close the black window to shut it down.
+2. On the start screen choose one of these:
+   - **Nuova barca 2027** (new 2027 boat): start from scratch.
+   - **Nuova barca partendo da Meravijosa S1 2026** (new boat from Meravijosa S1 2026): the same parts and items, to be updated.
+   - Open a `.dollaroni.json` file, or look at the 2026 examples.
+3. The sections on the left:
+   - **Panoramica** (overview): where the dollars go, Table 2 carbon limits, §2.5 masses, things to fix.
+   - **Pezzi laminati** (laminated parts): one part corresponds to one Layup Calculator sheet.
+     - For each substack choose fibre, matrix, process, area, number of plies and areal weight, with the origin (expired −50%, surplus −25%, upcycled).
+     - Masses and costs are calculated as you type.
+     - There is a preview of how the official sheet will look.
+   - **Voci di costo** (cost items): everything else (moulds, consumables, hourly processes, MSRP hardware, Table 3 used parts, upcycled elements), divided into the 7 categories of the S2 template. Grey rows come automatically from the parts.
+   - **Controlli** (checks): errors and things to verify, with a "Vai" (go) button that takes you to the point to correct.
+   - **Listino** (price list): the official 2026 price list and the items added by the team (MSRP, prices given on Discord, always with the source).
+   - **Esporta S1** (export S1): one click produces three things, downloadable one by one or all in a zip:
+     - the completed official Layup Calculator, one file per part;
+     - images of the tables for the appendix;
+     - a Word/Google Docs document with all the tables.
 
-## Brumoth, l'assistente con IA locale
+     Each table also has a "Copia per Google Docs" (copy for Google Docs) button.
+4. **Salva** (save, Ctrl+S) writes the project file. In the meantime a copy is saved automatically in the browser anyway.
+5. Ctrl+Z / Ctrl+Y undo and redo any change.
 
-In basso a destra c'è una **barchetta** (un Moth sui foil): è **Brumoth**. Entrando nell'app compare il fumetto
-"Chiedi a Brumoth!", che sparisce appena si scorre la pagina o si tocca da un'altra parte (cliccandolo si apre la chat).
-La chat risponde sul progetto aperto. Esempi:
-"quanto budget ci rimane?", "quanto carbonio serve per finire il budget?", "dove c'è troppo carbonio?",
-"fammi la classifica dei costi", "e se facessi la deriva in basalto?", "e se aggiungo 2 kg di carbonio nello scafo?",
-"come possiamo risparmiare?", "cosa dobbiamo sistemare?", "cosa dice il regolamento sugli sconti?", "cosa è cambiato rispetto all'S1?".
+## Brumoth, the assistant with local AI
 
-**Due modalità**, scelte dal menu a tendina sotto la casella della chat (come la scelta del modello nelle app di IA):
-- **Istantaneo** (predefinita): risponde il motore di Dollaroni con i numeri calcolati, **subito** e sempre esatti;
-- **Completo**: dopo la risposta dai dati, l'IA locale la riscrive a parole sue. Ci mette il tempo che serve
-  (da mezzo minuto a qualche minuto sui portatili); sotto la risposta si vede da quanto sta lavorando.
-  Se il portatile va a batteria compare "A batteria: più lento" (Windows rallenta il processore anche del doppio).
+At the bottom right is a **little boat** (a Moth on its foils): that is **Brumoth**. When you enter the app the bubble
+"Chiedi a Brumoth!" (ask Brumoth) appears, and it goes away as soon as you scroll or touch somewhere else (clicking it opens the chat).
+The chat answers about the open project, in Italian. It handles questions such as how much budget is left, how much carbon would use up
+the budget, where there is too much carbon, a cost ranking, "what if" simulations (a different fibre on a part, 2 kg more carbon in the
+hull), how to save money, what needs fixing, what the rules say about discounts, and what changed since S1.
 
-Come funziona (in due strati, così i numeri sono sempre giusti):
-1. **Motore delle risposte** (`src/engine/assistant.js`): capisce l'argomento dalle parole chiave, nomina pezzi e materiali,
-   e prepara i "fatti" con i numeri calcolati da Dollaroni (gli stessi di Panoramica, Controlli e Layup Calculator).
-   Fa anche le simulazioni (cambio di fibra in un pezzo, aggiunta di materiale) e calcola le idee di risparmio.
-   Questa è la risposta della modalità Istantanea e c'è sempre, anche senza IA.
-2. **IA locale di Brumoth** (`src/ai/llm.js`, solo modalità Completa): un piccolo modello linguistico (Qwen, licenza Apache 2.0)
-   che gira **dentro il browser** con llama.cpp in WebAssembly (libreria wllama). Riceve i fatti e li spiega a parole; non calcola niente.
-   Se scrive un numero che non è nei fatti, sotto la risposta compare "Da controllare". Con "Dati usati" si vedono i fatti di partenza.
+**Two modes**, chosen from the drop-down menu under the chat box (like choosing a model in AI apps):
+- **Istantaneo** (instant, the default): the Dollaroni engine answers with the calculated numbers, **immediately** and always exactly;
+- **Completo** (complete): after the answer from the data, the local AI rewrites it in its own words. It takes as long as it needs
+  (from half a minute to a few minutes on laptops); under the answer you can see how long it has been working.
+  If the laptop is on battery, "A batteria: più lento" (on battery: slower) appears, because Windows can slow the processor by as much as half.
 
-**Modifiche al progetto (sempre con Applica / Annulla).** Brumoth può anche cambiare i dati del progetto:
-"aggiungi 2 kg di carbonio allo scafo" (nuovo substack), "metti 20 kg di MDF nello scafo" (nuova voce),
-"crea un pezzo chiamato Timone di riserva nei foil", "aggiungi il materiale Carbon/Innegra a 160 SM$/kg con densità 1,3"
-(voce del team nel Listino), "fai la deriva in basalto" (cambio di fibra), "elimina il pezzo Bulkheads".
-Non cambia mai niente da solo: mostra una scheda con cosa cambia, il totale e il margine dopo la modifica e i problemi nuovi
-(per esempio un limite di carbonio superato), con **Applica** e **Annulla**; dopo "Applica" c'è "Torna indietro" (come Ctrl+Z).
-Anche le simulazioni "e se…" che si possono applicare propongono la scheda. Se la richiesta è troppo generica ("aggiungi carbonio")
-lo dice e chiede cosa manca (quantità, pezzo, prezzo, densità…). Brumoth modifica i **dati**, non l'app: pagine e funzioni nuove sono sviluppo.
+How it works (in two layers, so the numbers are always right):
+1. **Answer engine** (`src/engine/assistant.js`): works out the topic from keywords, identifies parts and materials, and prepares
+   the "facts" with the numbers calculated by Dollaroni (the same as in Overview, Checks and Layup Calculator).
+   It also runs the simulations (changing a part's fibre, adding material) and calculates savings ideas.
+   This is the answer in Instant mode and it is always available, even without AI.
+2. **Brumoth's local AI** (`src/ai/llm.js`, Complete mode only): a small language model (Qwen, Apache 2.0 licence)
+   that runs **inside the browser** with llama.cpp in WebAssembly (the wllama library). It receives the facts and explains them in words; it calculates nothing.
+   If it writes a number that is not among the facts, "Da controllare" (to check) appears under the answer. "Dati usati" (data used) shows the starting facts.
 
-**Istruzioni.** "Come faccio a…" riceve i passaggi con i nomi veri dei pulsanti (pezzi, materiali nuovi, voci, export, S1→S2,
-salvataggio, scarti, Performance Rating, aggiornamenti) e, se si può, la scheda per farlo subito. Modifiche e istruzioni
-non passano dall'IA: sono testi fissi del motore (`src/engine/actions.js`), quindi esatti anche su un PC lento.
+**Project changes (always with Apply / Cancel).** Brumoth can also change the project data: add 2 kg of carbon to the hull (new substack),
+put 20 kg of MDF in the hull (new item), create a new part, add a material to the price list with its price and density, change the fibre
+of a part, or delete a part.
+It never changes anything by itself: it shows a card with what changes, the total and margin after the change, and any new problems
+(for example a carbon limit exceeded), with **Applica** (apply) and **Annulla** (cancel); after applying there is "Torna indietro" (go back, like Ctrl+Z).
+"What if" simulations that can be applied also offer the card. If the request is too generic (just "add carbon")
+it says so and asks what is missing (quantity, part, price, density…). Brumoth changes the **data**, not the app: new pages and functions are development work.
 
-Il modello (modalità Completa):
-- si scarica **una volta sola** da Hugging Face la prima volta che si sceglie "Completo" (o all'apertura dell'app, se lo si imposta
-  nelle impostazioni ⚙ di Brumoth) e poi resta sul PC, nella memoria del browser di quell'indirizzo: funziona anche senza internet;
-- **Standard** (Qwen3.5 2B, circa 1,3 GB): risposte migliori, solo CPU, 2-4 minuti su un portatile; **Leggera** (Qwen3 0,6B,
-  circa 0,4 GB): con la scheda video circa 25 s, ma sbaglia più spesso i numeri. Si sceglie e si cancella dalle impostazioni ⚙;
-- la scheda video (WebGPU) è accesa di serie solo per la Leggera: con i modelli più grandi le schede video integrate Intel si bloccano.
-  Si può accendere o spegnere dalle impostazioni; se dà errore Brumoth riparte da solo senza;
-- all'apertura della chat in modalità Completa il modello si carica e legge una volta le istruzioni, che restano in memoria:
-  a ogni domanda legge solo i dati e la domanda;
-- usa **più core** solo se l'app è aperta da "Avvia Dollaroni.bat" o dal sito installato (serve la "cross-origin isolation", vedi sotto);
-- tutto resta sul PC: domande e dati del progetto non vengono inviati a nessuno.
+**Instructions.** "How do I…" questions get the steps with the real button names (parts, new materials, items, export, S1→S2,
+saving, waste, Performance Rating, updates) and, where possible, the card to do it right away. Changes and instructions
+do not go through the AI: they are fixed texts from the engine (`src/engine/actions.js`), so they are exact even on a slow PC.
 
-## Aggiornamenti per tutto il team
+The model (Complete mode):
+- is downloaded **only once** from Hugging Face the first time "Completo" is chosen (or when the app opens, if set
+  in Brumoth's ⚙ settings), and then stays on the PC, in the browser storage for that address: it also works offline;
+- **Standard** (Qwen3.5 2B, about 1.3 GB): better answers, CPU only, 2-4 minutes on a laptop; **Light** (Qwen3 0.6B,
+  about 0.4 GB): about 25 s with a graphics card, but gets numbers wrong more often. Choose and delete models from the ⚙ settings;
+- the graphics card (WebGPU) is on by default only for the Light model: with larger models, integrated Intel graphics hang.
+  It can be turned on or off from the settings; if it gives an error Brumoth restarts by itself without it;
+- when the chat opens in Complete mode the model loads and reads the instructions once, and they stay in memory:
+  for each question it reads only the data and the question;
+- it uses **multiple cores** only if the app is opened from "Avvia Dollaroni.bat" or the installed site (it needs cross-origin isolation, see below);
+- everything stays on the PC: questions and project data are not sent to anyone.
 
-Ogni PC sa quale versione ha (`version.json`) e controlla se ne esiste una più nuova **all'apertura, ogni 30 minuti e quando si torna
-sulla finestra**. Se c'è, compare in basso **"È disponibile Dollaroni x.y.z"** con l'elenco delle novità e il tasto **"Aggiorna ora"**;
-se si sono permesse le notifiche, arriva anche una notifica di Windows. Dopo l'aggiornamento si vede una volta la finestra "Novità".
-In fondo alla barra laterale ci sono la versione, "Novità" e "Controlla".
+## Updates for the whole team
 
-Funziona in tutti e due i modi di usare l'app:
-- **sito pubblicato** (GitHub Pages, anche installato come programma): il service worker scarica la versione nuova e "Aggiorna ora" la attiva;
-- **in locale** con "Avvia Dollaroni.bat": il server locale confronta `version.json` con quello del repository su GitHub; "Aggiorna ora"
-  scarica lo zip del branch e sostituisce i file dell'app. Prima fa una copia di quelli vecchi in `out/backup-<versione>-<data>/`.
-  Non tocca mai `out/`, i file `*.dollaroni.json` e "Avvia Dollaroni.bat". Se la cartella è un clone git, fa `git pull --ff-only`.
-  Se è cambiato anche `tools/devserver.py` chiede di chiudere e riaprire il .bat.
+Each PC knows which version it has (`version.json`) and checks whether a newer one exists **on opening, every 30 minutes and when you return
+to the window**. If there is one, **"È disponibile Dollaroni x.y.z"** (Dollaroni x.y.z is available) appears at the bottom with the list of changes and the **"Aggiorna ora"** (update now) button;
+if notifications are allowed, a Windows notification also arrives. After updating, the "Novità" (what's new) window appears once.
+At the bottom of the sidebar are the version, "Novità" and "Controlla" (check).
 
-Configurazione in `dollaroni.config.json` → `updates.repository`, per esempio `"sapienza-foiling-team/dollaroni"` (repository **pubblico**).
-Finché è vuoto, in locale il controllo è spento (in un clone git il repository si legge dal remote `origin`).
+It works in both ways of using the app:
+- **published site** (GitHub Pages, also installed as a program): the service worker downloads the new version and "Aggiorna ora" activates it;
+- **locally** with "Avvia Dollaroni.bat": the local server compares `version.json` with the one in the GitHub repository; "Aggiorna ora"
+  downloads the branch zip and replaces the app files. It first copies the old ones to `out/backup-<version>-<date>/`.
+  It never touches `out/`, the `*.dollaroni.json` files or "Avvia Dollaroni.bat". If the folder is a git clone, it runs `git pull --ff-only`.
+  If `tools/devserver.py` has also changed, it asks you to close and reopen the .bat.
 
-**Pubblicare una versione nuova** (a cosa serve: tutti i PC vedono l'avviso):
-1. `python tools/release.py 0.6.0 "Prima novità" "Seconda novità"` aggiorna `version.json` e `CHANGELOG.md`;
-2. commit e push su `main`: GitHub esegue i test (`tools/run_tests_headless.py`) e, se passano, pubblica su Pages.
+Configuration is in `dollaroni.config.json` → `updates.repository`, for example `"sapienza-foiling-team/dollaroni"` (a **public** repository).
+While it is empty, the local check is off (in a git clone the repository is read from the `origin` remote).
 
-Attenzione: il salvataggio automatico nel browser (e il modello dell'IA) valgono solo per quell'indirizzo. I file `.dollaroni.json` restano la copia da condividere.
+**Publishing a new version** (every PC then sees the notice):
+1. `python tools/release.py 0.6.0 "First change" "Second change"` updates `version.json` and `CHANGELOG.md`;
+2. commit and push to `main`: GitHub runs the tests (`tools/run_tests_headless.py`) and, if they pass, publishes to Pages.
 
-## Dall'S1 all'S2
+Note: the automatic save in the browser (and the AI model) apply only to that address. The `.dollaroni.json` files remain the copy to share.
 
-1. A S1 consegnato: **Panoramica → "Congela S1 e crea S2"** (c'è anche in fondo a "Esporta").
-   - L'S1 viene salvato dentro il progetto come riferimento fisso (`baseline`).
-   - Il progetto diventa S2, con gli stessi pezzi e voci segnati "stimata".
-   - Al primo Salva viene chiesto un nuovo file, così quello dell'S1 resta intatto.
-2. Durante la costruzione aggiorna ogni voce e ogni pezzo al valore reale, poi clicca **"stimata" → "✓ misurata"**.
-   - Nei pezzi c'è anche il **peso reale pesato**: serve per l'autovalutazione della 2.4.
-   - Sotto ogni totale compare il valore che aveva nell'S1.
-3. **Confronto S1→S2**:
-   - differenze per componente: è la tabella di confronto della 2.3;
-   - differenze voce per voce, dalla più grande;
-   - masse S1, S2 calcolate e pesate;
-   - quanto del costo è già misurato.
-4. **Esporta S2**: produce
-   - il documento con le tabelle della 2.2 (una per componente, con le note sugli sconti e il riepilogo);
-   - le tabelle della 2.3 (totale e confronto con l'S1);
-   - i dati di supporto per la 2.4 e il mass breakdown as-built;
-   - il Layup Calculator e le immagini dei pezzi as-built.
+## From S1 to S2
 
-   I testi (2.1, spiegazioni della 2.3, autovalutazione 2.4) li scrive il team.
-5. Se un progetto S2 non ha l'S1 dentro (es. creato a mano), da "Confronto" si può collegare il file dell'S1 consegnato.
+1. Once S1 has been submitted: **Panoramica → "Congela S1 e crea S2"** (freeze S1 and create S2; also at the bottom of "Esporta").
+   - S1 is saved inside the project as a fixed reference (`baseline`).
+   - The project becomes S2, with the same parts and items marked "stimata" (estimated).
+   - The first Save asks for a new file, so the S1 file stays intact.
+2. During construction, update each item and part to its real value, then click **"stimata" → "✓ misurata"** (measured).
+   - Parts also have the **real weighed weight**: it is used for the 2.4 self-assessment.
+   - Under each total you can see the value it had in S1.
+3. **S1→S2 comparison**:
+   - differences by component: this is the 2.3 comparison table;
+   - differences item by item, from the largest;
+   - S1 masses, S2 calculated and weighed masses;
+   - how much of the cost has already been measured.
+4. **Esporta S2** (export S2) produces:
+   - the document with the 2.2 tables (one per component, with notes on discounts and the summary);
+   - the 2.3 tables (total and comparison with S1);
+   - supporting data for 2.4 and the as-built mass breakdown;
+   - the Layup Calculator and the images of the as-built parts.
 
-## Regole 2027
+   The texts (2.1, explanations in 2.3, 2.4 self-assessment) are written by the team.
+5. If an S2 project does not contain S1 (for example, created by hand), the submitted S1 file can be linked from "Confronto" (comparison).
 
-Ogni progetto dice quale regolamento usa (campo `rules`; i file vecchi senza campo sono 2026). I progetti nuovi nascono con le regole 2027;
-un progetto 2027 creato prima con le regole 2026 mostra in Panoramica il tasto **"Passa alle regole 2027"**. In alto c'è sempre il badge "Regole 2026/2027".
+## 2027 rules
 
-Cosa cambia con il 2027 SMC Competition Rulebook v1.0 (7 settembre 2026):
-- **Budget**: va tenuto *sotto* i 10.000 SM$; sforarlo costa 500 punti (§10.1).
-- **Tab. 2** (carbonio): stessi limiti del 2026, "Wingbars" diventa "Hiking racks".
-- **Listino**: nel 2027 sta sulla SuMoth Agora Platform, aperta solo ai team ammessi. Finché non la vediamo si usano listino e Layup Calculator 2026, segnati **provvisori**.
-- **Sconti di provenienza** (−25/−50/−100%): il regolamento 2027 non li cita più. Restano attivi con un avviso "da confermare su Agora".
-- **Parti usate**: non c'è più il costo fisso della vecchia Tab. 3. Si inseriscono come "Parte usata o commerciale" con il prezzo (da Agora) e l'anno di produzione.
-- **Performance Rating** (nuova Tab. 3, §11): nella sezione omonima si spuntano le condizioni a)–g) per i 15 componenti; le vele, gli alberi e i foil commerciali prodotti dal 2017 valgono −100 ciascuno (§11.1.5), salvo danni compromettenti. Il rating finisce anche negli export.
-- **Scarti in S2** (§9.2.2): nei pezzi laminati (materiale consumato in più, che si somma a quantità e costo) e nei dettagli delle voci ("di cui scarto"). Tabella "Material use and waste" nell'export S2.
-- **Scafo upcycled** ammesso solo se in origine era di un'imbarcazione non foiling (§6.2.1): promemoria nei controlli.
-- Il mass breakdown as-built non è più richiesto (resta come tabella utile); gli export 2027 non usano la numerazione 2.1–2.4 del template S2 2026.
+Each project states which rulebook it uses (the `rules` field; old files without the field are 2026). New projects start with the 2027 rules;
+a 2027 project created earlier with the 2026 rules shows the **"Passa alle regole 2027"** (switch to the 2027 rules) button in Overview. The "Regole 2026/2027" badge is always at the top.
 
-## Cosa c'è nel motore
+What changes with the 2027 SMC Competition Rulebook v1.0 (7 September 2026):
+- **Budget**: must be kept *under* 10,000 SM$; exceeding it costs 500 points (§10.1).
+- **Table 2** (carbon): same limits as 2026, "Wingbars" becomes "Hiking racks".
+- **Price list**: in 2027 it is on the SuMoth Agora Platform, open only to admitted teams. Until we can see it, the 2026 price list and Layup Calculator are used, marked **provisional**.
+- **Origin discounts** (−25/−50/−100%): the 2027 rulebook no longer mentions them. They stay active with a "to be confirmed on Agora" warning.
+- **Used parts**: the fixed cost of the old Table 3 is gone. They are entered as "Parte usata o commerciale" (used or commercial part) with the price (from Agora) and the year of production.
+- **Performance Rating** (new Table 3, §11): in the section of the same name, tick conditions a)–g) for the 15 components; commercial sails, masts and foils produced since 2017 are worth −100 each (§11.1.5), barring compromising damage. The rating also goes into the exports.
+- **S2 waste** (§9.2.2): in laminated parts (extra material consumed, added to quantity and cost) and in item details ("di cui scarto", of which waste). "Material use and waste" table in the S2 export.
+- **Upcycled hull** allowed only if it originally came from a non-foiling boat (§6.2.1): a reminder in the checks.
+- The as-built mass breakdown is no longer required (it stays as a useful table); the 2027 exports do not use the 2.1–2.4 numbering of the 2026 S2 template.
 
-- **Import dei file ufficiali** (`src/io/official.js`)
-  - Listino `20xx_SMC_Standardized_Costs.xlsx`: le voci diventano il catalogo prezzi. Segnala i materiali senza prezzo e i doppioni.
-  - Template `20xx_SMC_Composite_Layup_Calculator.xlsx`: materiali, densità, processi e Vf vengono letti dal file stesso.
-  - Quando escono i file dell'anno nuovo basta sostituirli in `data/official/`.
-- **Motore layup** (`src/engine/layup.js`): usa le stesse formule del Layup Calculator ufficiale, senza il limite di 5 substack.
-- **Costi** (`src/engine/project.js`):
-  - voci di listino e lavorazioni a ore;
-  - hardware a prezzo MSRP;
-  - sconti di provenienza del §3.3: eccedenza industriale −25%, fuori shelf-life −50%, upcycled −100%;
-  - parti usate della Tab. 3, con costo fisso e handicap;
-  - totali per componente del template S2, margine sul budget, limiti di carbonio della Tab. 2 e mass breakdown del §2.5.
-- **Controlli** (`src/engine/checks.js`):
+## What is in the engine
+
+- **Import of official files** (`src/io/official.js`)
+  - Price list `20xx_SMC_Standardized_Costs.xlsx`: the items become the price catalogue. It flags materials without a price and duplicates.
+  - Template `20xx_SMC_Composite_Layup_Calculator.xlsx`: materials, densities, processes and Vf are read from the file itself.
+  - When the new year's files come out, just replace them in `data/official/`.
+- **Layup engine** (`src/engine/layup.js`): uses the same formulas as the official Layup Calculator, without the limit of 5 substacks.
+- **Costs** (`src/engine/project.js`):
+  - price-list items and hourly processes;
+  - hardware at MSRP;
+  - §3.3 origin discounts: industrial surplus −25%, out of shelf life −50%, upcycled −100%;
+  - Table 3 used parts, with fixed cost and handicap;
+  - totals by component of the S2 template, budget margin, Table 2 carbon limits and §2.5 mass breakdown.
+- **Checks** (`src/engine/checks.js`):
   - budget;
-  - carbonio oltre o vicino al limite;
-  - quantità dichiarate diverse da quelle del layup;
-  - materiali che non esistono nel calcolatore ufficiale;
-  - prezzi senza fonte;
-  - upcycled senza origine indicata.
-- **Tabelle dei report** (`src/engine/reports.js`):
-  - S1: tabella "SuMoth Dollar breakdown";
-  - S2 §2.2: una tabella per componente, con le note sugli sconti generate in automatico;
-  - S2 §2.3: riepilogo e confronto S1→S2;
+  - carbon over or close to the limit;
+  - declared quantities that differ from the layup;
+  - materials that do not exist in the official calculator;
+  - prices without a source;
+  - upcycled items without a stated origin.
+- **Report tables** (`src/engine/reports.js`):
+  - S1: "SuMoth Dollar breakdown" table;
+  - S2 §2.2: one table per component, with automatically generated notes on discounts;
+  - S2 §2.3: summary and S1→S2 comparison;
   - mass breakdown.
-- **Export Layup Calculator** (`src/io/layup-export.js`): **un file per pezzo** (Hull, Wing panel, Main vertical…).
-  - Parte da una copia del template ufficiale e cambia solo le celle di input. Formule, menu e stili restano quelli dell'organizzazione.
-  - I substack non usati vengono nascosti.
-  - Un pezzo con più di 5 substack viene diviso in "Pezzo (1/2)", "Pezzo (2/2)".
+- **Layup Calculator export** (`src/io/layup-export.js`): **one file per part** (Hull, Wing panel, Main vertical…).
+  - It starts from a copy of the official template and changes only the input cells. Formulas, menus and styles remain the organizers'.
+  - Unused substacks are hidden.
+  - A part with more than 5 substacks is split into "Part (1/2)", "Part (2/2)".
 
-## Verifiche fatte sui dati 2026
+## Checks done on the 2026 data
 
-I due progetti in `data/projects/` sono Meravijosa S1 e S2 2026, ricostruiti dai report consegnati.
+The two projects in `data/projects/` are Meravijosa S1 and S2 2026, reconstructed from the submitted reports.
 
-| Controllo | Risultato |
+| Check | Result |
 |---|---|
-| Appendice G S1 (8 pezzi, ogni substack) | uguale al grammo |
-| Tabella 2 S1 | 8.422,44 SM$, uguale |
-| Tabelle 2.1–2.9 S2 (7 componenti) | 9.955,88 SM$, uguale al centesimo |
-| Tabella 2.10 (confronto S1→S2) | Δ e variazioni uguali |
-| File esportati ricalcolati da LibreOffice con le formule ufficiali | scarto massimo 1e-15 |
+| S1 Appendix G (8 parts, every substack) | matches to the gram |
+| S1 Table 2 | 8,422.44 SM$, matches |
+| S2 Tables 2.1–2.9 (7 components) | 9,955.88 SM$, matches to the cent |
+| Table 2.10 (S1→S2 comparison) | Δ and changes match |
+| Exported files recalculated by LibreOffice with the official formulas | maximum difference 1e-15 |
 
-Cosa segnalano i controlli sui dati 2026:
-- S1: il main horizontal ha **1000,04 g di CFRP su 1000 g** consentiti dalla Tab. 2, quindi lo supera di 0,04 g. Il main vertical è al 98,7% del limite.
-- S2: la resina dello scafo è dichiarata 1,44 kg, ma con il Layup Calculator (Vf 35%) ne risultano 2,35 kg (−39%). Il margine sul budget è di 44,12 SM$.
+What the checks flag on the 2026 data:
+- S1: the main horizontal has **1000.04 g of CFRP against the 1000 g** allowed by Table 2, so it exceeds it by 0.04 g. The main vertical is at 98.7% of the limit.
+- S2: the hull resin is declared as 1.44 kg, but the Layup Calculator (Vf 35%) gives 2.35 kg (−39%). The budget margin is 44.12 SM$.
 
-## Pubblicare (GitHub Pages)
+## Publishing (GitHub Pages)
 
-Il repository contiene il workflow `.github/workflows/pages.yml`: a ogni push sul branch `main` GitHub
-esegue `python tools/build_pwa.py _site` e pubblica la cartella. Lo script copia solo i file dell'app
-(niente `out/`, note interne o file progetto `*.dollaroni.json`, esclusi anche da `.gitignore`) e scrive in `sw.js`
-la versione (impronta dei file) e l'elenco dei file da tenere offline.
+The repository contains the `.github/workflows/pages.yml` workflow: on each push to the `main` branch GitHub
+runs `python tools/build_pwa.py _site` and publishes the folder. The script copies only the app files
+(no `out/`, internal notes or `*.dollaroni.json` project files, which are also excluded by `.gitignore`) and writes into `sw.js`
+the version (a fingerprint of the files) and the list of files to keep offline.
 
-Prima volta: nelle impostazioni del repository, Pages > Source: **GitHub Actions**. Il sito sarà su
-`https://<account>.github.io/<repository>/`. Poi scrivere il repository in `dollaroni.config.json` (vedi "Aggiornamenti").
+First time: in the repository settings, Pages > Source: **GitHub Actions**. The site will be at
+`https://<account>.github.io/<repository>/`. Then write the repository in `dollaroni.config.json` (see "Updates").
 
-Il workflow, prima di pubblicare, lancia `python tools/run_tests_headless.py`: se un test fallisce la versione non viene pubblicata.
+Before publishing, the workflow runs `python tools/run_tests_headless.py`: if a test fails, the version is not published.
 
-**Cross-origin isolation.** Il server locale manda gli header `Cross-Origin-Opener-Policy: same-origin` e
-`Cross-Origin-Embedder-Policy: require-corp`; su GitHub Pages li aggiunge il service worker (dalla seconda apertura in poi).
-Servono all'IA per usare più core. Effetto collaterale da ricordare: i popup di login di altri siti (es. Google) non possono
-comunicare con la pagina, e iframe di altri siti vanno caricati con `credentialless`. Il server si può avviare con `--no-isolation`.
+**Cross-origin isolation.** The local server sends the headers `Cross-Origin-Opener-Policy: same-origin` and
+`Cross-Origin-Embedder-Policy: require-corp`; on GitHub Pages the service worker adds them (from the second opening onwards).
+The AI needs them to use multiple cores. A side effect to remember: login popups from other sites (e.g. Google) cannot
+communicate with the page, and iframes from other sites must be loaded with `credentialless`. The server can be started with `--no-isolation`.
 
-Per provare l'app installabile in locale (in locale il service worker normalmente è spento):
+To try the installable app locally (the service worker is normally off locally):
 
 ```bash
 python tools/build_pwa.py out/site
 python tools/devserver.py 8766 --root=out/site
 ```
 
-e aprire http://127.0.0.1:8766/?pwa. Le icone si rigenerano con `python tools/make_icons.py`.
+and open http://127.0.0.1:8766/?pwa. The icons can be regenerated with `python tools/make_icons.py`.
 
-## Come si provano i test
+## How to run the tests
 
-Serve solo Python (nessuna installazione di Node).
+Only Python is needed (no Node installation).
 
 ```bash
 python tools/devserver.py
 ```
 
-Poi apri http://127.0.0.1:8765/tests/ nel browser: deve comparire "81/81 test superati".
-I test salvano anche gli xlsx del Layup Calculator in `out/layup-s1/`.
+Then open http://127.0.0.1:8765/tests/ in the browser: it should report that all 81 tests pass.
+The tests also save the Layup Calculator xlsx files in `out/layup-s1/`.
 
-Senza aprire finestre (usa Chrome o Edge in modalità headless, come fa GitHub prima di pubblicare):
+Without opening any windows (uses Chrome or Edge in headless mode, as GitHub does before publishing):
 
 ```bash
 python tools/run_tests_headless.py
 ```
 
-Per ricontrollarli con le formule ufficiali, tramite LibreOffice:
+To recheck them with the official formulas, through LibreOffice:
 
 ```bash
 python tools/verify_layup_export.py out/layup-s1
 ```
 
-## Struttura
+## Structure
 
 ```
-index.html         l'app
-Avvia Dollaroni.bat avvio con doppio clic (server locale + browser)
-version.json       versione installata e note (le confronta il controllo aggiornamenti)
-CHANGELOG.md       storia delle versioni
-dollaroni.config.json  repository GitHub da cui aggiornarsi
-styles/app.css     grafica
-src/app/           interfaccia (Preact + htm, niente build): app.js, views/ (anche assistant.js, Brumoth: barchetta, fumetto e chat), store.js, updates.js, pwa.js
-src/ai/            IA locale di Brumoth nel browser (llm.js: download, cache, avvio, risposte in streaming)
-src/engine/        regole per anno (rules.js, rules-2026.js, rules-2027.js), calcolo layup, costi, Performance Rating, controlli, tabelle report,
-                   assistant.js (motore delle risposte di Brumoth)
-src/io/            lettura/scrittura xlsx, import file ufficiali, export template, docx, immagini
-data/official/     file ufficiali SuMoth (listino costi, Layup Calculator)
-data/projects/     progetti di esempio (Meravijosa S1 e S2 2026)
-tests/             test nel browser (golden test sui dati 2026)
-tools/             server locale (con aggiornamenti), test headless, release.py, verifica con LibreOffice, build del sito (build_pwa.py), icone
-sw.js, manifest.webmanifest, icons/   app installabile (service worker, manifest, icone)
-.github/workflows/ pubblicazione su GitHub Pages
+index.html         the app
+Avvia Dollaroni.bat double-click start (local server + browser)
+version.json       installed version and notes (compared by the update check)
+CHANGELOG.md       version history
+dollaroni.config.json  GitHub repository to update from
+styles/app.css     styling
+src/app/           interface (Preact + htm, no build): app.js, views/ (including assistant.js, Brumoth: boat, bubble and chat), store.js, updates.js, pwa.js
+src/ai/            Brumoth's local AI in the browser (llm.js: download, cache, start-up, streaming answers)
+src/engine/        rules by year (rules.js, rules-2026.js, rules-2027.js), layup calculation, costs, Performance Rating, checks, report tables,
+                   assistant.js (Brumoth's answer engine)
+src/io/            xlsx reading/writing, import of official files, template export, docx, images
+data/official/     official SuMoth files (cost price list, Layup Calculator)
+data/projects/     example projects (Meravijosa S1 and S2 2026)
+tests/             browser tests (golden tests on the 2026 data)
+tools/             local server (with updates), headless tests, release.py, LibreOffice check, site build (build_pwa.py), icons
+sw.js, manifest.webmanifest, icons/   installable app (service worker, manifest, icons)
+.github/workflows/ publishing to GitHub Pages
 vendor/            JSZip 3.10.1 (MIT), htm 3.1.1 + Preact (MIT), wllama 3.8.1 (MIT, llama.cpp in WebAssembly)
 ```
 
-## Formato del progetto (`dollaroni/1`)
+## Project format (`dollaroni/1`)
 
 ```jsonc
 {
@@ -270,10 +269,10 @@ vendor/            JSZip 3.10.1 (MIT), htm 3.1.1 + Preact (MIT), wllama 3.8.1 (M
   "catalogExtras": [ { "id": "hw-blocks", "name": "Blocks", "unit": "pc", "price": 32.5, "priceSource": "MSRP Harken" } ],
   "parts": [ {
     "id": "hull", "name": "Hull",
-    "component": "hull",          // categoria S2: hull, foils, mechanical_control, gantry, wingbars, rig, electronics
-    "limitGroup": "hull",         // colonna Tab. 2 per i limiti di carbonio
-    "massGroup": "hull",          // riga del mass breakdown §2.5: hull, wings, horizontal_foils, vertical_foils
-    "autoLines": true,            // true = le righe di costo fibra/resina/anima si generano da sole
+    "component": "hull",          // S2 category: hull, foils, mechanical_control, gantry, wingbars, rig, electronics
+    "limitGroup": "hull",         // Table 2 column for the carbon limits
+    "massGroup": "hull",          // §2.5 mass breakdown row: hull, wings, horizontal_foils, vertical_foils
+    "autoLines": true,            // true = the fibre/resin/core cost rows are generated automatically
     "substacks": [ { "reinforcement": "dry-fabric-basalt-fibers", "matrix": "std-epoxy/lamination-resin",
                      "plyArea": 3.997, "plies": 4, "arealWeight": 340, "process": "HAND LAYUP + VAC",
                      "matrixSource": "out_of_shelf_life" } ],
@@ -289,16 +288,16 @@ vendor/            JSZip 3.10.1 (MIT), htm 3.1.1 + Preact (MIT), wllama 3.8.1 (M
 }
 ```
 
-- **`source`** (provenienza):
+- **`source`** (origin):
   - `new`
   - `industrial_excess` (−25%)
   - `out_of_shelf_life` (−50%)
-  - `upcycled` (−100%): va indicata l'origine in `origin`.
-- **I materiali riciclati** hanno la loro voce di listino, per esempio `pet/recycled` a 0 SM$.
-- **Quantità da controllare contro il layup**: `"check": {"parts": ["hull"], "kind": "fibre" | "resin" | "core"}`.
+  - `upcycled` (−100%): the origin must be stated in `origin`.
+- **Recycled materials** have their own price-list item, for example `pet/recycled` at 0 SM$.
+- **Quantities to check against the layup**: `"check": {"parts": ["hull"], "kind": "fibre" | "resin" | "core"}`.
 
-## Prossimi passi
+## Next steps
 
-0. Listino 2027 da SuMoth Agora (quando il team è ammesso): sostituire i file provvisori in `rules-2027.js` e togliere gli avvisi sugli sconti se non esistono più.
-1. Salvataggio condiviso su Google Drive con login Google, con unione delle modifiche fatte da più persone.
-2. Controllo in Google Docs dei documenti importati: i file di prova sono in `Barca\Dollaroni - prova Google Docs`.
+0. 2027 price list from SuMoth Agora (once the team is admitted): replace the provisional files in `rules-2027.js` and remove the discount warnings if they no longer exist.
+1. Shared saving on Google Drive with Google login, merging changes made by several people.
+2. Check the imported documents in Google Docs.
