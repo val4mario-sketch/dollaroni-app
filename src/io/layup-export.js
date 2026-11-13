@@ -168,6 +168,13 @@ export function layupFileName(prefix, chunk) {
   return `${prefix} - Layup - ${safe}.xlsx`;
 }
 
+function checkedPart(spec, catalog, chunk) {
+  const result = computePart(spec, catalog, { ...chunk.part, substacks: chunk.substacks });
+  if (result.errors.length) throw new Error(`${chunk.title}: ${result.errors.join('; ')}`);
+  if (!result.substacks.length || result.totals.composite <= 0) throw new Error(`${chunk.title}: no material to export`);
+  return result;
+}
+
 /** Exports all the laminated parts: [{fileName, bytes, chunk, error}] (one file per part). */
 export async function exportAllLayups(templateBytes, spec, catalog, parts, prefix, JSZipLib) {
   const out = [];
@@ -175,7 +182,8 @@ export async function exportAllLayups(templateBytes, spec, catalog, parts, prefi
     for (const chunk of chunkPart(part)) {
       const fileName = layupFileName(prefix, chunk);
       try {
-        const { bytes, result } = await exportLayupChunk(templateBytes, spec, catalog, chunk, JSZipLib);
+        // 2027: there is no Layup Calculator file to fill in (the calculation is on Agora), only the appendix table
+        const { bytes, result } = spec.layout ? await exportLayupChunk(templateBytes, spec, catalog, chunk, JSZipLib) : { bytes: null, result: checkedPart(spec, catalog, chunk) };
         out.push({ fileName, bytes, chunk, result, error: null });
       } catch (e) {
         out.push({ fileName, bytes: null, chunk, result: null, error: e.message });

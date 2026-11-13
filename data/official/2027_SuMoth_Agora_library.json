@@ -1,0 +1,525 @@
+{
+ "app": "sumoth-agora",
+ "kind": "library",
+ "schema": 2,
+ "version": "2026.01",
+ "updated": "2026-10-11T16:27:04.908Z",
+ "notes": "first version test 20261011",
+ "lib": {
+  "fibers": {
+   "Aramid BioBased": {
+    "d": 1.4,
+    "dry": 50,
+    "preg": 300,
+    "rk": "POLY"
+   },
+   "Aramid Kevlar": {
+    "d": 1.44,
+    "dry": 200,
+    "preg": 400,
+    "rk": "POLY"
+   },
+   "Aramid Other": {
+    "d": 1.44,
+    "dry": 100,
+    "preg": 400,
+    "rk": "POLY"
+   },
+   "Basalt": {
+    "d": 2.7,
+    "dry": 0,
+    "preg": 300,
+    "rk": "BAS"
+   },
+   "bComp-PowerRibs": {
+    "d": 1,
+    "dry": 1,
+    "preg": 1,
+    "rk": "FLX"
+   },
+   "Carbon Fiber HM": {
+    "d": 1.84,
+    "dry": 250,
+    "preg": 500,
+    "rk": "CHM"
+   },
+   "Carbon Fiber IM": {
+    "d": 1.77,
+    "dry": 200,
+    "preg": 400,
+    "rk": "CIM"
+   },
+   "Carbon Fiber STM": {
+    "d": 1.8,
+    "dry": 150,
+    "preg": 300,
+    "rk": "CSTM"
+   },
+   "Carbon Fiber UHM": {
+    "d": 1.84,
+    "dry": 450,
+    "preg": 700,
+    "rk": "CHM"
+   },
+   "Diolen": {
+    "d": 1.38,
+    "dry": 25,
+    "preg": 300,
+    "rk": "POLY"
+   },
+   "Flax": {
+    "d": 1.3,
+    "dry": 0,
+    "preg": 300,
+    "rk": "FLX"
+   },
+   "Glass Fiber E": {
+    "d": 2.6,
+    "dry": 25,
+    "preg": 300,
+    "rk": "GLS"
+   },
+   "Glass Fiber S": {
+    "d": 2.49,
+    "dry": 75,
+    "preg": 300,
+    "rk": "GLS"
+   },
+   "Innegra": {
+    "d": 0.84,
+    "dry": 150,
+    "preg": 300,
+    "rk": "POLY"
+   }
+  },
+  "families": {
+   "CSTM": {
+    "label": "Carbon STM",
+    "d": 1.8
+   },
+   "CIM": {
+    "label": "Carbon IM",
+    "d": 1.77
+   },
+   "CHM": {
+    "label": "Carbon HM",
+    "d": 1.84
+   },
+   "BAS": {
+    "label": "Basalt",
+    "d": 2.7
+   },
+   "FLX": {
+    "label": "Flax",
+    "d": 1.3
+   },
+   "GLS": {
+    "label": "Glass",
+    "d": 2.6
+   },
+   "POLY": {
+    "label": "Polymer (aramid/Innegra/Diolen)",
+    "d": 1.4
+   }
+  },
+  "tech": {
+   "Hand Layup": {
+    "preg": false
+   },
+   "Hand Layup + Vac": {
+    "preg": false
+   },
+   "Infusion": {
+    "preg": false
+   },
+   "OoA Curing": {
+    "preg": true
+   },
+   "Autoclave": {
+    "preg": true
+   },
+   "Hotpress": {
+    "preg": true
+   }
+  },
+  "rfrac": {
+   "Hand Layup": {
+    "CSTM": 0.55,
+    "CIM": 0.55,
+    "CHM": 0.55,
+    "BAS": 0.45,
+    "FLX": 0.62,
+    "GLS": 0.46,
+    "POLY": null
+   },
+   "Hand Layup + Vac": {
+    "CSTM": 0.5,
+    "CIM": 0.5,
+    "CHM": 0.5,
+    "BAS": 0.4,
+    "FLX": 0.6,
+    "GLS": 0.4,
+    "POLY": null
+   },
+   "Infusion": {
+    "CSTM": 0.45,
+    "CIM": 0.45,
+    "CHM": 0.45,
+    "BAS": 0.35,
+    "FLX": 0.5,
+    "GLS": 0.35,
+    "POLY": null
+   },
+   "OoA Curing": {
+    "CSTM": 0.37,
+    "CIM": 0.37,
+    "CHM": 0.37,
+    "BAS": 0.3,
+    "FLX": 0.45,
+    "GLS": 0.35,
+    "POLY": null
+   },
+   "Autoclave": {
+    "CSTM": 0.37,
+    "CIM": 0.37,
+    "CHM": 0.37,
+    "BAS": 0.3,
+    "FLX": 0.45,
+    "GLS": 0.35,
+    "POLY": null
+   },
+   "Hotpress": {
+    "CSTM": 0.37,
+    "CIM": 0.37,
+    "CHM": 0.37,
+    "BAS": 0.3,
+    "FLX": 0.45,
+    "GLS": 0.35,
+    "POLY": null
+   }
+  },
+  "matrices": {
+   "Bio Epoxy": {
+    "d": 1.15,
+    "p": 15
+   },
+   "Epoxy": {
+    "d": 1.15,
+    "p": 25
+   },
+   "PA11": {
+    "d": 1.03,
+    "p": 0
+   },
+   "PA12": {
+    "d": 1.01,
+    "p": 25
+   },
+   "Polyester": {
+    "d": 1.2,
+    "p": 15
+   },
+   "PU Resin/Paint": {
+    "d": 1.2,
+    "p": 25
+   },
+   "Thermoplastic": {
+    "d": 1.05,
+    "p": 15
+   },
+   "Vinyl-ester": {
+    "d": 1.1,
+    "p": 15
+   }
+  },
+  "adhesives": {
+   "Bio-based Epoxy adhesive": {
+    "d": 1.1,
+    "p": 15
+   },
+   "Epoxy adhesive": {
+    "d": 1.1,
+    "p": 25
+   },
+   "Epoxy adhesive film (requires curing)": {
+    "d": 1.1,
+    "p": 25
+   },
+   "Methyl Methacrylate (MMA)": {
+    "d": 1.03,
+    "p": 15
+   }
+  },
+  "cores": {
+   "ASA": {
+    "p": 5000,
+    "grades": {}
+   },
+   "Cork": {
+    "p": null,
+    "grades": {}
+   },
+   "EPS recycled": {
+    "p": 0,
+    "grades": {}
+   },
+   "EPS standard": {
+    "p": 20,
+    "grades": {}
+   },
+   "Gurit Balsa": {
+    "p": null,
+    "grades": {}
+   },
+   "Honeycomb Aluminium (industry waste only)": {
+    "p": 20,
+    "grades": {}
+   },
+   "Honeycomb Aramid (industry waste only)": {
+    "p": 20,
+    "grades": {}
+   },
+   "Paulownia": {
+    "p": 0,
+    "grades": {}
+   },
+   "PET standard": {
+    "p": 20,
+    "grades": {
+     "100": 1040
+    }
+   },
+   "PVC/SAN": {
+    "p": 5000,
+    "grades": {
+     "60": 730,
+     "80": 620,
+     "100": 560,
+     "130": 510
+    }
+   },
+   "Recycled PET": {
+    "p": 0,
+    "grades": {
+     "80": 1090,
+     "100": 1040,
+     "115": 1010,
+     "135": 960,
+     "150": 930,
+     "200": 810,
+     "250": 700,
+     "300": 580
+    }
+   },
+   "XPS recycled": {
+    "p": 0,
+    "grades": {}
+   },
+   "XPS standard": {
+    "p": 20,
+    "grades": {
+     "100": 100
+    }
+   },
+   "Custom core…": {
+    "p": 0,
+    "grades": {},
+    "custom": true
+   }
+  },
+  "processes": {
+   "Additive Manufacturing": 10,
+   "Autoclave cure": 40,
+   "Laser (CNC)": 20,
+   "Machining (CNC)": 40,
+   "Oven cure": 20
+  },
+  "consumables": {
+   "Breather": {
+    "p": 3,
+    "u": "m²"
+   },
+   "Brushes": {
+    "p": 2,
+    "u": "brush"
+   },
+   "Flowmesh": {
+    "p": 5,
+    "u": "m²"
+   },
+   "PE vacuum hose": {
+    "p": 1,
+    "u": "lin. m"
+   },
+   "Peel ply": {
+    "p": 5,
+    "u": "m²"
+   },
+   "PVA": {
+    "p": 20,
+    "u": "L"
+   },
+   "PVC vacuum hose": {
+    "p": 1,
+    "u": "lin. m"
+   },
+   "Release agent solvent based": {
+    "p": 100,
+    "u": "L"
+   },
+   "Release agent water based": {
+    "p": 50,
+    "u": "L"
+   },
+   "Release wax": {
+    "p": 50,
+    "u": "kg"
+   },
+   "Spiral tube (infusion)": {
+    "p": 1,
+    "u": "lin. m"
+   },
+   "Spray tack (VARI)": {
+    "p": 20,
+    "u": "kg"
+   },
+   "Tacky tape (15 m roll)": {
+    "p": 8,
+    "u": "roll"
+   },
+   "Vacuum bag": {
+    "p": 2,
+    "u": "m²"
+   }
+  },
+  "raw": {
+   "Aluminium": 10,
+   "MDF/HDF recycled": 10,
+   "MDF/HDF wood": 20,
+   "Scrap wood": 0,
+   "Stainless Steel": 30,
+   "Steel": 10,
+   "Teflon/PTFE (1 kg max from block)": 1000,
+   "Tooling board Epoxy (0.7 t/cm)": 20,
+   "Tooling board PU (0.7 t/cm)": 15
+  },
+  "am": {
+   "ABS filament": 50,
+   "Other filaments (co-polymer/reinforced)": 35,
+   "PETG filament": 15,
+   "PLA filament": 10
+  },
+  "hwSourcing": {
+   "New": 1,
+   "From previous prototypes": null,
+   "From other boats": null
+  }
+ },
+ "removed": {
+  "cores": [
+   "Balsa"
+  ]
+ },
+ "settings": {
+  "scrapPct": 20,
+  "deadlines": {
+   "s1": "2027-04-15T14:12:00.000Z",
+   "s2": ""
+  },
+  "secVis": {},
+  "teamList": [
+   "AUD",
+   "CHL",
+   "COR",
+   "ECK",
+   "ENS",
+   "EWE",
+   "FHK",
+   "FRC",
+   "GCM",
+   "ICA",
+   "KTH",
+   "LIU",
+   "LTH",
+   "MET",
+   "MIU",
+   "PDC",
+   "PMI",
+   "POL",
+   "QUE",
+   "QUI",
+   "RAF",
+   "REV",
+   "SFT",
+   "SHF",
+   "SOL",
+   "SOT",
+   "TRE",
+   "TUA",
+   "TUD",
+   "TUM",
+   "UED",
+   "UNA",
+   "UNC",
+   "UOA",
+   "UPC",
+   "UPV",
+   "USE",
+   "WEB"
+  ],
+  "teamNames": {
+   "QUI": "Universidad Nacional de Quilmes"
+  },
+  "categories": {
+   "Hull": [
+    "Hull",
+    "Hull internal structures",
+    "Hull mould",
+    "Deck",
+    "Deck mould",
+    "Bowsprit",
+    "Mast base & Vang"
+   ],
+   "Gantry": [
+    "Gantry",
+    "Gantry mould"
+   ],
+   "Wings": [
+    "Wing Bars",
+    "Wing Bars mould",
+    "Hard wing panels",
+    "Hard wing panels mould",
+    "Soft wings"
+   ],
+   "Foils": [
+    "Main foil vertical",
+    "Main foil vertical mould",
+    "Main foil horizontal",
+    "Main foil horizontal mould",
+    "Rudder vertical",
+    "Rudder vertical mould",
+    "Rudder horizontal",
+    "Rudder horizontal mould"
+   ],
+   "Sail": [
+    "Sail",
+    "Battens"
+   ],
+   "Rig": [
+    "Mast",
+    "Boom",
+    "Spreader"
+   ],
+   "Mechanical systems": [
+    "Blocks",
+    "Ropes",
+    "Tiller mechanism",
+    "Tiller extension",
+    "Wand assembly"
+   ],
+   "Other": [
+    "Other"
+   ]
+  }
+ }
+}

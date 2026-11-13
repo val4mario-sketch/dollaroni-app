@@ -13,9 +13,9 @@ async function setup() {
   if (cache) return cache;
   const c = await loadContext();
   const project = projectFrom2026(structuredClone(c.s1));
-  const base = { spec: c.spec, catalogEntries: c.catalogEntries, rules: RULES_2027 };
+  const base = { ...c.agora, rules: RULES_2027 };
   const ev = evaluate(project, base);
-  cache = { project, base, ev, ctx: { ev, checks: runChecks(ev), spec: c.spec, catalogEntries: c.catalogEntries } };
+  cache = { project, base, ev, ctx: { ev, checks: runChecks(ev), ...c.agora } };
   return cache;
 }
 const ask = async (q) => answer(q, (await setup()).ctx);
@@ -53,7 +53,7 @@ suite('Brumoth – changes with Apply/Cancel', () => {
     const { ev } = await setup();
     const a = await ask('fai la deriva in basalto');
     eq(a.actions[0].type, 'swapFibre');
-    close(a.actions[0].preview.after.total - ev.total, -71.06, 0.01);
+    close(a.actions[0].preview.after.total - ev.total, -69.92, 0.01);
     const w = await ask('e se facessi la deriva in basalto?');
     eq(w.actions.length, 1, 'the simulation also offers Apply');
   });

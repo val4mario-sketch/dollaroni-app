@@ -13,6 +13,12 @@ const CARBON_SOURCES = [
   { value: 'upcycled', label: 'CFRP upcycled' },
 ];
 
+/** Standard densities of a core on Agora: only these have a documented resin absorption. */
+const grades = (entry) => {
+  const list = Object.entries(entry?.grades || {}).map(([d, abs]) => `${d} kg/m³ → ${abs} g/m²`);
+  return list.length ? ` · standard densities on Agora (absorbed resin): ${list.join(', ')}` : '';
+};
+
 export function Parts({ project, ev, evBase, ctx, update, selectedId, onSelect }) {
   const parts = project.parts;
   const selected = parts.find((p) => p.id === selectedId) || parts[0];
@@ -114,7 +120,7 @@ function PartEditor({ part, ev, evBase, isS2, ctx, update, onSelect }) {
             <div class="sub-body">
               <div class="sub-row">
                 <label class="field"><span>Fibra</span>
-                  <${CatalogSelect} catalog=${catalog} kinds=${['reinforcement']} value=${s.reinforcement} onChange=${(v) => setSub(i, (x) => { x.reinforcement = v; })} />
+                  <${CatalogSelect} catalog=${catalog} kinds=${spec.model === 'agora' ? ['reinforcement', 'prepreg'] : ['reinforcement']} value=${s.reinforcement} onChange=${(v) => setSub(i, (x) => { x.reinforcement = v; })} />
                   <div class="sub-line">
                     <${Select} className="inp-sm" value=${s.reinforcementSource || 'new'} options=${SOURCE_OPTIONS} onChange=${(v) => setSub(i, (x) => { x.reinforcementSource = v; })} />
                     ${r?.reinforcement?.carbon && html`<${Select} className="inp-sm" value=${s.carbonSource || (s.reinforcementSource === 'upcycled' ? 'upcycled' : 'virgin')} options=${CARBON_SOURCES} onChange=${(v) => setSub(i, (x) => { x.carbonSource = v; })} />`}
@@ -124,8 +130,8 @@ function PartEditor({ part, ev, evBase, isS2, ctx, update, onSelect }) {
                   <${CatalogSelect} catalog=${catalog} kinds=${['matrix']} value=${s.matrix} onChange=${(v) => setSub(i, (x) => { x.matrix = v; })} />
                   <div class="sub-line"><${Select} className="inp-sm" value=${s.matrixSource || 'new'} options=${SOURCE_OPTIONS} onChange=${(v) => setSub(i, (x) => { x.matrixSource = v; })} /></div>
                 </label>
-                <label class="field"><span>Process (Vf)</span>
-                  <${Select} value=${s.process} options=${spec.processes.map((p) => ({ value: p.name, label: `${p.name} · Vf ${Math.round(p.vf * 100)}%` }))} onChange=${(v) => setSub(i, (x) => { x.process = v; })} /></label>
+                <label class="field"><span>Process</span>
+                  <${Select} value=${s.process} options=${spec.processes.map((p) => ({ value: p.name, label: p.vf == null ? p.name : `${p.name} · Vf ${Math.round(p.vf * 100)}%` }))} onChange=${(v) => setSub(i, (x) => { x.process = v; })} /></label>
               </div>
               <div class="sub-row sub-nums">
                 <label class="field"><span>Area ply m²</span><${NumInput} value=${s.plyArea} onChange=${(v) => setSub(i, (x) => { x.plyArea = v ?? 0; }, 'area')} width=${84} /></label>
@@ -260,7 +266,7 @@ function CoreCard({ part, pr, catalog, set }) {
         <label class="field"><span>Absorbed resin (g/m²)</span><${NumInput} value=${c.resinUptake} onChange=${(v) => setCore((x) => { x.resinUptake = v; }, 'u')} placeholder="es. 250" /></label>
       `}
     </div>
-    ${c && html`<p class="muted small mt">Core mass ${kg(pr?.core?.mass || 0, 3)}${pr?.core?.uptake ? ` + absorbed resin ${kg(pr.core.uptake, 3)}` : ' · resin absorption not estimated'}</p>`}
+    ${c && html`<p class="muted small mt">Core mass ${kg(pr?.core?.mass || 0, 3)}${pr?.core?.uptake ? ` + absorbed resin ${kg(pr.core.uptake, 3)}` : ' · resin absorption not estimated'}${grades(catalog.get(c.ref))}</p>`}
   </${Card}>`;
 }
 

@@ -3,6 +3,11 @@
 Versions follow `MAJOR.MINOR.PATCH`. The current version and its notes are in `version.json`:
 to publish a new one use `python tools/release.py <version> "note" "note"` (it updates both files).
 
+## 0.7.0 – 13/11/2026
+- 2027 rules now use the SuMoth Agora library (v2026.01): official 2027 prices, new items (adhesives, prepreg for every fibre, standard core densities) and no more 'provisional price list'.
+- Laminate resin for 2027 is calculated as on Agora, from the process and the fibre family: totals match what the jury sees. A prepreg pays fibre and resin at its prepreg price; cores at a standard density get their resin absorption.
+- Origin discounts are applied as on Agora (no more 'to be confirmed'). In 2027 there is no Layup Calculator file: the export keeps the layup tables as images.
+
 ## 0.6.0 – 08/11/2026
 - The interface, messages and documentation are now in English.
 - Brumoth understands questions in English as well as Italian.

@@ -114,9 +114,9 @@ export function ExportView({ project, ev, evBase, ctx, checks, onToS2, go }) {
     <div class="page-head"><div><h1>Export ${project.stage}</h1><p class="muted">${isS2
       ? 'Tables of section 2 "Final cost analysis" of the S2 template, calculated from the as-built data.'
       : 'Collects the project data and puts it in the official formats of the S1 report.'}</p></div></div>
-    ${rules.official.provisional && html`<div class="notice notice-info">Rules ${rules.id}: the cost is declared on the SuMoth Agora Platform
-      (${isS2 ? 'Measured Manufacturing Cost, §9.2' : 'Predicted Manufacturing Cost, §7.3'}, 500 points). These files are a basis for filling it in and for the report.
-      The 2027 templates are on Moodle and we have not seen them yet, so the tables follow the structure of the 2026 reports.</div>`}
+    ${rules.official.agora && html`<div class="notice notice-info">Rules ${rules.id}: the cost is declared on the SuMoth Agora Platform
+      (${isS2 ? 'Measured Manufacturing Cost, §9.2' : 'Predicted Manufacturing Cost, §7.3'}, 500 points). Dollaroni uses the same library and resin fractions, so the totals should match; these files are a basis for filling it in and for the report.
+      There is no Layup Calculator file to fill in: the appendix keeps the layup tables as images. The 2027 templates are on Moodle and we have not seen them yet, so the tables follow the structure of the 2026 reports.</div>`}
 
     <div class="grid-2">
       <${Card} title="What is produced">
@@ -126,9 +126,9 @@ export function ExportView({ project, ev, evBase, ctx, checks, onToS2, go }) {
             <li><${Icon} name="gauge" /> <strong>${rules.reportNumbering ? '2.3 ' : ''}Cost Summary</strong>: total cost breakdown and comparison with the S1 estimate (Δ and change)${evBase ? '' : html` <${Badge} tone="warn">reference S1 missing</${Badge}>`}</li>
             <li><${Icon} name="check" /> <strong>${rules.reportNumbering ? '2.4 ' : ''}Self-Assessment</strong>: supporting data (how much is measured, largest differences, weighed vs calculated). You write the text</li>
             ${rules.wasteTracking && html`<li><${Icon} name="list" /> <strong>Material used and waste</strong> (§9.2.2)</li>`}
-            <li><${Icon} name="layers" /> <strong>Mass breakdown as-built</strong>${massRef} and <strong>Layup Calculator</strong> of the as-built parts, with the images</li>`
+            <li><${Icon} name="layers" /> <strong>Mass breakdown as-built</strong>${massRef} and <strong>${rules.official.agora ? 'layup tables' : 'Layup Calculator'}</strong> of the as-built parts, with the images</li>`
           : html`
-            <li><${Icon} name="file" /> <strong>Official Layup Calculator</strong>, one file per part (${project.parts.length} parts${project.parts.some((p) => (p.substacks || []).length > 5) ? ', those with more than 5 substacks in several files' : ''})</li>
+            <li><${Icon} name="file" /> <strong>${rules.official.agora ? 'Layup tables (images)' : 'Official Layup Calculator'}</strong>, one ${rules.official.agora ? 'table' : 'file'} per part (${project.parts.length} parts${project.parts.some((p) => (p.substacks || []).length > 5) ? ', those with more than 5 substacks in several files' : ''})</li>
             <li><${Icon} name="layers" /> <strong>Images of the layup tables</strong> for the appendix</li>
             <li><${Icon} name="book" /> <strong>Document for Google Docs</strong> (Montserrat): SuMoth Dollar breakdown table, SM$ by component, carbon limits, estimated masses, appendix</li>`}
           ${ev.performance && html`<li><${Icon} name="star" /> <strong>Performance Rating</strong> (Table 3): conditions by component and commercial parts</li>`}
@@ -150,7 +150,7 @@ export function ExportView({ project, ev, evBase, ctx, checks, onToS2, go }) {
     </div>
 
     ${r && html`<${Card} title="File pronti" actions=${html`<${Button} kind="primary" icon="download" onClick=${() => downloadBytes(r.zip.bytes, r.zip.name, r.zip.mime)}>Download all (.zip)</${Button}>`}>
-      ${r.errors.length > 0 && html`<div class="notice notice-warn"><strong>Not exported to the Layup Calculator:</strong>${r.errors.map((e) => html`<div>${e}</div>`)}</div>`}
+      ${r.errors.length > 0 && html`<div class="notice notice-warn"><strong>Parts not exported:</strong>${r.errors.map((e) => html`<div>${e}</div>`)}</div>`}
       ${folders.map((f) => html`<div class="file-group">
         <h4>${f}</h4><p class="muted small">${FOLDER_INFO[f] || ''}</p>
         <ul class="file-list">${r.files.filter((x) => x.folder === f).map((x) => html`<li>

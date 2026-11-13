@@ -13,9 +13,9 @@ async function ctx2027() {
   if (cache) return cache;
   const c = await loadContext();
   const project = projectFrom2026(structuredClone(c.s1));
-  const base = { spec: c.spec, catalogEntries: c.catalogEntries, rules: RULES_2027 };
+  const base = { ...c.agora, rules: RULES_2027 };
   const ev = evaluate(project, base);
-  cache = { c, project, base, ev, ctx: { ev, checks: runChecks(ev), spec: c.spec } };
+  cache = { c, project, base, ev, ctx: { ev, checks: runChecks(ev), spec: c.agora.spec } };
   return cache;
 }
 const ask = async (q, extra = {}) => {
@@ -49,25 +49,25 @@ suite('Assistant – topics and numbers', () => {
   });
   test('budget: engine total and margin (Meravijosa brought to 2027)', async () => {
     const a = await ask('quanto budget rimane?');
-    ok(a.text.includes('8.422,36 SM$'), 'totale');
-    ok(a.text.includes('Remaining 1.577,64 SM$'), 'margine');
+    ok(a.text.includes('8.405,57 SM$'), 'totale');
+    ok(a.text.includes('Remaining 1.594,43 SM$'), 'margine');
     ok(a.text.includes('−500 points'), 'penalità 2027');
-    ok(a.text.includes('338,56 SM$ of 2026 origin discounts'), 'discounts to be confirmed');
+    ok(!a.text.includes('origin discounts'), 'Agora applies the discounts: nothing to confirm');
   });
   test('capacity: carbon that can be bought with the margin and Table 2 limits', async () => {
     const a = await ask('quanto carbonio serve per finire il budget? dove ce ne è troppo?');
     eq(a.intents.join(), 'capacity,carbon');
-    ok(a.text.includes('about 10,52 kg'), 'dry carbon 1577,64/150');
-    ok(a.text.includes('1,21 kg of resin'), 'resin per kg of fibre at Vf 35%');
-    ok(a.text.includes('9,15 kg of CFRP'), 'CFRP room left');
+    ok(a.text.includes('about 10,63 kg'), 'dry carbon 1594,43/150');
+    ok(a.text.includes('1,00 kg of resin'), 'resin per kg of fibre: 50% resin by mass on Agora');
+    ok(a.text.includes('9,51 kg of CFRP'), 'CFRP room left');
     ok(a.text.includes('the limits stop you first'), 'the limit comes before the budget');
-    ok(a.text.includes('Main Horizontal (CFRP, 0,04 g over the limit)'), 'main horizontal over by 0,04 g');
+    ok(a.text.includes('No group is over the limit'), 'main horizontal at 90,6%');
   });
   test('simulation: the fin in basalt, equal to the full recalculation of the project', async () => {
     const { ev, project, base, c } = await ctx2027();
     const a = await ask('e se facessi la deriva in basalto?');
     ok(a.text.includes('Main vertical'), 'pezzo');
-    const sims = simulateSwap(ev, { spec: c.spec }, ev.parts.filter((p) => p.part.id === 'main-vertical'), findMaterials('carbonio')[0], findMaterials('basalto')[0]);
+    const sims = simulateSwap(ev, { spec: c.agora.spec }, ev.parts.filter((p) => p.part.id === 'main-vertical'), findMaterials('carbonio')[0], findMaterials('basalto')[0]);
     eq(sims.length, 1);
     const p2 = structuredClone(project);
     for (const s of p2.parts.find((p) => p.id === 'main-vertical').substacks) { s.reinforcement = 'dry-fabric-basalt-fibers'; delete s.carbonSource; }
@@ -77,7 +77,7 @@ suite('Assistant – topics and numbers', () => {
   });
   test('savings ideas: recycled MDF and carbon -> basalt', async () => {
     const { ev, c } = await ctx2027();
-    const ideas = savingIdeas(ev, { spec: c.spec });
+    const ideas = savingIdeas(ev, { spec: c.agora.spec });
     const mdf = ideas.find((x) => x.kind === 'recycled' && x.target === 'hull-mould');
     ok(mdf, 'recycled MDF missing');
     close(mdf.saving, 1900, 0.005, '190 kg × (20 − 10)');
@@ -106,8 +106,8 @@ suite('Assistant – topics and numbers', () => {
 suite('Assistant – local AI', () => {
   test('number check: accepts those in the data (also rounded), flags invented ones', async () => {
     const a = await ask('quanto budget rimane?');
-    eq(verifyNumbers('Restano 1.577,64 SM$ (circa 1578), il 84,2% è usato. Nel 2027 sotto i 10.000 SM$.', a.facts).length, 0);
-    eq(verifyNumbers('Restano 1577.64 SM$ di margine.', a.facts).length, 0);
+    eq(verifyNumbers('Restano 1.594,43 SM$ (circa 1594), il 84,1% è usato. Nel 2027 sotto i 10.000 SM$.', a.facts).length, 0);
+    eq(verifyNumbers('Restano 1594.43 SM$ di margine.', a.facts).length, 0);
     eq(verifyNumbers('Restano circa 1.600 SM$ e lo scafo costa 4.200 SM$.', a.facts).join(), '1.600,4.200');
     eq(verifyNumbers('Vedi §10.1 e la Tab. 2, ci sono 3 voci.', a.facts).length, 0);
   });

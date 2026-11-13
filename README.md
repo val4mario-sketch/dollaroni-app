@@ -3,9 +3,9 @@
 An app that calculates the boat's SuMoth Dollars (SM$) and automatically produces the files in the format required by the SuMoth
 Challenge. You work in a convenient internal view; when needed, one button fills in the official templates.
 
-**Version 0.6.0.** It includes the calculation engine, the 2026 data, the interface, "Export S1", the S1→S2 transition with comparison and "Export S2",
+**Version 0.7.0.** It includes the calculation engine, the 2026 data, the interface, "Export S1", the S1→S2 transition with comparison and "Export S2",
 the **2027 rules**, **Brumoth**, the assistant with local AI (the little boat at the bottom right) and **update notices** for every PC.
-Still missing are the 2027 price list (it is on SuMoth Agora) and saving to Google Drive.
+The 2027 rules use the **SuMoth Agora library** (prices and resin fractions, `data/official/2027_SuMoth_Agora_library.json`). Still missing: saving to Google Drive.
 
 ## How to use it
 
@@ -133,8 +133,8 @@ a 2027 project created earlier with the 2026 rules shows the **"Switch to the 20
 What changes with the 2027 SMC Competition Rulebook v1.0 (7 September 2026):
 - **Budget**: must be kept *under* 10,000 SM$; exceeding it costs 500 points (§10.1).
 - **Table 2** (carbon): same limits as 2026, "Wingbars" becomes "Hiking racks".
-- **Price list**: in 2027 it is on the SuMoth Agora Platform, open only to admitted teams. Until we can see it, the 2026 price list and Layup Calculator are used, marked **provisional**.
-- **Origin discounts** (−25/−50/−100%): the 2027 rulebook no longer mentions them. They stay active with a "to be confirmed on Agora" warning.
+- **Price list and laminate calculation**: from the SuMoth Agora library (agora.sumoth.org/library.json, a copy in `data/official/`; update it with `python tools/update_agora_library.py`, then run the tests). Resin = fibre × r/(1−r), with r the resin mass fraction of the process for the fibre family (e.g. hand layup + vacuum: carbon 0.50, basalt 0.40), as Agora does. A prepreg (selectable as the fibre of a substack) pays fibre and resin at its prepreg price; a core at one of Agora's standard densities gets its resin absorption automatically. There is no Layup Calculator file in 2027: the export keeps the layup tables as images. 2026 items keep their ids, so projects made from 2026 ones keep working.
+- **Origin discounts** (−25/−50/−100%): the 2027 rulebook no longer mentions them, but Agora applies them per row, so Dollaroni does too.
 - **Used parts**: the fixed cost of the old Table 3 is gone. They are entered as "Used or commercial part" with the price (from Agora) and the year of production.
 - **Performance Rating** (new Table 3, §11): in the section of the same name, tick conditions a)–g) for the 15 components; commercial sails, masts and foils produced since 2017 are worth −100 each (§11.1.5), barring compromising damage. The rating also goes into the exports.
 - **S2 waste** (§9.2.2): in laminated parts (extra material consumed, added to quantity and cost) and in item details ("of which waste"). "Material use and waste" table in the S2 export.
@@ -250,7 +250,7 @@ src/ai/            Brumoth's local AI in the browser (llm.js: download, cache, s
 src/engine/        rules by year (rules.js, rules-2026.js, rules-2027.js), layup calculation, costs, Performance Rating, checks, report tables,
                    assistant.js (Brumoth's answer engine)
 src/io/            xlsx reading/writing, import of official files, template export, docx, images
-data/official/     official SuMoth files (cost price list, Layup Calculator)
+data/official/     official SuMoth files (2026 price list and Layup Calculator, 2027 SuMoth Agora library)
 data/projects/     example projects (Meravijosa S1 and S2 2026)
 tests/             browser tests (golden tests on the 2026 data)
 tools/             local server (with updates), headless tests, release.py, LibreOffice check, site build (build_pwa.py), icons
@@ -296,6 +296,6 @@ vendor/            JSZip 3.10.1 (MIT), htm 3.1.1 + Preact (MIT), wllama 3.8.1 (M
 
 ## Next steps
 
-0. 2027 price list from SuMoth Agora (once the team is admitted): replace the provisional files in `rules-2027.js` and remove the discount warnings if they no longer exist.
+0. When Agora publishes a new library: `python tools/update_agora_library.py`, tests, and update the 2027 golden values if prices change.
 1. Shared saving on Google Drive with Google login, merging changes made by several people.
 2. Check the imported documents in Google Docs.

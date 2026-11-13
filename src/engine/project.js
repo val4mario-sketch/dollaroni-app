@@ -43,11 +43,13 @@ function layupKg(partResults, link) {
   return grams / G_PER_KG;
 }
 
-function coreOf(part) {
+function coreOf(part, catalog) {
   const c = part.core;
   if (!c) return null;
   const mass = c.mass ?? (c.area && c.thickness && c.density ? c.area * (c.thickness / 1000) * c.density : 0);
-  const uptake = c.resinUptake && c.area ? (c.resinUptake * c.area) / G_PER_KG : 0; // g/m² × m² -> kg
+  // Agora: resin absorption (g/m²) of the standard core densities, if the team has not entered it
+  const absorption = c.resinUptake ?? catalog.get(c.ref)?.grades?.[c.density] ?? null;
+  const uptake = absorption && c.area ? (absorption * c.area) / G_PER_KG : 0; // g/m² × m² -> kg
   return { ...c, mass, uptake, source: c.source || 'new' };
 }
 
@@ -62,8 +64,11 @@ function autoLinesFor(part, pr, catalog) {
   const reinfRefs = new Set(masses.filter((m) => m.role === 'reinforcement').map((m) => m.ref));
   const core = pr.core;
   if (core?.uptake) {
-    const firstMatrix = masses.find((m) => m.role === 'matrix');
+    // the resin absorbed by the core is paid at the matrix price, also in a prepreg part (Agora)
+    const firstMatrix = masses.find((m) => m.role === 'matrix' && catalog.get(m.ref)?.kind !== 'prepreg');
+    const matrixRef = pr.substacks[0]?.input.matrix;
     if (firstMatrix) firstMatrix.grams += core.uptake * G_PER_KG;
+    else if (matrixRef) masses.push({ role: 'matrix', ref: matrixRef, source: 'new', grams: core.uptake * G_PER_KG });
   }
   const waste = part.waste || {};
   const gramsByRef = {};
@@ -161,7 +166,7 @@ export function evaluate(project, { spec, catalogEntries, rules }) {
   const partResults = new Map();
   for (const part of project.parts || []) {
     const pr = computePart(spec, catalog, part);
-    pr.core = coreOf(part);
+    pr.core = coreOf(part, catalog);
     pr.status = part.status || 'estimated';
     // calculated mass (laminate + core + absorbed resin) and as-built weighed mass, if entered
     pr.computedMass = pr.totals.composite / G_PER_KG + (pr.core?.mass || 0) + (pr.core?.uptake || 0);

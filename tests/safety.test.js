@@ -13,7 +13,7 @@ const CARBON = 'dry-fabric-carbon-fibers/std-modulus-cf';
 async function base() {
   const c = await loadContext();
   const project = projectFrom2026(structuredClone(c.s1));
-  const ctx = { spec: c.spec, catalogEntries: c.catalogEntries, rules: RULES_2027 };
+  const ctx = { ...c.agora, rules: RULES_2027 };
   return { project, ctx, run: (p) => { const ev = evaluate(p, ctx); return { ev, checks: runChecks(ev) }; } };
 }
 
@@ -91,12 +91,15 @@ suite('Silent errors in the accounts', () => {
     eq(has(run(p).checks, 'foil-group', foil.id), false, 'group chosen, no warning');
   });
   test('discounts to be confirmed: total and margin without discounts', async () => {
-    const { project: p, run } = await base();
-    const w = run(p).checks.find((x) => x.code === 'discount-unconfirmed');
-    ok(w.message.includes('8.760,92 SM$'), 'total without discounts: ' + w.message); // 8.422,36 + 338,56
-    ok(w.message.includes('the margin would fall to 1.239,08 SM$'), w.message);
+    const { project: p, ctx } = await base();
+    // Agora applies the discounts; the check stays for rules that leave them unconfirmed
+    const run = (q) => runChecks(evaluate(q, { ...ctx, rules: { ...RULES_2027, sourcesToConfirm: true } }));
+    ok(!runChecks(evaluate(p, ctx)).some((x) => x.code === 'discount-unconfirmed'), 'not with the Agora rules');
+    const w = run(p).find((x) => x.code === 'discount-unconfirmed');
+    ok(w.message.includes('8.727,35 SM$'), 'total without discounts: ' + w.message); // 8.405,57 + 321,77
+    ok(w.message.includes('the margin would fall to 1.272,65 SM$'), w.message);
     p.lines.push({ id: 'caro', component: 'rig', name: 'Caro', material: { name: 'Caro', unit: 'pc', qty: 1, price: 1400, priceSource: 'x' } });
-    ok(run(p).checks.find((x) => x.code === 'discount-unconfirmed').message.includes('you would exceed the budget by 160,92 SM$'), 'worst case over budget');
+    ok(run(p).find((x) => x.code === 'discount-unconfirmed').message.includes('you would exceed the budget by 127,35 SM$'), 'worst case over budget');
   });
   test('the 2026 data stays free of new errors and with the golden totals', async () => {
     const { evS1, evS2 } = await loadContext();

@@ -10,7 +10,7 @@ import { projectFrom2026, toRules2027, freezeToS2, newLine } from '../src/app/te
 import { s1Tables } from '../src/io/s1-export.js';
 import { s2Tables, buildS2Export } from '../src/io/s2-export.js';
 
-const ctx27 = (c) => ({ spec: c.spec, catalogEntries: c.catalogEntries, rules: RULES_2027 });
+const ctx27 = (c) => ({ ...c.agora, rules: RULES_2027 });
 const ctx26 = (c) => ({ spec: c.spec, catalogEntries: c.catalogEntries, rules: RULES_2026 });
 const codes = (ev) => runChecks(ev).map((x) => x.code);
 
@@ -32,16 +32,17 @@ suite('2027 rules', () => {
     eq(RULES_2027.performance.components.length, 15);
   });
 
-  test('new boat from Meravijosa: 2027 rules, same total, discounts to be confirmed', async () => {
+  test('new boat from Meravijosa: 2027 rules, Agora resin fractions, discounts applied as on Agora', async () => {
     const c = await loadContext();
     const p = projectFrom2026(c.s1);
     eq(p.rules, '2027');
     const ev = evaluate(p, ctx27(c));
-    eq(cents(ev.total), 8422.36);
+    eq(cents(ev.total), 8405.57, '8422.36 with the 2026 Vf: less resin (basalt/carbon by hand + vacuum 40%/50% of the mass), −16.78 SM$ checked by hand');
     const k = codes(ev);
-    ok(k.includes('discount-unconfirmed'), 'warning about 2026 discounts to be confirmed');
+    ok(!k.includes('discount-unconfirmed'), 'Agora applies the origin discounts');
     ok(!k.includes('uptake'), 'the §2.5 mass breakdown is no longer required');
-    ok(runChecks(ev).some((x) => x.code === 'carbon' && x.target === 'main_horizontal'), 'Table 2 unchanged: main horizontal still over');
+    const mh = ev.carbon.find((g) => g.id === 'main_horizontal').checks.find((x) => x.key === 'cfrp');
+    close(mh.value / mh.limit, 0.906, 0.001, 'main horizontal no longer over: CFRP = 2 × CF with 50% resin');
     ok(!codes(evaluate(c.s1, ctx26(c))).includes('discount-unconfirmed'), 'in 2026 no warning on discounts');
   });
 
@@ -141,13 +142,42 @@ suite('2027 rules', () => {
     ok(t.components.some((x) => x.title === 'Hiking racks'), 'terrazze = Hiking racks');
     eq(t.waste.rows.length, 1);
     eq(t.performance.totalRow[2], '+50');
-    const r = await buildS2Export({ project: s2, ev, evS1, rules: RULES_2027, spec: c.spec, catalog: ev.catalog, templateBytes: c.templateBytes });
+    const r = await buildS2Export({ project: s2, ev, evS1, rules: RULES_2027, spec: c.agora.spec, catalog: ev.catalog, templateBytes: null });
     eq(r.errors.length, 0, r.errors.join('; '));
     const docx = r.files.find((f) => f.name.endsWith('.docx'));
     const xml = await (await globalThis.JSZip.loadAsync(docx.bytes)).file('word/document.xml').async('string');
-    for (const s of ['MEASURED MANUFACTURING COST', 'Material use and waste', 'SuMoth Performance Rating', 'Hiking racks cost breakdown', 'to be confirmed on the SuMoth Agora Platform']) ok(xml.includes(s), `manca "${s}"`);
+    for (const s of ['MEASURED MANUFACTURING COST', 'Material use and waste', 'SuMoth Performance Rating', 'Hiking racks cost breakdown', 'as applied by the SuMoth Agora Platform', 'resin fractions of the SuMoth Agora library']) ok(xml.includes(s), `manca "${s}"`);
     ok(!xml.includes('2.2. Components Build'), 'no numbering of the 2026 template');
+    ok(!r.files.some((f) => f.name.endsWith('.xlsx')), 'no Layup Calculator file in 2027');
+    ok(r.files.some((f) => f.folder === 'Appendix'), 'layup tables as images');
     for (const f of r.files) await fetch('/out/export-s2-2027/' + encodeURIComponent(f.folder) + '/' + encodeURIComponent(f.name), { method: 'PUT', body: f.bytes });
+  });
+
+  test('SuMoth Agora library: 2026 ids kept, resin fraction by process × family, prepreg and core grades', async () => {
+    const c = await loadContext();
+    const cat = new Map(c.agora.catalogEntries.map((e) => [e.id, e]));
+    for (const proj of [c.s1, c.s2]) {
+      const refs = [...proj.parts.flatMap((pt) => pt.substacks.flatMap((x) => [x.reinforcement, x.matrix])), ...proj.lines.map((l) => l.material?.ref || l.process?.ref)];
+      for (const r of refs) ok(!r || r.startsWith('hw-') || cat.has(r), `"${r}" missing from the Agora catalogue`);
+    }
+    eq(cat.get('dry-fabric-carbon-fibers/ultra-high-modulus-cf').price, 450, 'UHM 450 on Agora (250 in 2026)');
+    eq(cat.get('mma/bonding').price, 15);
+    eq(c.agoraWarnings.length, 2, 'Cork and Balsa without price');
+    const IM = 'dry-fabric-carbon-fibers/int-modulus-cf';
+    const part = (sub, core) => ({ id: 'x', name: 'X', component: 'hull', autoLines: true, substacks: [{ plyArea: 1, plies: 1, arealWeight: 200, matrix: 'std-epoxy/lamination-resin', ...sub }], ...(core ? { core } : {}) });
+    const run = (pt) => evaluate({ rules: '2027', parts: [pt], lines: [] }, ctx27(c));
+    // infusion of IM carbon: r = 0.45 -> resin = 200 · 0.45/0.55; Vf = (0.55/1.77) / (0.55/1.77 + 0.45/1.15)
+    const inf = run(part({ reinforcement: IM, process: 'INFUSION' })).parts[0].substacks[0];
+    close(inf.resin, 163.636, 0.001);
+    close(inf.vf, 0.4426, 0.0001);
+    // IM prepreg in OoA: r = 0.37, fibre and resin at 400 SM$/kg
+    const pp = run(part({ reinforcement: 'cf-epoxy-prepreg/epoxy-int-modulus-cf', process: 'OOA CURING' }));
+    close(pp.total, (200 + 200 * 0.37 / 0.63) / 1000 * 400, 1e-9);
+    ok(pp.lines.every((l) => l.material.entry.kind === 'prepreg'), 'resin on the prepreg item');
+    // recycled PET 100 kg/m³: 1040 g/m² of absorbed resin on Agora
+    const core = run(part({ reinforcement: IM, process: 'INFUSION' }, { ref: 'pet/recycled', area: 2, thickness: 10, density: 100 })).parts[0].core;
+    close(core.mass, 2, 1e-9);
+    close(core.uptake, 2.08, 1e-9);
   });
 
   test('upcycled hull (§6.2.1): reminder only with the 2027 rules', async () => {
