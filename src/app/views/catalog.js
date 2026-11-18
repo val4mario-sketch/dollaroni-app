@@ -20,22 +20,22 @@ export function Catalog({ project, ctx, update }) {
 
     <${Card} title="Team items" actions=${html`<${Button} small icon="plus" onClick=${addExtra}>Add item</${Button}>`}>
       <p class="muted small">${ctx.rules.help.catalogExtras}</p>
-      ${extras.length === 0 ? html`<p class="muted">No items added.</p>` : html`<div class="table-scroll"><table class="tbl">
+      ${extras.length === 0 ? html`<p class="muted">No items added.</p>` : html`<div class="table-scroll"><table class="tbl tbl-cards">
         <thead><tr><th>Name</th><th>Type</th><th>Unit</th><th class="r">SM$/unit</th><th>Density g/cm³</th><th>Price source</th><th></th></tr></thead>
         <tbody>${extras.map((e) => html`<tr>
           <td><${TextInput} value=${e.name} width=${200} onChange=${(v) => setExtra(e.id, (x) => { x.name = v; }, 'n')} /></td>
-          <td><${Select} value=${e.kind || 'hardware'} options=${EXTRA_KINDS} width=${170} onChange=${(v) => setExtra(e.id, (x) => { x.kind = v; })} /></td>
-          <td><${Select} value=${e.unit} options=${UNITS} width=${80} onChange=${(v) => setExtra(e.id, (x) => { x.unit = v; })} /></td>
-          <td class="r"><${NumInput} value=${e.price} width=${72} onChange=${(v) => setExtra(e.id, (x) => { x.price = v; }, 'p')} /></td>
-          <td>${e.kind === 'reinforcement' ? html`<${NumInput} value=${e.density} width=${64} placeholder="es. 1,8" onChange=${(v) => setExtra(e.id, (x) => { x.density = v; }, 'd')} />` : html`<span class="muted small">—</span>`}</td>
-          <td><${TextInput} value=${e.priceSource} width=${220} placeholder="es. MSRP Harken, Discord 12/11" onChange=${(v) => setExtra(e.id, (x) => { x.priceSource = v; }, 's')} /></td>
+          <td data-label="Type"><${Select} value=${e.kind || 'hardware'} options=${EXTRA_KINDS} width=${170} onChange=${(v) => setExtra(e.id, (x) => { x.kind = v; })} /></td>
+          <td data-label="Unit"><${Select} value=${e.unit} options=${UNITS} width=${80} onChange=${(v) => setExtra(e.id, (x) => { x.unit = v; })} /></td>
+          <td class="r" data-label="SM$/unit"><${NumInput} value=${e.price} width=${72} onChange=${(v) => setExtra(e.id, (x) => { x.price = v; }, 'p')} /></td>
+          <td data-label="Density g/cm³">${e.kind === 'reinforcement' ? html`<${NumInput} value=${e.density} width=${64} placeholder="es. 1,8" onChange=${(v) => setExtra(e.id, (x) => { x.density = v; }, 'd')} />` : html`<span class="muted small">—</span>`}</td>
+          <td data-label="Price source"><${TextInput} value=${e.priceSource} width=${220} placeholder="es. MSRP Harken, Discord 12/11" onChange=${(v) => setExtra(e.id, (x) => { x.priceSource = v; }, 's')} /></td>
           <td class="row-actions"><${Button} small icon="trash" title="Elimina" onClick=${() => update((d) => { d.catalogExtras = d.catalogExtras.filter((x) => x.id !== e.id); })} /></td>
         </tr>`)}</tbody></table></div>`}
     </${Card}>
 
     <${Card} title=${ctx.libraryVersion ? `SuMoth Agora library v${ctx.libraryVersion}` : provisional ? `Official 2026 price list (provisional for ${ctx.rules.id})` : 'Official 2026 price list'} actions=${html`<${TextInput} value=${q} onChange=${setQ} placeholder="Cerca (es. basalt, PET, CNC)" width=${240} />`}>
       ${ctx.catalogWarnings.length > 0 && html`<div class="notice notice-warn">${ctx.catalogWarnings.map((w) => html`<div>${w}</div>`)}</div>`}
-      <div class="table-scroll"><table class="tbl tbl-compact">
+      <div class="table-scroll"><table class="tbl tbl-compact tbl-catalog">
         <thead><tr><th>Categoria</th><th>Voce</th><th>Unità</th><th class="r">SM$/unità</th><th>Nota</th></tr></thead>
         <tbody>${entries.map((e) => html`<tr>
           <td class="muted">${kindLabel(e.kind)}</td>

@@ -126,6 +126,9 @@ export function App({ contexts }) {
       setTimeout(() => document.querySelector('.row-open')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 50);
     }
     document.querySelector('main')?.scrollTo(0, 0);
+    window.scrollTo(0, 0); // on the phone the whole page scrolls
+    // on the phone the sections are a scrolling row: bring the chosen one into view
+    setTimeout(() => document.querySelector('.nav-item.active')?.scrollIntoView({ block: 'nearest', inline: 'center' }), 0);
   }, []);
 
   const actions = {
@@ -264,7 +267,7 @@ export function App({ contexts }) {
         <span class=${`stage-badge ${isS2 ? 's2' : ''}`} title=${isS2 ? 'Stage S2: construction and final accounts' : 'Stage S1: project estimate'}>${isS2 ? 'S2 · as-built' : 'S1 · estimate'}</span>
         <button class=${`rules-badge ${ctx.rules.official.provisional ? 'provisional' : ''}`} onClick=${() => go('overview')}
           title=${`${ctx.rules.title}${ctx.rules.official.provisional ? ' · provisional 2026 price list and Layup Calculator, awaiting SuMoth Agora' : ''}`}>
-          Rules ${ctx.rules.id}${ctx.rules.official.provisional ? ' · provisional price list' : ''}</button>
+          Rules ${ctx.rules.id}${ctx.rules.official.provisional ? html`<span class="rules-extra"> · provisional price list</span>` : ''}</button>
       </div>
       <div class="topbar-actions">
         <${Button} kind="ghost" icon="undo" title="Annulla (Ctrl+Z)" onClick=${undo} disabled=${!canUndo} />
@@ -280,15 +283,15 @@ export function App({ contexts }) {
       <div class="budget-main">
         <span class="budget-label">Budget</span>
         <strong class=${ev.error ? '' : ev.total > ev.budget ? 't-err' : ''}>${ev.error ? '–' : sm(ev.total)}</strong>
-        <span class="muted">/ ${ev.error ? '–' : sm(ev.budget)} SM$</span>
+        <span class="muted budget-cap">/ ${ev.error ? '–' : sm(ev.budget)} SM$</span>
       </div>
       <div class="budget-bar">${!ev.error && html`<${Bar} ratio=${ev.total / ev.budget} tone=${ev.total > ev.budget ? 'err' : ev.margin < ev.budget * 0.02 ? 'warn' : 'accent'} height=${10} />`}</div>
       <div class="budget-side">
-        ${!ev.error && html`<span>Margine <strong class=${ev.margin < 0 ? 't-err' : ''}>${sm(ev.margin)}</strong> SM$ (${pct(Math.max(ev.margin, 0) / ev.budget)})</span>`}
+        ${!ev.error && html`<span class="budget-margin">Margin <strong class=${ev.margin < 0 ? 't-err' : ''}>${sm(ev.margin)}</strong><span class="budget-extra"> SM$ (${pct(Math.max(ev.margin, 0) / ev.budget)})</span></span>`}
         ${!ev.error && evBase && html`<span class="muted small">S1: ${sm(evBase.total)}</span>`}
         <button class="link-chip" onClick=${() => go('checks')}>
           ${errors ? html`<${Badge} tone="err">${errors} ${errors === 1 ? 'errore' : 'errori'}</${Badge}>` : html`<${Badge} tone="ok">no errors</${Badge}>`}
-          ${warnings > 0 && html`<${Badge} tone="warn">${warnings} to check</${Badge}>`}
+          ${warnings > 0 && html`<${Badge} tone="warn">${warnings}<span class="budget-extra"> to check</span></${Badge}>`}
         </button>
       </div>
     </div>

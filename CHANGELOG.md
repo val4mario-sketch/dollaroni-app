@@ -3,6 +3,10 @@
 Versions follow `MAJOR.MINOR.PATCH`. The current version and its notes are in `version.json`:
 to publish a new one use `python tools/release.py <version> "note" "note"` (it updates both files).
 
+## 0.7.1 – 18/11/2026
+- Comfortable on the phone: only the budget and the sections stay at the top, cost items and the Performance Rating become cards, bigger fields and buttons, no sideways scrolling.
+- Install it on the phone from the site: Chrome menu > Install app (Android) or Share > Add to Home Screen (iPhone).
+
 ## 0.7.0 – 13/11/2026
 - 2027 rules now use the SuMoth Agora library (v2026.01): official 2027 prices, new items (adhesives, prepreg for every fibre, standard core densities) and no more 'provisional price list'.
 - Laminate resin for 2027 is calculated as on Agora, from the process and the fibre family: totals match what the jury sees. A prepreg pays fibre and resin at its prepreg price; cores at a standard density get their resin absorption.

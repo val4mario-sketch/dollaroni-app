@@ -1,0 +1,214 @@
+/* Phone (from the CRM copy 0.5.0-crm.4). Loaded after app.css.
+   The page scrolls as a whole: only the budget and the row of sections stay at the top. */
+
+/* touch: no double-tap delay or grey highlight */
+button, a, label, select, input { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* any touch screen: bigger targets */
+@media (pointer: coarse) {
+  .btn { height: 40px; }
+  .btn-sm { height: 36px; }
+  .inp { height: 40px; }
+  .inp-sm { height: 36px; }
+  input[type="checkbox"] { width: 20px; height: 20px; }
+}
+
+@media (max-width: 760px) {
+  /* --- pagina che scorre tutta insieme: in alto restano solo budget e sezioni --- */
+  .app { display: block; height: auto; min-height: 100dvh; }
+  .body { display: block; overflow: visible; }
+  main { overflow: visible; padding: 14px max(12px, env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); overscroll-behavior: contain; }
+
+  /* 16px fields: below that iPhone zooms the page when you tap them */
+  .inp, select.inp, textarea, .ai-input textarea { font-size: 16px; }
+  .inp { height: 44px; }
+  .inp-sm { height: 40px; }
+  .btn { height: 44px; padding: 0 14px; }
+  .btn-sm { height: 40px; padding: 0 12px; font-size: 14px; }
+  .btn-icon, .btn-sm.btn-icon { min-width: 44px; justify-content: center; padding: 0 10px; }
+
+  /* --- barra in alto: nome della barca a tutta larghezza, comandi solo icona --- */
+  .topbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: max(10px, env(safe-area-inset-top)) 12px 8px; }
+  .brand { display: none; }
+  .project-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+  .project-meta .inp:first-child { flex: 1 1 calc(100% - 80px); min-width: 0; width: auto !important; }
+  .project-meta .inp + .inp { flex: none; width: 72px !important; }
+  .project-meta .stage-badge, .project-meta .rules-badge { flex: none; }
+  .rules-extra { display: none; }
+  .topbar-actions { grid-column: 1 / -1; margin: 0; width: 100%; display: flex; flex-wrap: nowrap; gap: 4px; }
+  .topbar-actions .sep { display: none; }
+  .topbar-actions .btn > span { display: none; }
+  .topbar-actions .btn { flex: 1 1 0; justify-content: center; padding: 0; min-width: 0; }
+  .topbar-actions .btn-primary > span { display: inline; }
+  .topbar-actions .btn-primary { flex: 2 1 0; }
+
+  /* --- budget: una riga, sempre visibile --- */
+  .budgetbar { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 2px 10px; min-height: 52px; padding: 6px 12px 9px; background: var(--panel); border-bottom: 1px solid var(--border); }
+  .budget-main { font-size: 13px; white-space: nowrap; }
+  .budget-main strong { font-size: 18px; }
+  .budget-label { display: none; }
+  .budget-bar { position: absolute; left: 0; right: 0; bottom: 0; min-width: 0; }
+  .budget-bar .bar { height: 3px !important; border-radius: 0; }
+  .budget-side { margin: 0; flex-basis: auto; justify-content: flex-end; gap: 6px; font-size: 12px; flex-wrap: nowrap; min-width: 0; overflow: hidden; }
+  .budget-margin { white-space: nowrap; }
+  .budget-extra, .budget-cap { display: none; }
+  .budget-side > .muted { display: none; }
+
+  /* --- sezioni: fila di pillole che scorre, attaccata sotto il budget --- */
+  .sidebar { position: sticky; top: 52px; z-index: 19; display: flex; flex-direction: row; gap: 6px; padding: 8px 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+    background: var(--bg); border: 0; border-bottom: 1px solid var(--border); }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .nav-item { flex: none; scroll-snap-align: center; height: 38px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--panel); font-size: 14px; }
+  .nav-item.active { border-color: var(--accent); }
+  .nav-item .icon { display: none; }
+  .nav-count { margin-left: 6px; }
+  .sidebar-foot { display: none; }
+
+  /* --- start screen (the CRM never shows it) --- */
+  .welcome { grid-template-columns: minmax(0, 1fr); padding: max(16px, env(safe-area-inset-top)) 12px 16px; }
+  .welcome-box { padding: 20px 16px; }
+  .welcome-row { grid-template-columns: 1fr; }
+
+  /* --- intestazioni, schede, metriche --- */
+  h1 { font-size: 20px; }
+  .page-head { flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .page-head p { font-size: 13px; }
+  .card { padding: 14px 12px; border-radius: 12px; margin-bottom: 12px; }
+  .card-head { flex-wrap: wrap; align-items: flex-start; }
+  .card-actions { flex-wrap: wrap; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .metric { padding: 10px 12px; }
+  .metric-value { font-size: 19px; }
+  .metric-label { font-size: 11px; }
+  .grid-2 { display: block; }
+  .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-wide { grid-column: 1 / -1; }
+  .details-grid { grid-template-columns: 1fr; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -12px 12px; padding: 0 12px; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; padding: 8px 14px; font-size: 13px; }
+
+  /* panoramica */
+  .comp-row { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "name val pct" "bar bar bar"; gap: 4px 10px; padding: 9px 4px; }
+  .comp-name { grid-area: name; } .comp-val { grid-area: val; } .comp-pct { grid-area: pct; } .comp-bar { grid-area: bar; }
+  .carbon-check { grid-template-columns: 1fr auto; gap: 2px 10px; }
+  .carbon-check .bar { grid-column: 1 / -1; grid-row: 2; }
+  .basis-row { grid-template-columns: 1fr auto; gap: 4px 10px; }
+  .basis-row .bar { grid-column: 1 / -1; grid-row: 2; }
+  .check-item { flex-direction: column; align-items: stretch; }
+  .check-item .btn { align-self: flex-end; }
+
+  /* tabelle di sola lettura: più strette, scorrono di lato se serve */
+  .tbl { font-size: 13px; }
+  .tbl th, .tbl td { padding: 6px 5px; }
+  .card > .tbl, .card > .tbl-compact { display: block; overflow-x: auto; }
+  .cmp-tbl th:last-child, .cmp-tbl td:last-child { display: none; }
+  .report-preview { margin: 0 -12px; padding: 0 12px; }
+
+  /* --- voci di costo: ogni riga diventa una scheda --- */
+  .lines-tbl { min-width: 0 !important; }
+  .lines-card .table-scroll { overflow: visible; }
+  .lines-tbl, .lines-tbl tbody { display: block; }
+  .lines-tbl thead { display: none; }
+  .lines-tbl tr:not(.row-details) { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; padding: 12px 10px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+  .lines-tbl tr.row-auto { background: var(--panel-2); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 8px; padding: 10px; font-size: 13px; }
+  .lines-tbl tr.row-auto td.c-name { padding-right: 56px; }
+  .lines-tbl tr.row-auto td.c-total { font-size: 14px; padding-top: 6px; }
+  .lines-tbl tr.row-open { border-color: var(--accent); margin-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .lines-tbl td { display: block; padding: 0; border: 0; background: none !important; text-align: left; min-width: 0; }
+  .lines-tbl td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+  .lines-tbl tr:not(.row-details) { position: relative; }
+  .lines-tbl td.c-name { grid-column: 1 / -1; font-weight: 600; padding-right: 104px; min-height: 40px; }
+  .lines-tbl td.row-actions { position: absolute; top: 12px; right: 10px; display: flex; gap: 6px; }
+  .lines-tbl td.c-what { grid-column: 1 / -1; }
+  .lines-tbl td.c-total { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 16px; }
+  .lines-tbl td.c-total::before { content: "Total SM$"; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .lines-tbl td.c-total .s1-ref { display: inline; margin-left: 8px; }
+  .lines-tbl td.c-empty, .lines-tbl td:empty { display: none; }
+  .lines-tbl .inp { width: 100% !important; }
+  .lines-tbl .proc-cell { flex-wrap: nowrap; justify-content: flex-start !important; }
+  .lines-tbl .proc-cell .inp { flex: 1 1 60px; min-width: 0; width: auto !important; }
+  .lines-tbl .proc-cell .unit, .lines-tbl .proc-cell > span { flex: none; }
+  .lines-tbl .row-details .proc-cell { flex-wrap: wrap; }
+  .lines-tbl .row-details .proc-cell select { flex: 1 1 100%; }
+  .lines-tbl tr.row-details { display: block; margin-bottom: 8px; }
+  .lines-tbl tr.row-details td { display: block; padding: 12px 10px 14px; border: 1px solid var(--accent); border-top: 0; border-radius: 0 0 12px 12px; background: var(--panel-2) !important; }
+  .row-err td.c-name .t-err { font-weight: 400; }
+  .lines-tbl tr.row-err { border-color: var(--err); }
+  .type-picker { grid-template-columns: 1fr; }
+  .group-total { width: 100%; }
+
+  /* --- tabelle con campi (voci del team, parti commerciali): schede --- */
+  .tbl-cards, .tbl-cards tbody { display: block; }
+  .tbl-cards thead { display: none; }
+  .tbl-cards tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; padding: 12px 10px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 12px; }
+  .tbl-cards td { display: block; padding: 0; border: 0; min-width: 0; text-align: left; }
+  .tbl-cards td:first-child { grid-column: 1; font-weight: 600; }
+  .tbl-cards td.row-actions { grid-column: 2; grid-row: 1; justify-self: end; }
+  .tbl-cards td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+  .tbl-cards .inp { width: 100% !important; }
+
+  /* listino ufficiale: solo voce, unità e prezzo */
+  .tbl-catalog th:first-child, .tbl-catalog td:first-child, .tbl-catalog th:nth-child(5), .tbl-catalog td:nth-child(5) { display: none; }
+
+  /* --- pezzi laminati --- */
+  .parts-layout { display: block; }
+  .parts-list { position: static; display: flex; gap: 8px; overflow-x: auto; margin: 0 -12px 12px; padding: 0 12px 4px; scrollbar-width: none; }
+  .parts-list::-webkit-scrollbar { display: none; }
+  .part-item { flex: none; width: 180px; }
+  .sub-card { grid-template-columns: 1fr; padding: 12px 10px; }
+  .sub-letter { display: flex; align-items: baseline; gap: 8px; padding: 0; text-align: left; }
+  .sub-row { grid-template-columns: 1fr; }
+  .sub-nums { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sub-nums .inp { width: 100% !important; }
+  .sub-out { grid-column: 1 / -1; justify-content: stretch; }
+  .sub-out > span { flex: 1; min-width: 0; }
+  .sub-actions { flex-direction: row; justify-content: flex-end; }
+  .sub-total { flex-wrap: wrap; gap: 6px 16px; justify-content: flex-start; }
+  .kv { gap: 8px 12px; }
+  .weigh-field { flex-wrap: wrap; }
+  .danger-row { flex-wrap: wrap; }
+  .preview-svg { margin: 0 -4px; }
+
+  /* --- performance rating: una scheda per componente, condizioni come pulsanti --- */
+  .perf-tbl, .perf-tbl tbody, .perf-tbl tfoot { display: block; }
+  .perf-tbl thead { display: none; }
+  .perf-tbl tr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .perf-tbl td { display: block; padding: 0; border: 0; }
+  .perf-tbl td:first-child { order: -2; flex: 1 1 calc(100% - 70px); font-weight: 600; }
+  .perf-tbl td.r { order: -1; flex: 0 0 auto; margin-left: auto; }
+  .perf-tbl td.c { flex: 0 0 calc((100% - 12px) / 3); }
+  .perf-tbl td.c .perf-opt { width: 100%; }
+  .perf-tbl td.perf-na { display: none; }
+  .perf-tbl tr.perf-group td { flex: 1; padding: 6px 4px; }
+  .perf-tbl tfoot td:empty { display: none; }
+  .perf-opt { min-width: 0; height: 40px; padding: 0 12px; font-size: 14px; }
+  .perf-letter { font-weight: 700; color: var(--text); }
+  .perf-legend { grid-template-columns: 24px 1fr; }
+
+  /* --- esporta --- */
+  .export-cta { flex-wrap: wrap; }
+  .export-cta .btn { width: 100%; justify-content: center; }
+  .file-list li { flex-wrap: wrap; gap: 6px; }
+  .file-list li > span { overflow-wrap: anywhere; min-width: 0; }
+  .table-block-head { flex-wrap: wrap; gap: 6px; }
+
+  /* --- fixed elements --- */
+  .toast { left: 12px; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .ai-fab { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .ai-hint { right: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .ai-panel { right: 0; bottom: 0; width: 100vw; height: 100dvh; border-radius: 0; border: 0; }
+  .ai-fab.open { display: none; }
+  .ai-head { padding-top: max(12px, env(safe-area-inset-top)); }
+  .ai-input { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+  .update-banner { bottom: calc(12px + env(safe-area-inset-bottom)); }
+}
+
+/* no hover effects stuck after a tap */
+@media (hover: none) {
+  .ai-fab:hover { transform: none; }
+}
+
+/* on desktop the condition letter is already in the table header */
+.perf-letter { display: none; }
+@media (max-width: 760px) { .perf-letter { display: inline; } }

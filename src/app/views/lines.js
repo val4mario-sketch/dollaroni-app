@@ -66,14 +66,14 @@ function AutoRow({ lr, project, go, isS2, baseTotals }) {
   const part = project.parts.find((p) => p.id === partId);
   const m = lr.material;
   return html`<tr class="row-auto">
-    <td>${lr.name}<div class="small muted">calculated from the part ${part?.name || ''}</div>
+    <td class="c-name">${lr.name}<div class="small muted">calculated from the part ${part?.name || ''}</div>
       ${isS2 && html`<${StatusPill} status=${lr.status} title="The state is changed in the laminated part" />`}</td>
-    <td>${shortName(m?.entry) || m?.label}</td>
-    <td class="r">${num(m?.qty || 0, 3)} ${unitLabel(m?.unit)}${m?.waste > 0 && html`<span class="s1-ref">of which waste ${num(m.waste, 3)}</span>`}</td>
-    <td>${SOURCE_LABEL[m?.source] || ''}</td>
-    <td class="r">${num(m?.unitPrice || 0, 2)}</td>
-    <td></td>
-    <td class="r strong">${sm(lr.total)}<${S1Ref} isS2=${isS2} baseTotals=${baseTotals} id=${lr.id} /></td>
+    <td class="c-what" data-label="What">${shortName(m?.entry) || m?.label}</td>
+    <td class="r" data-label="Quantity">${num(m?.qty || 0, 3)} ${unitLabel(m?.unit)}${m?.waste > 0 && html`<span class="s1-ref">of which waste ${num(m.waste, 3)}</span>`}</td>
+    <td class="c-opt" data-label="Origin">${SOURCE_LABEL[m?.source] || ''}</td>
+    <td class="r" data-label="SM$/unit">${num(m?.unitPrice || 0, 2)}</td>
+    <td class="c-empty"></td>
+    <td class="r strong c-total">${sm(lr.total)}<${S1Ref} isS2=${isS2} baseTotals=${baseTotals} id=${lr.id} /></td>
     <td class="row-actions"><${Button} small icon="layers" title=${`Open the part ${part?.name || ''}`} onClick=${() => go('parts', { part: partId })} /></td>
   </tr>`;
 }
@@ -144,15 +144,15 @@ function LineRow({ lr, project, ev, ctx, update, expanded, setExpanded, isS2, ba
 
   return html`
     <tr class=${`${errs ? 'row-err' : ''} ${expanded ? 'row-open' : ''}`}>
-      <td><${TextInput} value=${line.name} width=${150} placeholder="Item name" onChange=${(v) => set((l) => { l.name = v; }, 'lname')} />
+      <td class="c-name"><${TextInput} value=${line.name} width=${150} placeholder="Item name" onChange=${(v) => set((l) => { l.name = v; }, 'lname')} />
         ${isS2 && html`<div><${StatusPill} status=${lr.status} onToggle=${() => set((l) => { l.status = l.status === 'measured' ? 'estimated' : 'measured'; })} /></div>`}
         ${errs && html`<div class="t-err small">${lr.errors.join(' · ')}</div>`}</td>
-      <td>${what}</td>
-      <td class="r">${qty}</td>
-      <td>${source}</td>
-      <td class="r">${unitPrice}</td>
-      <td>${processCell}</td>
-      <td class="r strong">${sm(lr.total)}<${S1Ref} isS2=${isS2} baseTotals=${baseTotals} id=${line.id} /></td>
+      <td class="c-what" data-label="What">${what}</td>
+      <td class="r" data-label="Quantity">${qty}</td>
+      <td data-label=${type === 'used' ? 'Year' : 'Origin'}>${source}</td>
+      <td class="r" data-label="SM$/unit">${unitPrice}</td>
+      <td class="c-opt" data-label="Process">${processCell}</td>
+      <td class="r strong c-total">${sm(lr.total)}<${S1Ref} isS2=${isS2} baseTotals=${baseTotals} id=${line.id} /></td>
       <td class="row-actions">
         <${Button} small icon=${expanded ? 'chevronDown' : 'chevron'} title="Details" onClick=${() => setExpanded(expanded ? null : line.id)} />
         <${Button} small icon="trash" title="Elimina voce" onClick=${remove} />
